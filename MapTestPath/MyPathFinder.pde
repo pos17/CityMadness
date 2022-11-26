@@ -1,0 +1,3 @@
+class MyPathfinder extends Pathfinder {
+  
+}
