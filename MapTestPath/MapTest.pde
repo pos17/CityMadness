@@ -1,59 +1,47 @@
 import ai.pathfinder.*;
 
 ArrayList<Node> mapDots = new ArrayList<Node>();
+ArrayList<Node> mapDotsClicked = new ArrayList<Node>();
+ArrayList<Node> mapDotsSource = new ArrayList<Node>();
 ArrayList<Particle> particles = new ArrayList<Particle>();
 Pathfinder pf = new Pathfinder();
 
 int d = 50;
 int pathMaxLength = 10;
 int r = 1;
-int nParticles = 50000;
+int nParticles = 20000;
 int scale = 1;
 
-int clickedX;
-int clickedY;
-
+int clickedX = -1;
+int clickedY = -1;
+int myRad = 100;
+boolean done = false;
 
 void setup(){
   size(1069,800,P2D);
   JSONPoints jp = new JSONPoints();
   pf = jp.getPathfinder();
   mapDots = pf.nodes;
-  //size(width,height,P2D);
-
-  /*
-  mapDots.add(new ControlPoint(d,       d,        0));
-  mapDots.add(new ControlPoint(width/2, d,        1));
-  mapDots.add(new ControlPoint(width-d, d,        2));
-  mapDots.add(new ControlPoint(d,       height/2, 3));
-  mapDots.add(new ControlPoint(width/2, height/2, 4));
-  mapDots.add(new ControlPoint(width-d, height/2, 5));
-  mapDots.add(new ControlPoint(d,       height-d, 6));
-  mapDots.add(new ControlPoint(width/2, height-d, 7));
-  mapDots.add(new ControlPoint(width-d, height-d, 8));
-  */
-  /*
-  for(int i = 0; i<mapDots.size(); i++){
-    ControlPoint cp = mapDots.get(i);
-    cp.setupConnections();
+  println("waiting for you");
+  if(clickedX !=-1 || clickedY !=-1) {
+    println("click");
+    mapDotsSource = jp.getNodesInArea(parseInt(width/2),parseInt(height/2),50);
+    mapDotsClicked = jp.getNodesInArea(clickedX,clickedY,myRad);
+    println(mapDotsClicked.size());
+    for(int i = 0; i<nParticles; i++){
+      
+      Node cp = mapDotsSource.get((int)random(mapDotsSource.size()));
+      Node cptgt = mapDotsClicked.get((int)random(mapDotsClicked.size()));  
+      particles.add(new Particle(cp,cptgt,pf));
+       //println();
+    }
+    noLoop();
+    done = true;
   }
-  */
- // Node cptgt = mapDots.get((int)random(mapDots.size()));
-    
-  for(int i = 0; i<nParticles; i++){
-    Node cp = mapDots.get((int)random(mapDots.size()));
-    Node cptgt = mapDots.get((int)random(mapDots.size()));
-    
-    //println("cp x: "+ cp.x + ", cp y:"+ cp.y + ", cp z:" + cp.z );
-    //println("cptgt x: "+ cptgt.x + ", cptgt y:"+ cptgt.y + ", cptgt z:" + cptgt.z );
-   
-    
-    particles.add(new Particle(cp,cptgt,pf));
-     //println();
-  }
+  loop();
   background(0);
   
-  noLoop();
+  //noLoop();
   
 }
 
@@ -69,13 +57,13 @@ void draw(){
     point(cp.x,cp.y);
   }
   */
-  
+  if(done) {
   for(int i = 0; i<nParticles; i++){
     Particle p = particles.get(i);
     p.moveOnPath();
     p.show();
   }
-  
+  }
 }
 
 
@@ -124,7 +112,9 @@ class Particle {
     //this.c = color(random(0,255) ,random(0,255),random(0,255));
     this.c = color(191, 249, 255);
     
-    ArrayList<Node> apath = pf.dijkstra(cp,cptgt);
+    //ArrayList<Node> apath = pf.dijkstra(cp,cptgt);
+    ArrayList<Node> apath = pf.bfs(cp,cptgt);
+    
     //println(apath.size());
     for(int i =0;i< apath.size();i++) {
       this.path.add(apath.get(apath.size()-1-i));

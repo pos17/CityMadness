@@ -95,16 +95,16 @@ class JSONPoints {
     return givenwidth;
   }
   
-  ArrayList<Node> returnNodesInArea(float xPosRatio, int yPosRatio,int radius) {
-    int cPosx = xPosRatio * width;
-    int cPosy = yPosRatio * height;
+  ArrayList<Node> getNodesInArea(float xPosRatio, int yPosRatio,int radius) {
+    int cPosx = parseInt(xPosRatio);
+    int cPosy = parseInt(yPosRatio);
     ArrayList<Node> toRet = new ArrayList<Node>();
     
-      for (int i = 0; i < this.pf.nodes; i++) {
-        
-        pDist = sqrt(sq(this.pf.nodes(i).x-cPosx)+sq(this.pf.nodes(i).y-cPosy));
+      for (int i = 0; i < this.pf.nodes.size(); i++) {
+        Node node = (Node)this.pf.nodes.get(i);
+        int pDist = parseInt(sqrt(sq((node.x)-cPosx)+sq((node.y)-cPosy)));
         if (pDist < radius) {
-          toRet.add(this.pf.nodes(i));
+          toRet.add(node);
         }
       }
     return toRet;
