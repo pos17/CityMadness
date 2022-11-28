@@ -11,6 +11,7 @@ int pathMaxLength = 10;
 int r = 1;
 int nParticles = 20000;
 int scale = 1;
+int instants = 10;
 
 int clickedX = -1;
 int clickedY = -1;
@@ -28,15 +29,9 @@ void setup(){
     mapDotsSource = jp.getNodesInArea(parseInt(width/2),parseInt(height/2),50);
     mapDotsClicked = jp.getNodesInArea(clickedX,clickedY,myRad);
     println(mapDotsClicked.size());
-    for(int i = 0; i<nParticles; i++){
-      
-      Node cp = mapDotsSource.get((int)random(mapDotsSource.size()));
-      Node cptgt = mapDotsClicked.get((int)random(mapDotsClicked.size()));  
-      particles.add(new Particle(cp,cptgt,pf));
-       //println();
-    }
+    thread("giveDestination");
     noLoop();
-    done = true;
+    //done = true;
   }
   loop();
   background(0);
@@ -47,9 +42,8 @@ void setup(){
 
 void draw(){
   //background(0,0.1);
-  noStroke();
-  fill(0,20);
-  rect(0,0,width,height);
+  drawBackground();
+  
   /*
   for(int i = 0; i<mapDots.size(); i++){
     Node cp = mapDots.get(i);
@@ -58,14 +52,33 @@ void draw(){
   }
   */
   if(done) {
-  for(int i = 0; i<nParticles; i++){
+  for(int i = 0; i<particles.size(); i++){
     Particle p = particles.get(i);
     p.moveOnPath();
     p.show();
   }
-  }
+   }
 }
 
+void drawBackground(){
+  noStroke();
+  fill(0,20);
+  rect(0,0,width,height);
+}
+
+void giveDestination(){
+  for(int t = 0; t<instants; t++){
+    for(int i = t*nParticles/(instants+1); i<(t+1)*nParticles/(instants+1); i++){
+        
+        Node cp = mapDotsSource.get((int)random(mapDotsSource.size()));
+        Node cptgt = mapDotsClicked.get((int)random(mapDotsClicked.size()));  
+        particles.add(new Particle(cp,cptgt,pf));
+         //println();
+    }
+    done = true;
+    delay((int)random(60,120));
+  }
+}
 
 
 class Particle {
