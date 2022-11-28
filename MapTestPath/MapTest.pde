@@ -11,7 +11,7 @@ int pathMaxLength = 10;
 int r = 1;
 int nParticles = 20000;
 int scale = 1;
-int instants = 10;
+int instants = 500;
 
 PGraphics bkg;
 
