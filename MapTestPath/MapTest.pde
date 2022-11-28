@@ -13,6 +13,8 @@ int nParticles = 20000;
 int scale = 1;
 int instants = 10;
 
+PGraphics bkg;
+
 int clickedX = -1;
 int clickedY = -1;
 int myRad = 100;
@@ -20,6 +22,16 @@ boolean done = false;
 
 void setup(){
   size(1069,800,P2D);
+  
+  //Setup Background
+  bkg = createGraphics(width,height,P2D);
+  bkg.beginDraw();
+  bkg.noStroke();
+  bkg.fill(0);
+  bkg.rect(0,0,width,height);
+  bkg.endDraw();
+  tint(0,20); //To draw bkg with an alpha
+  
   JSONPoints jp = new JSONPoints();
   pf = jp.getPathfinder();
   mapDots = pf.nodes;
@@ -41,8 +53,7 @@ void setup(){
 }
 
 void draw(){
-  //background(0,0.1);
-  drawBackground();
+  image(bkg,0,0);
   
   /*
   for(int i = 0; i<mapDots.size(); i++){
@@ -60,11 +71,6 @@ void draw(){
    }
 }
 
-void drawBackground(){
-  noStroke();
-  fill(0,20);
-  rect(0,0,width,height);
-}
 
 void giveDestination(){
   for(int t = 0; t<instants; t++){
