@@ -7,16 +7,18 @@ Pathfinder pf = new Pathfinder();
 
 int d = 50;
 int pathMaxLength = 10;
-int r = 3;
+int r = 1;
 int nParticles = 10000;
-int scale = 5;
+int scale = 1;
 
 
 void setup(){
-  size(800,800,P2D);
+  size(1069,800,P2D);
   JSONPoints jp = new JSONPoints();
   pf = jp.getPathfinder();
   mapDots = pf.nodes;
+  //size(width,height,P2D);
+
   /*
   mapDots.add(new ControlPoint(d,       d,        0));
   mapDots.add(new ControlPoint(width/2, d,        1));
@@ -114,7 +116,9 @@ class Particle {
     //this.motionTime = (int)random(60,200); 
     this.t = 0;
     
-    this.c = color(random(0,255),random(0,255),random(0,255));
+    //this.c = color(random(0,255) ,random(0,255),random(0,255));
+    this.c = color(191, 249, 255);
+    
     ArrayList<Node> apath = pf.dijkstra(cp,cptgt);
     //println(apath.size());
     for(int i =0;i< apath.size();i++) {
@@ -162,14 +166,14 @@ class Particle {
       this.nextPoint = null;
     }
     else if(nextPoint == null){
-      this.x = this.currentPoint.x + r*cos(radians(frameCount));
-      this.y = this.currentPoint.y + r*sin(radians(frameCount));
+      this.x = this.currentPoint.x + r*cos(radians(frameCount*10)+random(10));
+      this.y = this.currentPoint.y + r*sin(radians(frameCount*10)+random(10));
     }
     
   }
   
   void show(){
-    strokeWeight(4);
+    strokeWeight(2);
     stroke(this.c);
     point(this.x, this.y);
   }

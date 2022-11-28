@@ -23,6 +23,8 @@ class JSONPoints {
     //println(json);
     features = json.getJSONArray("features");
     points = new JSONArray();
+    
+    
     for(int i = 0; i<features.size(); i++) {
       //println("i:"+i);
       JSONObject obj = features.getJSONObject(i);
@@ -36,7 +38,6 @@ class JSONPoints {
         float objy = el.getJSONArray("coordinates").getFloat(1);
         objx = objx - bLCoordX;
         objy = objy - tRCoordY;
-        
         
         int objxInt = parseInt((objx* width)/(tRCoordX-bLCoordX));
         int objyInt = parseInt((objy* height)/(bLCoordY-tRCoordY));
@@ -87,7 +88,12 @@ class JSONPoints {
     return pf;
   }
   
-  
+  int getWidthGivenHeight(int givenheight) {
+    int givenwidth = parseInt(abs(givenheight/(tRCoordY-bLCoordY)*(tRCoordX-bLCoordX)));
+    println(givenwidth);
+    println(givenheight);
+    return givenwidth;
+  }
   
 }
 
