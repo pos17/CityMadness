@@ -15,7 +15,7 @@ int instants = 10;
 
 int clickedX = -1;
 int clickedY = -1;
-int myRad = 100;
+int myRad = 50;
 boolean done = false;
 
 void setup(){
