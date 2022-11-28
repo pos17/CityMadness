@@ -8,7 +8,7 @@ Pathfinder pf = new Pathfinder();
 int d = 50;
 int pathMaxLength = 10;
 int r = 1;
-int nParticles = 10000;
+int nParticles = 50000;
 int scale = 1;
 
 
