@@ -1,6 +1,5 @@
 import ai.pathfinder.*;
 
-
 ArrayList<Node> mapDots = new ArrayList<Node>();
 ArrayList<Particle> particles = new ArrayList<Particle>();
 Pathfinder pf = new Pathfinder();
@@ -10,6 +9,9 @@ int pathMaxLength = 10;
 int r = 1;
 int nParticles = 50000;
 int scale = 1;
+
+int clickedX;
+int clickedY;
 
 
 void setup(){
@@ -51,11 +53,14 @@ void setup(){
   }
   background(0);
   
+  noLoop();
+  
 }
 
 void draw(){
   //background(0,0.1);
-  fill(0,10);
+  noStroke();
+  fill(0,20);
   rect(0,0,width,height);
   /*
   for(int i = 0; i<mapDots.size(); i++){
