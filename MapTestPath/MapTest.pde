@@ -26,6 +26,7 @@ void setup(){
   println("waiting for you");
   if(clickedX !=-1 || clickedY !=-1) {
     println("click");
+    mapDots = pf.nodes;
     mapDotsSource = jp.getNodesInArea(parseInt(width/2),parseInt(height/2),50);
     mapDotsClicked = jp.getNodesInArea(clickedX,clickedY,myRad);
     println(mapDotsClicked.size());
@@ -51,6 +52,7 @@ void draw(){
     point(cp.x,cp.y);
   }
   */
+  
   if(done) {
   for(int i = 0; i<particles.size(); i++){
     Particle p = particles.get(i);
