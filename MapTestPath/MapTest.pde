@@ -6,7 +6,7 @@ ArrayList<Node> mapDotsSource = new ArrayList<Node>();
 ArrayList<Particle> particles = new ArrayList<Particle>();
 Pathfinder pf = new Pathfinder();
 
-int d = 50;
+int d = 100;
 int pathMaxLength = 10;
 int r = 1;
 int nParticles = 20000;
@@ -17,11 +17,11 @@ PGraphics bkg;
 
 int clickedX = -1;
 int clickedY = -1;
-int myRad = 50;
+int myRad = 80;
 boolean done = false;
 
 void setup(){
-  size(1069,800,P2D);
+  size(1382,800,P2D);
   
   //Setup Background
   bkg = createGraphics(width,height,P2D);
@@ -30,7 +30,7 @@ void setup(){
   bkg.fill(0);
   bkg.rect(0,0,width,height);
   bkg.endDraw();
-  tint(0,20); //To draw bkg with an alpha
+  tint(0,5); //To draw bkg with an alpha
   
   JSONPoints jp = new JSONPoints();
   pf = jp.getPathfinder();
@@ -39,7 +39,7 @@ void setup(){
   if(clickedX !=-1 || clickedY !=-1) {
     println("click");
     mapDots = pf.nodes;
-    mapDotsSource = jp.getNodesInArea(parseInt(width/2),parseInt(height/2),50);
+    mapDotsSource = jp.getNodesInArea(parseInt(width/5),parseInt(height/2),20);
     mapDotsClicked = jp.getNodesInArea(clickedX,clickedY,myRad);
     println(mapDotsClicked.size());
     thread("giveDestination");
@@ -150,7 +150,7 @@ class Particle {
       
     }
     this.nextPointIndex = 0;
-    this.nextPoint = this.path.get(1);
+    this.nextPoint = this.path.get(nextPointIndex);
   }
   
   
@@ -227,7 +227,9 @@ class Particle {
       
       this.t = 0;
       this.currentPoint = this.nextPoint;
-      this.nextPoint = path.get(nextPointIndex);
+      if(this.path.size()!=1) {
+        this.nextPoint = path.get(nextPointIndex);
+      }
       this.motionTime = (int)(dist(this.currentPoint.x,this.currentPoint.y,this.nextPoint.x,this.nextPoint.y)/scale);
     }
   }

@@ -10,25 +10,25 @@ class JSONPoints {
   //ArrayList<ControlPoint> controlPoints;
   
   
-  /* Cremona */
+  /* Cremona 
   float tRCoordX = 10.041624438149427;
   float tRCoordY = 45.146485875477254;
   float bLCoordX = 9.99635398643295;
   float bLCoordY = 45.12452785362902;
+  */
   
-  
-  /* Milano 
+  /* Milano */
   float tRCoordX = 9.231021608560354;
   float tRCoordY = 45.49082190275931;
   float bLCoordX = 9.15040660361177;
   float bLCoordY = 45.44414445567239;
-  */
+  
   
   JSONPoints() {
     //controlPoints = new ArrayList<ControlPoint>();
     ArrayList<Node> nodes = new ArrayList<Node>();
     
-    json = loadJSONObject("graph.json");
+    json = loadJSONObject("graphMilan.json");
     //println(json);
     features = json.getJSONArray("features");
     points = new JSONArray();
@@ -86,6 +86,7 @@ class JSONPoints {
     }
     
     pf = new Pathfinder(nodes);
+    println("number of nodes:"+nodes.size());
      //println(pf.nodes);
   }
   /*
