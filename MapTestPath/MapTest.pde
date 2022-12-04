@@ -20,6 +20,8 @@ int clickedY = -1;
 int myRad = 80;
 boolean done = false;
 
+//Paolo è molto bello
+
 void setup(){
   size(1382,800,P2D);
   
