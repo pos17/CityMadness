@@ -2,6 +2,7 @@ import ai.pathfinder.*;
 
 ArrayList<Node> mapDots = new ArrayList<Node>();
 ArrayList<Node> mapDotsClicked = new ArrayList<Node>();
+Node clickedDot = new Node();
 ArrayList<Node> mapDotsSource = new ArrayList<Node>();
 ArrayList<Particle> particles = new ArrayList<Particle>();
 Pathfinder pf = new Pathfinder();
@@ -42,7 +43,8 @@ void setup(){
     println("click");
     mapDots = pf.nodes;
     mapDotsSource = jp.getNodesInArea(parseInt(width/5),parseInt(height/2),20);
-    mapDotsClicked = jp.getNodesInArea(clickedX,clickedY,myRad);
+    // mapDotsClicked = jp.getNodesInArea(clickedX,clickedY,myRad);
+    clickedDot = jp.getNodeNearToPoint(clickedX,clickedY);
     println(mapDotsClicked.size());
     thread("giveDestination");
     noLoop();
@@ -80,8 +82,10 @@ void giveDestination(){
   for(int t = 0; t<instants; t++){
     for(int i = t*nParticles/(instants+1); i<(t+1)*nParticles/(instants+1); i++){
         
-        Node cp = mapDotsSource.get((int)random(mapDotsSource.size()));
-        Node cptgt = mapDotsClicked.get((int)random(mapDotsClicked.size()));  
+        // Node cp = mapDotsSource.get((int)random(mapDotsSource.size()));
+        // Node cptgt = mapDotsClicked.get((int)random(mapDotsClicked.size()));  
+        Node cp = mapDotsSource.get(1);
+        Node cptgt = clickedDot;
         particles.add(new Particle(cp,cptgt,pf));
          //println();
     }

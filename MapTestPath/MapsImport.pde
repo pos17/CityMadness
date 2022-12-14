@@ -120,11 +120,11 @@ class JSONPoints {
     return toRet;
   }
   
-  ArrayList<Node> getNodeNearToPoint(float xPosRatio, int yPosRatio) {
+  Node getNodeNearToPoint(float xPosRatio, int yPosRatio) {
     int cPosx = parseInt(xPosRatio);
     int cPosy = parseInt(yPosRatio);
     float refDist = -1; 
-    Node roRet = new Node();
+    Node toRet = new Node();
     //ArrayList<Node> toRet = new ArrayList<Node>();
     
       for (int i = 0; i < this.pf.nodes.size(); i++) {
