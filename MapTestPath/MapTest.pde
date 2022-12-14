@@ -141,8 +141,8 @@ class Particle {
     //this.c = color(random(0,255) ,random(0,255),random(0,255));
     this.c = color(191, 249, 255);
     
-    //ArrayList<Node> apath = pf.dijkstra(cp,cptgt);
-    ArrayList<Node> apath = pf.bfs(cp,cptgt);
+    ArrayList<Node> apath = pf.dijkstra(cp,cptgt);
+    //ArrayList<Node> apath = pf.bfs(cp,cptgt);
     
     //println(apath.size());
     for(int i =0;i< apath.size();i++) {
