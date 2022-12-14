@@ -125,14 +125,14 @@ void initializeParticles(){
   }
 }
 
-void initializeStreets(){
-  
+   /* 
   ArrayList<Node> path = new ArrayList<Node>();
   int t;
   int motionTime;
   color c;
   boolean readyToFinishFirst = false;
   boolean finishedFirst = false;
+  */
   /*
   Particle(Node cp){
     this.x = cp.x;
@@ -152,6 +152,7 @@ void initializeStreets(){
     //this.generateRandomPath();
   }
   */
+  /*
   Particle(Node cp, Node cptgt,Pathfinder pf) {
     this.x = cp.x;
     this.y = cp.y;
@@ -229,6 +230,7 @@ void initializeStreets(){
     
   }
   */
+  /*
   void moveOnPath() {
     
     
@@ -277,3 +279,4 @@ void initializeStreets(){
   }
   println("Streets: " + streets.size());
 }
+*/
