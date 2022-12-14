@@ -10,21 +10,22 @@ float mutateAmount = 0.15;
 float mutationRate = 0.01;
 int PopSize = 50;
 int Resolution = 150;
-float ratio;
+float ratio = 1.49;
 Population population;
 
-
 void settings() {
-  myImage = loadImage("images/eiffel.jpg");
+  //myImage = loadImage("images/eiffel.jpg");
   //println(img.width, img.height);
-  ratio = (float)myImage.width/(float)myImage.height;
+  //ratio = (float)myImage.width/(float)myImage.height;
   //print(int(720/ratio));
   size(720*2, int(720/ratio), P2D);
   //frameRate(60);
-  smooth(8);
+  //smooth(8);
 }
 
 void setup() {
+  myImage = loadImage("images/eiffel.jpg");
+  smooth(8);
   //size(740,300,P2D);
   frameRate(60);
   //smooth(8);
