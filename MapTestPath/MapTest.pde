@@ -1,16 +1,21 @@
 import ai.pathfinder.*;
+import java.util.Arrays;
 
 ArrayList<Node> mapDots = new ArrayList<Node>();
 ArrayList<Node> mapDotsClicked = new ArrayList<Node>();
 Node clickedDot = new Node();
 ArrayList<Node> mapDotsSource = new ArrayList<Node>();
 ArrayList<Particle> particles = new ArrayList<Particle>();
+ArrayList<StreetParticle> streets = new ArrayList<StreetParticle>();
 Pathfinder pf = new Pathfinder();
+
+IntList checkedStreets = new IntList();
 
 int d = 100;
 int pathMaxLength = 10;
 int r = 1;
 int nParticles = 20000;
+int nStreetParticles = 10000;
 int scale = 1;
 int instants = 500;
 
@@ -46,10 +51,25 @@ void setup(){
     // mapDotsClicked = jp.getNodesInArea(clickedX,clickedY,myRad);
     clickedDot = jp.getNodeNearToPoint(clickedX,clickedY);
     println(mapDotsClicked.size());
-    thread("giveDestination");
+    
+    thread("initializeParticles");
+    
+    
+    //Initialize a list to check if the point has already been considered for the street representation
+    for(int i = 0; i<mapDots.size(); i++){
+      checkedStreets.append(i);
+    }
+    
+    println(checkedStreets.size());
+    /*
+    for(int i = 0; i<nStreetParticles; i++){
+      streets.add(new StreetParticle(pf)); 
+    }
+    */
     noLoop();
     //done = true;
   }
+  
   loop();
   background(0);
   
@@ -68,17 +88,26 @@ void draw(){
   }
   */
   
+ 
   if(done) {
-  for(int i = 0; i<particles.size(); i++){
-    Particle p = particles.get(i);
-    p.moveOnPath();
-    p.show();
+    for(int i = 0; i<particles.size(); i++){
+      Particle p = particles.get(i);
+      p.moveOnPath();
+      p.show();
+    }
+    
+    
+    for(int i = 0; i<streets.size(); i++){
+      StreetParticle s = streets.get(i);
+      s.moveOnPath();
+      s.show();
+    }
+    
   }
-   }
 }
 
 
-void giveDestination(){
+void initializeParticles(){
   for(int t = 0; t<instants; t++){
     for(int i = t*nParticles/(instants+1); i<(t+1)*nParticles/(instants+1); i++){
         
@@ -87,22 +116,16 @@ void giveDestination(){
         Node cp = mapDotsSource.get(1);
         Node cptgt = clickedDot;
         particles.add(new Particle(cp,cptgt,pf));
-         //println();
+    }
+    for(int i = t*nStreetParticles/(instants+1); i<(t+1)*nStreetParticles/(instants+1); i++){
+      streets.add(new StreetParticle(pf)); 
     }
     done = true;
     delay((int)random(60,120));
   }
 }
 
-
-class Particle {
-
-  float x, y;
-  Node currentPoint;
-  Node nextPoint;
-  int currentPointIndex =-1;
-  int nextPointIndex =-1;
-  int shiftIndex = 1;
+void initializeStreets(){
   
   ArrayList<Node> path = new ArrayList<Node>();
   int t;
@@ -252,93 +275,5 @@ class Particle {
    float[] a = {this.x, this.y};
    return a;
   }
+  println("Streets: " + streets.size());
 }
-
-
-
-
-
-
-
-
-
-/*
-class Particle {
-
-  float x, y;
-  ControlPoint currentPoint;
-  ControlPoint nextPoint;
-  ArrayList<ControlPoint> path;
-  int t;
-  int motionTime;
-  color c;
-  
-  Particle(ControlPoint cp){
-    this.x = cp.getX();
-    this.y = cp.getY();
-    this.currentPoint = cp;
-    
-    this.nextPoint = null;
-    
-    path = new ArrayList<ControlPoint>();
-    path.add(this.currentPoint);
-    
-    //this.motionTime = (int)random(60,200); 
-    this.t = 0;
-    
-    this.c = color(random(0,255),random(0,255),random(0,255));
-    
-    this.generateRandomPath();
-  }
-  
-  void generateRandomPath(){
-    if(this.nextPoint == null){
-      for(int i = 0; i<pathMaxLength; i++){
-        ControlPoint pathPoint = this.path.get(0);
-        IntList futureConnections = mapDots.get(mapDots.indexOf(pathPoint)).getConnections();
-        
-        this.path.add(0, mapDots.get(futureConnections.get((int)random(0,futureConnections.size()))));
-      }
-      
-      this.nextPoint = path.get(0);
-    }
-  }
-  
-  void moveOnPath(){
-    if(nextPoint != null && this.t<motionTime){
-      this.x = lerp(this.currentPoint.getX(), this.nextPoint.getX(), map(this.t,0,this.motionTime,0,1));
-      this.y = lerp(this.currentPoint.getY(), this.nextPoint.getY(), map(this.t,0,this.motionTime,0,1));
-      
-      this.t++;
-    }
-    else if(this.t>=this.motionTime && path.size()>0 && nextPoint != null){
-      this.t = 0;
-      this.currentPoint = this.nextPoint;
-      this.nextPoint = path.get(0);
-      this.motionTime = (int)(dist(this.currentPoint.getX(),this.currentPoint.getY(),this.nextPoint.getX(),this.nextPoint.getY())/scale);
-      path.remove(0);
-    }
-    else if(this.t>=this.motionTime && path.size()<=0 && nextPoint != null){
-      this.t = 0;
-      this.currentPoint = this.nextPoint;
-      this.nextPoint = null;
-    }
-    else if(nextPoint == null){
-      this.x = this.currentPoint.getX() + r*cos(radians(frameCount));
-      this.y = this.currentPoint.getY() + r*sin(radians(frameCount));
-    }
-    
-  }
-  
-  void show(){
-    strokeWeight(4);
-    stroke(this.c);
-    point(this.x, this.y);
-  }
-  
-  
-  float[] getCoords(){
-   float[] a = {this.x, this.y};
-   return a;
-  }
-*/
