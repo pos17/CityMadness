@@ -4,5 +4,4 @@ void mouseReleased(){
   println(clickedX);
   println(clickedY);
   setup();
-  loop();
 }
