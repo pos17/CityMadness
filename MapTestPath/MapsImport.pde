@@ -123,12 +123,7 @@ class JSONPoints {
 }
 
 
-
-
-
 /*
-
-
 class ControlPoint{
   int x,y,id;
   IntList connections; // attento ve che sono gli indici dei controlpoint nella lista mapDots, non gli id dei punti
