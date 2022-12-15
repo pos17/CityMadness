@@ -49,13 +49,7 @@ class Map {
         
         Node ndMusic = new Node(objxInt,objyInt,objId);  
         nodesMusic.add(ndMusic);
-        if(objId/100.0 == 0.0) {
-        println("Porco dio ");
-        }
         
-        //if(i<100) {
-        //  println(objId);
-        //}
         sounds.addNote(int(objId));
         
       }
@@ -92,15 +86,7 @@ class Map {
                 tgtNodeMusic = chNodeMusic;
               } 
             }
-            if(srcNodeMusic.z == 0.0) {
-                println("Porco dio000 ");
-            }
-            if(tgtNodeMusic.z == 0.0) {
-                println("Porco dio "); //<>//
-                println(obj);
-                println(src);
-                println(tgt);
-            }
+             //<>//
             
             srcNodeNoMusic.connectBoth(tgtNodeNoMusic);
             //println("z");
@@ -111,13 +97,17 @@ class Map {
             //println(tgtNodeMusicId);
             //println(srcNodeMusicId);
             float linkWeight = sounds.getWeights(tgtNodeMusicId,srcNodeMusicId);
-            
-            srcNodeMusic.connectBoth(tgtNodeMusic,linkWeight*100);
+            linkWeight = 13-linkWeight;
+            srcNodeMusic.connectBoth(tgtNodeMusic,linkWeight*10000);
       }
     }
     pf = new Pathfinder(nodesNoMusic);
     pfMusic = new Pathfinder(nodesMusic);
     pfNoMusic = new Pathfinder(nodesNoMusic);
+    ArrayList<Node> nodesMus = pfMusic.nodes;
+    for(int i = 0; i< nodesMus.size();i++ ) {
+      print(nodesMus.get(i).links.get(0)); //<>//
+    }
     
     println("number of nodes:"+nodesMusic.size());
     println("number of nodes:"+nodesNoMusic.size());
@@ -159,7 +149,7 @@ class Map {
       return pf;
   }
   
-  void createUserPath(boolean music, int clickedX,int clickedY, int srcX, int srcY,int hasMusic) {
+  void createUserPath(int clickedX,int clickedY, int srcX, int srcY,int hasMusic) {
   
     println("click");
     Node srcNode = this.getNodeNearToPoint(srcX,srcY);
@@ -177,12 +167,12 @@ class Map {
       int nId = parseInt(n.z);
       pathIdList.append(nId);
     }
-    println(pathIdList);
+    //println(pathIdList);
     
     midiList = sounds.generateMidiList(pathIdList);
     tp.add(new TriggerParticle(sourceClickPath));
     thread("initializeParticles");
-    
+    //initializeParticles();
     
     
   
@@ -190,11 +180,11 @@ class Map {
   
   ArrayList<Node> getPath(Node src,Node tgt,int pfId) {
     if(pfId == 0) {
-      return pf.aStar(src,tgt);
+      return pf.bfs(src,tgt);
     } else if(pfId == 1) {
-      return pfNoMusic.dijkstra(src,tgt);
+      return pfNoMusic.bfs(src,tgt);
     } else if(pfId == 2) {
-      return pfMusic.dijkstra(src,tgt);
+      return pfMusic.bfs(src,tgt);
     }
     else return pf.bfs(src,tgt);
   }

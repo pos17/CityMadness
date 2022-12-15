@@ -11,6 +11,10 @@ NetAddress pureData;
 Map myMap;
 boolean isMusicOn = false;
 
+boolean goodMusic = false;
+
+int buttonw = 50;
+
 ArrayList<Node> mapDots = new ArrayList<Node>();
 ArrayList<Node> mapDotsClicked = new ArrayList<Node>();
 Node clickedDot = new Node();
@@ -26,6 +30,7 @@ IntList checkedStreets = new IntList();
 
 IntList midiList = new IntList();
 IntList pathIdList = new IntList();
+
 
 ArrayList<TriggerParticle> tp = new ArrayList<TriggerParticle>();
 
@@ -50,7 +55,7 @@ void setup(){
   size(1382,800,P2D);
   
   osc = new OscP5(this, 12000);
-  pureData = new NetAddress("127.0.0.1", 57120);
+  pureData = new NetAddress("localhost", 8001);
   
   //Setup Background
   bkg = createGraphics(width,height,P2D);
@@ -98,14 +103,23 @@ void setup(){
     //Initialize a list to check if the point has already been considered for the street representation
     
     
-  println(checkedStreets.size());
+  //println(checkedStreets.size());
     
   background(0);
+  textSize(buttonw);
 }
 
 void draw(){
   image(bkg,0,0);
   
+  fill(255, 10);
+  stroke(0);
+  strokeWeight(3);
+  rect(width-buttonw, height-buttonw, buttonw, buttonw);
+  rect(width-2*buttonw, height-buttonw, buttonw, buttonw);
+  fill(0);
+  text("B", width-buttonw, height);
+  text("G", width-2*buttonw, height);
  
     for(int i = 0; i<particles.size(); i++){
       Particle p = particles.get(i);

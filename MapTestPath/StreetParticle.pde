@@ -41,7 +41,7 @@ class StreetParticle{
     this.x = path.get(0).x;
     this.y = path.get(0).y;
     
-    println(this.x+","+this.y);
+    //println(this.x+","+this.y);
     
     this.currentPoint = path.get(0);
     

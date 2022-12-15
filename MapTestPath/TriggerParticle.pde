@@ -7,6 +7,8 @@ class TriggerParticle{
   int nextPointIndex =-1;
   int shiftIndex = 1;
   
+  int[] pentatonic = {1, 3, 6, 8, 10};
+  
   ArrayList<Node> path = new ArrayList<Node>();
   int t;
   int motionTime;
@@ -43,7 +45,7 @@ class TriggerParticle{
         
         if(nextPointIndex == 0) {
           shiftIndex = +1;
-        } 
+        }
         else if(nextPointIndex == this.path.size()-1) {
           shiftIndex = -1;
         }
@@ -53,7 +55,7 @@ class TriggerParticle{
         if(this.path.size()!=1){
           this.nextPoint = path.get(nextPointIndex);
         }
-        this.motionTime = (int)(dist(this.currentPoint.x,this.currentPoint.y,this.nextPoint.x,this.nextPoint.y)/(0.5*scale));
+        this.motionTime = (int)(dist(this.currentPoint.x,this.currentPoint.y,this.nextPoint.x,this.nextPoint.y)/(0.2*scale));
         
         this.sendMessage();
     }
@@ -76,7 +78,8 @@ class TriggerParticle{
    OscMessage msg = new OscMessage("/newNote");
    for(int i = 0; i<pathIdList.size(); i++){
      if(pathIdList.get(i) == parseInt(this.currentPoint.z)){
-       msg.add(midiList.get(i));
+       msg.add(pentatonic[(int)random(5)]);
+       //msg.add("bang");
        println(midiList.get(i));
        osc.send(msg, pureData);
      }
