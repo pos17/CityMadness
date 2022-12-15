@@ -166,10 +166,11 @@ class Map {
     clickedDot = this.getNodeNearToPoint(clickedX,clickedY);
     //println(mapDotsClicked.size());
     sourceClickPath = this.getPath(clickedDot,srcNode,hasMusic);
+    
     //println(sourceClickPath);
     
-    IntList pathIdList = new IntList(); 
-    FloatList distList = new FloatList(); 
+     
+    //FloatList distList = new FloatList(); 
     
     for(int i = 0; i < sourceClickPath.size();i++) {
       Node n = sourceClickPath.get(i);
@@ -177,10 +178,12 @@ class Map {
       pathIdList.append(nId);
     }
     println(pathIdList);
-    sounds.generateMidiList(pathIdList);
     
-    
+    midiList = sounds.generateMidiList(pathIdList);
+    tp.add(new TriggerParticle(sourceClickPath));
     thread("initializeParticles");
+    
+    
     
   
   }

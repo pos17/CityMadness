@@ -24,6 +24,11 @@ Pathfinder pf = new Pathfinder();
 
 IntList checkedStreets = new IntList();
 
+IntList midiList = new IntList();
+IntList pathIdList = new IntList();
+
+ArrayList<TriggerParticle> tp = new ArrayList<TriggerParticle>();
+
 int d = 100;
 int pathMaxLength = 10;
 int r = 1;
@@ -114,6 +119,11 @@ void draw(){
       StreetParticle s = streets.get(i);
       s.moveOnPath();
       s.show();
+    }
+    for(int i = 0; i<tp.size(); i++){
+      TriggerParticle t = tp.get(i);
+      t.moveOnPath();
+      t.show();
     }
     
   

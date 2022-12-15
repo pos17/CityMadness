@@ -23,7 +23,7 @@ class TriggerParticle{
     this.nextPoint = null;
     this.t = 0;
     
-    this.c = color(191, 249, 255);
+    this.c = color(255, 0, 0);
     
     this.nextPointIndex = 0;
     this.nextPoint = this.path.get(nextPointIndex);
@@ -53,7 +53,7 @@ class TriggerParticle{
         if(this.path.size()!=1){
           this.nextPoint = path.get(nextPointIndex);
         }
-        this.motionTime = (int)(dist(this.currentPoint.x,this.currentPoint.y,this.nextPoint.x,this.nextPoint.y)/(2*scale));
+        this.motionTime = (int)(dist(this.currentPoint.x,this.currentPoint.y,this.nextPoint.x,this.nextPoint.y)/(0.5*scale));
         
         this.sendMessage();
     }
@@ -61,7 +61,7 @@ class TriggerParticle{
   
   
   void show(){
-    strokeWeight(2);
+    strokeWeight(5);
     stroke(this.c);
     point(this.x, this.y);
   }
@@ -74,8 +74,14 @@ class TriggerParticle{
   
   void sendMessage(){
    OscMessage msg = new OscMessage("/newNote");
-   msg.add(currentPoint.z);
-   osc.send(msg, pureData); 
+   for(int i = 0; i<pathIdList.size(); i++){
+     if(pathIdList.get(i) == parseInt(this.currentPoint.z)){
+       msg.add(midiList.get(i));
+       println(midiList.get(i));
+       osc.send(msg, pureData);
+     }
+   }
+    
   }
   
 }
