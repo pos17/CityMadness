@@ -55,7 +55,7 @@ class TriggerParticle{
         if(this.path.size()!=1){
           this.nextPoint = path.get(nextPointIndex);
         }
-        this.motionTime = (int)(dist(this.currentPoint.x,this.currentPoint.y,this.nextPoint.x,this.nextPoint.y)/(0.2*scale));
+        this.motionTime = (int)(dist(this.currentPoint.x,this.currentPoint.y,this.nextPoint.x,this.nextPoint.y)/(0.4*scale));
         
         this.sendMessage();
     }
@@ -75,16 +75,28 @@ class TriggerParticle{
   }
   
   void sendMessage(){
-   OscMessage msg = new OscMessage("/newNote");
-   for(int i = 0; i<pathIdList.size(); i++){
-     if(pathIdList.get(i) == parseInt(this.currentPoint.z)){
-       msg.add(pentatonic[(int)random(5)]+60);
-       //msg.add("bang");
-       //println(midiList.get(i));
-       osc.send(msg, pureData);
+    
+   if(goodMusic) {
+     OscMessage msg = new OscMessage("/newNote");
+     for(int i = 0; i<pathIdList.size(); i++){
+       if(pathIdList.get(i) == parseInt(this.currentPoint.z)){
+         msg.add(pentatonic[(int)random(5)]+60);
+         //msg.add("bang");
+         println(midiList.get(i));
+         osc.send(msg, pureData);
+       }
+     }
+   } else {
+     OscMessage msg = new OscMessage("/newNote");
+     for(int i = 0; i<pathIdList.size(); i++){
+       if(pathIdList.get(i) == parseInt(this.currentPoint.z)){
+         //msg.add(pentatonic[(int)random(5)]+60);
+         //msg.add("bang");
+         println(midiList.get(i));
+         msg.add(midiList.get(i));
+         osc.send(msg, pureData);
+       }
      }
    }
-    
-  }
-  
+ }
 }
