@@ -5,8 +5,8 @@ class SoundWeights{
   float[] weights = {12,4,10,5,11,7,1,8,2,5,2,8};
   
   SoundWeights(){
-  notes = new HashMap<Integer, Integer>();
-  normWeights();
+    notes = new HashMap<Integer, Integer>();
+    normWeights();
   }
   
   void addNote(int noteId) {

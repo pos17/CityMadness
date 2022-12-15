@@ -1,5 +1,12 @@
+import oscP5.*;
+import netP5.*;
+import controlP5.*;
+
 import ai.pathfinder.*;
 import java.util.Arrays;
+
+OscP5 osc;
+NetAddress pureData;
 
 Map myMap;
 boolean isMusicOn = false;
@@ -36,6 +43,9 @@ boolean done = false;
 
 void setup(){
   size(1382,800,P2D);
+  
+  osc = new OscP5(this, 12000);
+  pureData = new NetAddress("127.0.0.1", 57120);
   
   //Setup Background
   bkg = createGraphics(width,height,P2D);
@@ -91,14 +101,6 @@ void setup(){
 void draw(){
   image(bkg,0,0);
   
-  /*
-  for(int i = 0; i<mapDots.size(); i++){
-    Node cp = mapDots.get(i);
-    //cp.show();
-    point(cp.x,cp.y);
-  }
-  */
-  
  
     for(int i = 0; i<particles.size(); i++){
       Particle p = particles.get(i);
@@ -106,6 +108,7 @@ void draw(){
       p.show();
     }
     //println(streets.size());
+    
     for(int i = 0; i<streets.size(); i++){
       
       StreetParticle s = streets.get(i);
