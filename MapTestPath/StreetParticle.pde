@@ -13,8 +13,9 @@ class StreetParticle{
   color c;
   
   
-  StreetParticle(Pathfinder pf){
-    
+  StreetParticle(ArrayList<Node> path){
+    this.path = path;
+    /*
     Node n;
     Node m;
     
@@ -35,11 +36,14 @@ class StreetParticle{
     else{ // Look for random points
       m = mapDots.get((int)random(mapDots.size()));
     }
+    */
     
+    this.x = path.get(0).x;
+    this.y = path.get(0).y;
     
-    this.x = n.x;
-    this.y = n.y;
-    this.currentPoint = n;
+    println(this.x+","+this.y);
+    
+    this.currentPoint = path.get(0);
     
     this.nextPoint = null;
     
@@ -47,12 +51,9 @@ class StreetParticle{
     
     this.c = color(50, 50, 150);
     
-    ArrayList<Node> apath = pf.bfs(n,m);
+    //ArrayList<Node> apath = pf.bfs(n,m);
     
     //println(apath.size());
-    for(int i =0;i< apath.size();i++) {
-      this.path.add(apath.get(apath.size()-1-i));
-    }
     this.nextPointIndex = 0;
     this.nextPoint = this.path.get(nextPointIndex);
     

@@ -1,7 +1,6 @@
 void mouseReleased(){
-  clickedX = mouseX;
-  clickedY = mouseY;
-  println(clickedX);
-  println(clickedY);
-  setup();
+  int hasMusic;
+  if(isMusicOn) hasMusic = 2;
+  else hasMusic = 1;
+  myMap.createUserPath(isMusicOn, mouseX,mouseY, width/5,height/2,hasMusic);
 }

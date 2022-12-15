@@ -1,24 +1,32 @@
 class SoundWeights{
-  int[] notes;
+  HashMap<Integer,Integer> notes; //= new HashMap<Integer,String>();
+  
+  //int[] notes;
   float[] weights = {12,4,10,5,11,7,1,8,2,5,2,8};
   
-  SoundWeights(int numNodes){
-     notes = new int[numNodes];
-     for (int i=0; i<numNodes;i++){
-      notes[i] = floor(random(12)); 
-     }
-    normWeights();
-    
+  SoundWeights(){
+  notes = new HashMap<Integer, Integer>();
+  normWeights();
   }
   
-  int getNote(int node){
-    
-   return notes[node]; 
+  void addNote(int noteId) {
+    int NoteVal = int(random(0,11));
+    notes.put(noteId,NoteVal);
   }
   
-  float getWeigths(int node1, int node2){
-    int note1 = notes[node1];
-    int note2 = notes[node2];
+  
+  int getNoteVal(int node){
+    
+   return notes.get(node); 
+  }
+  
+  float getWeights(int node1, int node2){
+    //println(notes); //<>//
+    //println("couple");
+    //println(node1);
+    //println(node2);
+    int note1 = notes.get(node1);
+    int note2 = notes.get(node2);
     int interv = abs(note2 - note1);
     return weights[interv];
   }
