@@ -112,7 +112,7 @@ class Map {
             //println(srcNodeMusicId);
             float linkWeight = sounds.getWeights(tgtNodeMusicId,srcNodeMusicId);
             
-            srcNodeMusic.connectBoth(tgtNodeMusic,linkWeight);
+            srcNodeMusic.connectBoth(tgtNodeMusic,linkWeight*100);
       }
     }
     pf = new Pathfinder(nodesNoMusic);
@@ -165,7 +165,21 @@ class Map {
     Node srcNode = this.getNodeNearToPoint(srcX,srcY);
     clickedDot = this.getNodeNearToPoint(clickedX,clickedY);
     //println(mapDotsClicked.size());
-    sourceClickPath = getPath(clickedDot,srcNode,hasMusic);
+    sourceClickPath = this.getPath(clickedDot,srcNode,hasMusic);
+    //println(sourceClickPath);
+    
+    IntList pathIdList = new IntList(); 
+    FloatList distList = new FloatList(); 
+    
+    for(int i = 0; i < sourceClickPath.size();i++) {
+      Node n = sourceClickPath.get(i);
+      int nId = parseInt(n.z);
+      pathIdList.append(nId);
+    }
+    println(pathIdList);
+    sounds.generateMidiList(pathIdList);
+    
+    
     thread("initializeParticles");
     
   
