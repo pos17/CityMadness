@@ -1,3 +1,6 @@
+import netP5.*;
+import oscP5.*;
+
 import ai.pathfinder.*;
 import java.util.Arrays;
 
