@@ -55,7 +55,7 @@ class TriggerParticle{
         if(this.path.size()!=1){
           this.nextPoint = path.get(nextPointIndex);
         }
-        this.motionTime = (int)(dist(this.currentPoint.x,this.currentPoint.y,this.nextPoint.x,this.nextPoint.y)/(0.2*scale));
+        this.motionTime = (int)(dist(this.currentPoint.x,this.currentPoint.y,this.nextPoint.x,this.nextPoint.y)/(0.4*scale));
         
         this.sendMessage();
     }
