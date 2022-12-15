@@ -17,6 +17,7 @@ boolean goodMusic = false;
 
 
 int buttonw = 50;
+int offset = 10;
 
 ArrayList<Node> mapDots = new ArrayList<Node>();
 ArrayList<Node> mapDotsClicked = new ArrayList<Node>();
@@ -118,11 +119,11 @@ void draw(){
   fill(255, 10);
   stroke(0);
   strokeWeight(3);
-  rect(width-buttonw, height-buttonw, buttonw, buttonw);
-  rect(width-2*buttonw, height-buttonw, buttonw, buttonw);
+  circle(width-buttonw/2, height-buttonw/2, buttonw);
+  circle(width-3*buttonw/2, height-buttonw/2, buttonw);
   fill(0);
-  text("B", width-buttonw, height);
-  text("G", width-2*buttonw, height);
+  text("B", width-buttonw+offset, height-offset);
+  text("G", width-2*buttonw+offset, height-offset);
  
     for(int i = 0; i<particles.size(); i++){
       Particle p = particles.get(i);
