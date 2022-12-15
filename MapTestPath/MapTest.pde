@@ -11,7 +11,7 @@ OscP5 osc;
 NetAddress pureData;
 
 Map myMap;
-boolean isMusicOn = true;
+
 
 boolean goodMusic = false;
 

@@ -16,7 +16,7 @@ void mouseReleased(){
   }
   else{
     int hasMusic;
-    if(isMusicOn) hasMusic = 2;
+    if(goodMusic) hasMusic = 2;
     else hasMusic = 1;
     //println(hasMusic);
     myMap.createUserPath(mouseX,mouseY, width/5,height/2,hasMusic);
