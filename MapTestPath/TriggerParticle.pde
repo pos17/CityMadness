@@ -78,7 +78,7 @@ class TriggerParticle{
    OscMessage msg = new OscMessage("/newNote");
    for(int i = 0; i<pathIdList.size(); i++){
      if(pathIdList.get(i) == parseInt(this.currentPoint.z)){
-       msg.add(pentatonic[(int)random(5)]);
+       msg.add(pentatonic[(int)random(5)]+60);
        //msg.add("bang");
        println(midiList.get(i));
        osc.send(msg, pureData);

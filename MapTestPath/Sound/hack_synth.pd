@@ -32,7 +32,7 @@
 #X obj 688 225 tgl 15 0 empty empty empty 17 7 0 10 #fcfcfc #000000 #000000 0 1;
 #X obj 833 405 s note;
 #X obj 79 33 r note;
-#X floatatom 833 363 5 0 0 0 - - - 0;
+#X floatatom 830 344 5 0 0 0 - - - 0;
 #X obj 62 558 throw~ out;
 #X obj 502 483 catch~ out;
 #X obj 680 501 hip~ 600;
@@ -55,15 +55,14 @@
 #X msg 833 110 listen 0;
 #X msg 916 109 listen 8001;
 #X obj 833 199 list trim;
-#X obj 833 235 route newNote;
+#X obj 829 234 route newNote;
 #X obj 1071 112 bng 19 250 50 0 empty empty empty 0 -10 0 12 #fcfcfc #000000 #000000;
 #X obj 690 363 * 1;
 #X msg 775 344 0.0075;
 #X msg 779 317 1;
 #X obj 971 219 route mode;
 #X obj 981 252 sel 0;
-#X obj 951 420 print;
-#X obj 833 265 + 60;
+#X obj 926 392 print;
 #X connect 0 0 2 0;
 #X connect 1 0 3 1;
 #X connect 2 0 3 0;
@@ -122,8 +121,8 @@
 #X connect 54 0 52 0;
 #X connect 55 0 56 0;
 #X connect 55 0 61 0;
-#X connect 56 0 63 0;
-#X connect 56 0 64 0;
+#X connect 55 0 63 0;
+#X connect 56 0 33 0;
 #X connect 57 0 54 0;
 #X connect 58 0 29 0;
 #X connect 59 0 58 1;
@@ -131,5 +130,3 @@
 #X connect 61 0 62 0;
 #X connect 62 0 60 0;
 #X connect 62 1 59 0;
-#X connect 64 0 33 0;
-#X connect 64 0 63 0;

@@ -45,7 +45,7 @@ class SoundWeights{
   IntList generateMidiList(IntList ids) {
     IntList midi = new IntList();
     for(int i =0; i< ids.size();i++) {
-      midi.append(notes.get(ids.get(i)));
+      midi.append(notes.get(ids.get(i))+60);
     }
     
     println(midi);
