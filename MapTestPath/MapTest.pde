@@ -5,11 +5,13 @@ import controlP5.*;
 import ai.pathfinder.*;
 import java.util.Arrays;
 
+import java.util.Collections;
+
 OscP5 osc;
 NetAddress pureData;
 
 Map myMap;
-boolean isMusicOn = false;
+boolean isMusicOn = true;
 
 boolean goodMusic = false;
 

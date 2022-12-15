@@ -184,13 +184,37 @@ class Map {
     } else if(pfId == 1) {
       return pfNoMusic.bfs(src,tgt);
     } else if(pfId == 2) {
-      return pfMusic.bfs(src,tgt);
+      return this.randomGetPath(src,tgt);
     }
     else return pf.bfs(src,tgt);
   }
   
   ArrayList<Node> getMapDots() {
     return pf.nodes;
+  }
+  
+  
+  ArrayList<Node> randomGetPath(Node src, Node tgt) {
+    ArrayList<Node> toRet = new ArrayList<Node>();
+    
+    
+    ArrayList<Node> nodes = this.getMapDots();
+    Node randomNode1 =  nodes.get(int(random(0,nodes.size())));
+    Node randomNode2 =  nodes.get(int(random(0,nodes.size())));
+    
+    ArrayList<Node> srcR1 = pfNoMusic.bfs(src,randomNode1);
+    Collections.reverse(srcR1);
+    toRet.addAll(srcR1);
+     ArrayList<Node> srcR2 = pfNoMusic.bfs(toRet.get(toRet.size()-1),randomNode2);
+    Collections.reverse(srcR2);
+    toRet.remove(toRet.size()-1);
+    toRet.addAll(srcR2);
+    ArrayList<Node> srcR3 = pfNoMusic.bfs(toRet.get(toRet.size()-1),tgt);
+    Collections.reverse(srcR3);
+    toRet.remove(toRet.size()-1);
+    toRet.addAll(srcR3);
+    Collections.reverse(toRet);
+    return toRet;
   }
   
 }
