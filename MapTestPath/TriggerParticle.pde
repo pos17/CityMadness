@@ -25,7 +25,7 @@ class TriggerParticle{
     this.nextPoint = null;
     this.t = 0;
     
-    this.c = color(255, 0, 0);
+    this.c = color(255, 27, 28);
     
     this.nextPointIndex = 0;
     this.nextPoint = this.path.get(nextPointIndex);
@@ -80,7 +80,7 @@ class TriggerParticle{
      if(pathIdList.get(i) == parseInt(this.currentPoint.z)){
        msg.add(pentatonic[(int)random(5)]+60);
        //msg.add("bang");
-       println(midiList.get(i));
+       //println(midiList.get(i));
        osc.send(msg, pureData);
      }
    }

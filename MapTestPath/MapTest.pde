@@ -12,8 +12,9 @@ NetAddress pureData;
 
 Map myMap;
 boolean isMusicOn = true;
-
+boolean creatingParticles = false;
 boolean goodMusic = false;
+
 
 int buttonw = 50;
 
@@ -147,14 +148,24 @@ void draw(){
 
 
 void initializeParticles(){
-  for(int t = 0; t<instants; t++){
+  creatingParticles = true;
+  for(int t = 0; t<instants && creatingParticles; t++){
     for(int i = t*nParticles/(instants+1); i<(t+1)*nParticles/(instants+1); i++){
-        Node cp = sourceDot;
-        Node cptgt = clickedDot;
         particles.add(new Particle(sourceClickPath));
     }
     
     done = true;
     delay((int)random(60,120));
   }
+  creatingParticles = false;
+}
+
+void keyPressed(){
+ if(key == 'r'){
+   
+     creatingParticles = false;
+     particles.clear(); 
+     tp.clear();
+ }
+  
 }
