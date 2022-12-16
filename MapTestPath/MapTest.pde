@@ -1,7 +1,5 @@
 import oscP5.*;
 import netP5.*;
-import controlP5.*;
-
 import ai.pathfinder.*;
 import java.util.Arrays;
 
@@ -9,6 +7,7 @@ import java.util.Collections;
 
 OscP5 osc;
 NetAddress pureData;
+
 
 Map myMap;
 boolean isMusicOn = true;
@@ -125,6 +124,7 @@ void setup(){
     
   background(2,3,5);
   textSize(buttonw);
+
 }
 
 void draw(){
@@ -133,21 +133,23 @@ void draw(){
   
   stroke(0);
   strokeWeight(3);
+  
   if(goodMusic){
-    fill(255, 10);
-    circle(width-buttonw/2, height-buttonw/2, buttonw);
-    fill(255, 237, 102, 10);
-    circle(width-3*buttonw/2, height-buttonw/2, buttonw);
+    fill(44,100,105,10);
+    rect(width-buttonw, height-buttonw, buttonw,buttonw);
+    fill(255, 195, 34,10);
+    rect(width-2*buttonw, height-buttonw,buttonw, buttonw);
   }
   else{
-    fill(255, 237, 102, 10);
-    circle(width-buttonw/2, height-buttonw/2, buttonw);
-    fill(255, 10);
-    circle(width-3*buttonw/2, height-buttonw/2, buttonw);
+    fill(255, 195, 34,10);
+    rect(width-buttonw, height-buttonw, buttonw,buttonw);
+    fill(44,100,105,10);
+    rect(width-2*buttonw, height-buttonw,buttonw, buttonw);
   }
   fill(0);
   text("B", width-buttonw+offset, height-offset);
   text("G", width-2*buttonw+offset, height-offset);
+  
     
   for(int i = 0; i<streets.size(); i++){  
     StreetParticle s = streets.get(i);
@@ -190,5 +192,4 @@ void keyPressed(){
      
      sourceChosen = false;
  }
-  
 }
