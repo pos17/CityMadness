@@ -116,11 +116,21 @@ void setup(){
 void draw(){
   image(bkg,0,0);
   
-  fill(255, 10);
+  
   stroke(0);
   strokeWeight(3);
-  circle(width-buttonw/2, height-buttonw/2, buttonw);
-  circle(width-3*buttonw/2, height-buttonw/2, buttonw);
+  if(goodMusic){
+    fill(255, 10);
+    circle(width-buttonw/2, height-buttonw/2, buttonw);
+    fill(255, 237, 102, 10);
+    circle(width-3*buttonw/2, height-buttonw/2, buttonw);
+  }
+  else{
+    fill(255, 237, 102, 10);
+    circle(width-buttonw/2, height-buttonw/2, buttonw);
+    fill(255, 10);
+    circle(width-3*buttonw/2, height-buttonw/2, buttonw);
+  }
   fill(0);
   text("B", width-buttonw+offset, height-offset);
   text("G", width-2*buttonw+offset, height-offset);
