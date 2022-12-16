@@ -64,7 +64,7 @@ class TriggerParticle{
   
   
   void show(){
-    strokeWeight(5);
+    strokeWeight(7);
     stroke(this.c);
     point(this.x, this.y);
   }

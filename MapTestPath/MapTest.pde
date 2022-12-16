@@ -156,16 +156,17 @@ void draw(){
     s.moveOnPath();
     s.show();
   }
-  for(int i = 0; i<tp.size(); i++){
-    TriggerParticle t = tp.get(i);
-    t.moveOnPath();
-    t.show();
-  }
   
   for(int i = 0; i<particles.size(); i++){
     Particle p = particles.get(i);
     p.moveOnPath();
     p.show();
+  }
+  
+  for(int i = 0; i<tp.size(); i++){
+    TriggerParticle t = tp.get(i);
+    t.moveOnPath();
+    t.show();
   }
 }
 
