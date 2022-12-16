@@ -60,8 +60,8 @@ boolean done = false;
 //Paolo è molto bello
 
 void setup(){
-  size(1382,800,P2D);
-  
+  //size(1382,800,P2D);
+  fullScreen(P2D);
   osc = new OscP5(this, 12000);
   pureData = new NetAddress("localhost", 8001);
   
@@ -113,6 +113,15 @@ void setup(){
     
     
   //println(checkedStreets.size());
+  
+  OscMessage msg = new OscMessage("/mode");
+  if(goodMusic){
+    msg.add(1);
+  }
+  else{
+    msg.add(0); 
+  }
+  osc.send(msg, pureData);
     
   background(2,3,5);
   textSize(buttonw);

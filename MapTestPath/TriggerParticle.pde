@@ -78,24 +78,31 @@ class TriggerParticle{
   void sendMessage(){
     
    if(goodMusic) {
-     OscMessage msg = new OscMessage("/newNote");
+     OscMessage msg1 = new OscMessage("/newNote");
+     OscMessage msg2 = new OscMessage("/newNote");
+     
      for(int i = 0; i<pathIdList.size(); i++){
        if(pathIdList.get(i) == parseInt(this.currentPoint.z)){
-         msg.add(pentatonic[(int)random(5)]+60);
-         //msg.add("bang");
-         println(midiList.get(i));
-         osc.send(msg, pureData);
+         msg1.add(pentatonic[(int)random(5)]+60);
+         msg1.add(pentatonic[(int)random(5)]+48);
+         
+         osc.send(msg1, pureData);
+         osc.send(msg1, pureData);
+         
        }
      }
    } else {
-     OscMessage msg = new OscMessage("/newNote");
+     OscMessage msg1 = new OscMessage("/newNote");
+     OscMessage msg2 = new OscMessage("/newNote");
      for(int i = 0; i<pathIdList.size(); i++){
        if(pathIdList.get(i) == parseInt(this.currentPoint.z)){
          //msg.add(pentatonic[(int)random(5)]+60);
          //msg.add("bang");
          println(midiList.get(i));
-         msg.add(midiList.get(i)+60);
-         osc.send(msg, pureData);
+         msg1.add(midiList.get(i)+60);
+         msg1.add(midiList.get(i)+48);
+         osc.send(msg1, pureData);
+         osc.send(msg1, pureData);
        }
      }
    }
