@@ -182,7 +182,7 @@ class Map {
     if(pfId == 0) {
       return pf.bfs(src,tgt);
     } else if(pfId == 1) {
-      return pfNoMusic.bfs(src,tgt);
+      return pfNoMusic.dijkstra(src,tgt);
     } else if(pfId == 2) {
       return this.randomGetPath(src,tgt);
     }
