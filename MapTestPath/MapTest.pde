@@ -41,8 +41,8 @@ ArrayList<TriggerParticle> tp = new ArrayList<TriggerParticle>();
 int d = 100;
 int pathMaxLength = 10;
 int r = 1;
-int nParticles = 2000;
-int nStreetParticles = 1000;
+int nParticles = 5000;
+int nStreetParticles = 5000;
 int scale = 1;
 int instants = 500;
 

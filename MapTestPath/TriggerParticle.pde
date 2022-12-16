@@ -93,7 +93,7 @@ class TriggerParticle{
          //msg.add(pentatonic[(int)random(5)]+60);
          //msg.add("bang");
          println(midiList.get(i));
-         msg.add(midiList.get(i));
+         msg.add(midiList.get(i)+60);
          osc.send(msg, pureData);
        }
      }
