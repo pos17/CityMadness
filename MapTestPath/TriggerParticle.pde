@@ -25,7 +25,8 @@ class TriggerParticle{
     this.nextPoint = null;
     this.t = 0;
     
-    this.c = color(255, 27, 28);
+    //this.c = color(250, 131, 52);
+    this.c = color(109, 18, 15);
     
     this.nextPointIndex = 0;
     this.nextPoint = this.path.get(nextPointIndex);

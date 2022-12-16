@@ -23,7 +23,8 @@ class Particle {
     this.nextPoint = null;
     this.t = 0;
     
-    this.c = color(191, 249, 255);
+    //this.c = color(191, 249, 255);
+    this.c = color(255, 195, 34);
     
     this.nextPointIndex = 0;
     this.nextPoint = this.path.get(nextPointIndex);
@@ -39,7 +40,8 @@ class Particle {
       if(!finishedFirst) {
         if(readyToFinishFirst) {
           finishedFirst = true;
-          this.c = color(255,215,0);
+          //this.c = color(255,215,0);
+          this.c = color(248, 118, 32);
          }
       }
       this.currentPointIndex = nextPointIndex;

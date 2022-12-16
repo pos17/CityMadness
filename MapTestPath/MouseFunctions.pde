@@ -20,10 +20,19 @@ void mouseReleased(){
   }
   else{
     
-    int hasMusic;
-    if(goodMusic) hasMusic = 2;
-    else hasMusic = 1;
-    //println(hasMusic);
-    myMap.createUserPath(mouseX,mouseY, width/5,height/2,hasMusic);
+    if(sourceChosen){
+      int hasMusic;
+      if(goodMusic) 
+        hasMusic = 2;
+      else 
+        hasMusic = 1;
+      //println(hasMusic);
+      myMap.createUserPath(mouseX,mouseY, startPointX,startPointY,hasMusic);
+    }
+    else{
+      startPointX = mouseX;
+      startPointY = mouseY;
+      sourceChosen = true;
+    }
   }
 }

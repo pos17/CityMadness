@@ -14,6 +14,10 @@ Map myMap;
 boolean isMusicOn = true;
 boolean creatingParticles = false;
 boolean goodMusic = false;
+boolean sourceChosen = false;
+
+int startPointX = -1;
+int startPointY = -1;
 
 
 int buttonw = 50;
@@ -44,7 +48,7 @@ int r = 1;
 int nParticles = 5000;
 int nStreetParticles = 5000;
 int scale = 1;
-int instants = 500;
+int instants = 1000;
 
 PGraphics bkg;
 
@@ -65,7 +69,8 @@ void setup(){
   bkg = createGraphics(width,height,P2D);
   bkg.beginDraw();
   bkg.noStroke();
-  bkg.fill(0);
+  //bkg.fill(0);
+  bkg.fill(2,3,5);
   bkg.rect(0,0,width,height);
   bkg.endDraw();
   tint(0,5); //To draw bkg with an alpha
@@ -109,7 +114,7 @@ void setup(){
     
   //println(checkedStreets.size());
     
-  background(0);
+  background(2,3,5);
   textSize(buttonw);
 }
 
@@ -134,27 +139,23 @@ void draw(){
   fill(0);
   text("B", width-buttonw+offset, height-offset);
   text("G", width-2*buttonw+offset, height-offset);
- 
-    for(int i = 0; i<particles.size(); i++){
-      Particle p = particles.get(i);
-      p.moveOnPath();
-      p.show();
-    }
-    //println(streets.size());
     
-    for(int i = 0; i<streets.size(); i++){
-      
-      StreetParticle s = streets.get(i);
-      s.moveOnPath();
-      s.show();
-    }
-    for(int i = 0; i<tp.size(); i++){
-      TriggerParticle t = tp.get(i);
-      t.moveOnPath();
-      t.show();
-    }
-    
+  for(int i = 0; i<streets.size(); i++){  
+    StreetParticle s = streets.get(i);
+    s.moveOnPath();
+    s.show();
+  }
+  for(int i = 0; i<tp.size(); i++){
+    TriggerParticle t = tp.get(i);
+    t.moveOnPath();
+    t.show();
+  }
   
+  for(int i = 0; i<particles.size(); i++){
+    Particle p = particles.get(i);
+    p.moveOnPath();
+    p.show();
+  }
 }
 
 
@@ -177,6 +178,8 @@ void keyPressed(){
      creatingParticles = false;
      particles.clear(); 
      tp.clear();
+     
+     sourceChosen = false;
  }
   
 }

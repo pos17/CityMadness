@@ -49,7 +49,11 @@ class StreetParticle{
     
     this.t = 0;
     
-    this.c = color(114, 97, 163);
+    //this.c = color(114, 97, 163);
+    //this.c = color(40, 75, 113);
+    //this.c = color(70, 1, 2);
+    this.c = color(44,100,105);
+
     
     //ArrayList<Node> apath = pf.bfs(n,m);
     
