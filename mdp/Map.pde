@@ -3,8 +3,11 @@ class Map{
   MapPath path;
   MapLine line;
   
+  boolean pathDone;
+  
   Map(){
-    mapPoints = loadMapPoints();
+    this.mapPoints = loadMapPoints();
+    this.pathDone = false;
   }
   
   void show(){
@@ -13,19 +16,22 @@ class Map{
       MapPoint m = iter.next();
       m.show();
     }
-    line.show();
+    if(pathDone){
+      line.show();
+      
   }
   
   void createMapPath(){
-    path = new MapPath();
+    this.path = new MapPath();
   }
   
   void addToPath(int id){
-    path.appendPoint(mapPoints.get(id)); 
+    this.path.appendPoint(mapPoints.get(id)); 
   }
   
   void endMapPath(){
-    path.end();
+    this.path.end();
+    this.pathDone = true;
     this.createLine();
   }
   
