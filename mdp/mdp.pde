@@ -19,15 +19,7 @@ void setup(){
   
   strokeJoin(MITER);
   
-  
   map = new Map();
-  
-  map.createMapPath();
-  for(int i = 20; i<100; i++){
-    map.addToPath(i);
-  }
-  map.endMapPath();
-  
 }
 
 

@@ -1,13 +1,29 @@
-/*
-
-void oscEvent(OscMessage theOscMessage) {
+void oscEvent(OscMessage msg) {
+  String start = "start";
+  String end = "stop";
   
-  if(theOscMessage.checkAddrPattern("/MusPath")==true) {
-    //musicPath.append(theOscMessage.get(0).intValue());
+  if(msg.checkAddrPattern("/MusPath")==true) {
+    
+    if(start.equalsIgnoreCase(msg.get(0).stringValue())){
+      map.createMapPath();
+    }
+    else if(end.equalsIgnoreCase(msg.get(0).stringValue())){
+      map.endMapPath();
+    }
+    else{
+      map.addToPath(msg.get(0).intValue());
+    }
   }
   
-  if(theOscMessage.checkAddrPattern("/ShortPath")==true) {
-    //shortPath.append(theOscMessage.get(0).intValue());
+  if(msg.checkAddrPattern("/ShortPath")==true){
+    if(start.equalsIgnoreCase(msg.get(0).stringValue())){
+      map.createMapPath();
+    }
+    else if(end.equalsIgnoreCase(msg.get(0).stringValue())){
+      map.endMapPath();
+    }
+    else{
+      map.addToPath(msg.get(0).intValue());
+    }
   }
 }
-*/
