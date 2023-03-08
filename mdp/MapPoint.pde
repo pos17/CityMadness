@@ -1,18 +1,15 @@
 class MapPoint{
- float x,y;
+ PVector coordinates;
  int id;
- boolean lineString;
  ArrayList<MapPoint> line;
  
   MapPoint(int id, float x, float y){
-    this.x = x;
-    this.y = y;
+    this.coordinates = new PVector(x, y);
     this.id = id;
   }
   
-  float[] getCoords(){
-    float[]f = {this.x, this.y};
-   return f; 
+  PVector getCoords(){
+   return this.coordinates; 
   }
   
   int getId(){
@@ -22,11 +19,11 @@ class MapPoint{
   void show(){
     stroke(255,0,0);
     strokeWeight(3);
-    point(this.x,this.y);
+    point(this.coordinates.x,this.coordinates.y);
   }
 }
 
-class MapPointSorter implements Comparator<MapPoint> {  
+class MapPointSorter implements Comparator<MapPoint> {
     public int compare(MapPoint m1, MapPoint m2)
     {
         if (m1.getId() == m2.getId())
