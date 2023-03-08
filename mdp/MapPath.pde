@@ -1,16 +1,16 @@
 class MapPath{
-  IntList path;
+  ArrayList<MapPoint> path;
   boolean finished;
   int index;
   
   MapPath(){
-    this.path = new IntList();
+    this.path = new ArrayList<MapPoint>();
     this.finished = false;
     this.index = 0;
   }
   
-  void append(int id){
-     path.append(id);
+  void appendPoint(MapPoint m){
+     path.add(m);
   }
   
   void end(){
@@ -21,16 +21,19 @@ class MapPath{
     return finished; 
   }
   
-  int getNextPoint(){
+  MapPoint getNextPoint(){
     if(finished){
-      this.index++;
-      if(index < path.size())
+      if(index < path.size()){
+        MapPoint nextPoint = this.path.get(this.index);
+        this.index++;
+        return nextPoint;
+      }
+      else{
+        this.index--;
         return this.path.get(this.index);
-      
-      else
-        throw new NullPointerException("No more path");
+      }
     }
     else
-      throw new NullPointerException("not finished");
+      return new MapPoint(0,0,-1); //Path is not finished
   }
 }
