@@ -147,21 +147,21 @@ def startHandler(unused_addr, start):
 
     MusPath = notes[steps]
     ShortPath = notes[steps_]
-    client.send_message("/MusPath", "StartMusPath")
+    client.send_message("/MusPath", "Start")
     for i in range(len(MusPath)):
         client.send_message("/MusPath", "{0}".format(MusPath[i]))
         #time.sleep(1)
         if i == len(MusPath)-1:
             break
-    client.send_message("/MusPath", "StopMusPath")
-    client.send_message("/ShortPath", "StartShortPath")
+    client.send_message("/MusPath", "Stop")
+    client.send_message("/ShortPath", "Start")
     for i in range(len(ShortPath)):
         client.send_message("/ShortPath", "{0}".format(ShortPath[i]))
         #time.sleep(1)
         if i == len(ShortPath)-1:
             break
     
-    client.send_message("/ShortPath", "StopShortPath")
+    client.send_message("/ShortPath", "Stop")
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", default="127.0.0.1",
