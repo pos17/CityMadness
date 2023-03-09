@@ -1,5 +1,5 @@
 int iter = 0 ;
-int musPathLen = 0;
+int shortPathLen = 0;
 void oscEvent(OscMessage msg) {
   String start = "Start";
   String end = "Stop";
@@ -9,37 +9,37 @@ void oscEvent(OscMessage msg) {
   //println("MessageEnd \n");
   print("msg"+msg);
   
-  if(msg.checkAddrPattern("/StartMusPath")==true) {
+  if(msg.checkAddrPattern("/StartShortPath")==true) {
     
     println(msg.get(0).intValue());
     StartedPath = true;
-    musPathLen = msg.get(0).intValue();
+    shortPathLen = msg.get(0).intValue();
     map.createMapPath();
     println("Started Path Parsing");
     println("iter=" + iter );
     iter++;
-    println("Length: " + musPathLen);
+    println("Length: " + shortPathLen);
   }
-  else if(msg.checkAddrPattern("/MusPath")){
+  else if(msg.checkAddrPattern("/ShortPath")){
     println("parsed");
     println("iter=" + iter );
     iter++;
       //println(msg.get(0).stringValue());
       
       //println(parseInt(msg.get(0).stringValue()));
-      for(int i = 0; i <musPathLen; i++) {
+      for(int i = 0; i <shortPathLen; i++) {
         println("parsed");
         map.addToPath(msg.get(i).intValue());
         println(msg.get(i).intValue());
       }  
   }
-  else if(msg.checkAddrPattern("/StopMusPath")) {
+  else if(msg.checkAddrPattern("/StopShortPath")) {
     println("ended");
     println("iter=" + iter );
     iter++;
-      map.endMapPath();
+    map.endMapPath();
       
-    }
+  }
   else {
   println("something else");
   println(msg);

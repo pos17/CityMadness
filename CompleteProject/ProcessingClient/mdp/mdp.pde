@@ -11,6 +11,8 @@ Map map;
 int inport = 1234;
 int outport = 5004;
 
+PFont font;
+
 void setup(){
   size(900,800);
   pixelDensity(displayDensity());
@@ -20,6 +22,9 @@ void setup(){
   myRemoteLocation = new NetAddress("127.0.0.1", outport);
   
   strokeJoin(MITER);
+  
+  font = createFont("Arial", 20);
+  textFont(font);
   
   map = new Map();
 }

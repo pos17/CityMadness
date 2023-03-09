@@ -14,11 +14,27 @@ class MapPath{
   }
   
   void end(){
-    this.finished = true; 
+    this.finished = true;
+    println("Ids of the path:");
+    for(int i = 0; i<this.path.size(); i++){
+      println(this.path.get(i).getId()); 
+    }
+    println("End IDs of the path");
   }
   
   boolean hasEnd(){
     return finished; 
+  }
+  
+  void show(){
+    strokeWeight(5);
+    stroke(0,255,0);
+    for(int i = 0; i<this.path.size(); i++){
+      MapPoint m = path.get(i);
+      PVector p = m.getCoords();
+      point(p.x, p.y);
+      text("Id: " + m.getId(), p.x + 20, p.y + 20);
+    }
   }
   
   MapPoint getNextPoint(){

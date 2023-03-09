@@ -101,7 +101,7 @@ def loadNodes(features):
         if features[i]["geometry"]["type"] == "LineString":
             source = features[i]["src"] - 1
             target = features[i]["tgt"]-1
-
+            print(str(source) + ", " + str(target))
             nodes[source][3].append(target)
             nodes[target][3].append(source)
     nodes = np.array(nodes, dtype=object)
@@ -117,6 +117,7 @@ def getPath(start, target, policy):
         steps.append(now)
         counter += 1
         if counter > 500:
+            print("path not possible")
             break
     return steps
 
@@ -153,12 +154,16 @@ def targetHandler(unused_addr, target):
 def startHandler(unused_addr, start):
     time.sleep(7)
     print("startHandler")
+    print("start: " + str(start) )
+    print("targetG: "+str(targetG))
     steps_ = getPath(start, targetG, pol_shortest)
     steps = getPath(start, targetG, pol_musical)
 
 
-    MusPath = notes[steps]
-    ShortPath = notes[steps_]
+    #MusPath = notes[steps]
+    #ShortPath = notes[steps_]
+    MusPath = steps
+    ShortPath = steps_
     client.send_message("/StartMusPath",len(MusPath))
     print("Path Started")
     #client.send_message("/MusPath",MusPath)
@@ -166,7 +171,7 @@ def startHandler(unused_addr, start):
     for i in range(len(MusPath)):
         #client.send_message("/MusPath", "{0}".format(MusPath[i]))
         msg.add_arg(MusPath[i], arg_type='i')
-        print(MusPath)
+        print(MusPath[i])
         #time.sleep(1)
         if i == len(MusPath)-1:
             break
@@ -180,14 +185,52 @@ def startHandler(unused_addr, start):
     #time.sleep(10)
     client.send_message("/StopMusPath",0)
     print("MusPath finished")
-    client.send_message("/StartShortPath",1)
+
+    
+
+
+
+
+    client.send_message("/StartShortPath",len(ShortPath))
+    print("Short Path Started")
+    #client.send_message("/MusPath",MusPath)
+    msg2 = osc_message_builder.OscMessageBuilder(address = '/ShortPath')
     for i in range(len(ShortPath)):
-        client.send_message("/ShortPath", "{0}".format(ShortPath[i]))
+        #client.send_message("/MusPath", "{0}".format(MusPath[i]))
+        msg2.add_arg(ShortPath[i], arg_type='i')
+        print(ShortPath[i])
         #time.sleep(1)
         if i == len(ShortPath)-1:
             break
+    msg2 = msg2.build()
+    print("done path short")
+    #time.sleep(2)
+    client.send(msg2)
     
+    #client.send_message("MusPath",MusPath)
+    print("ShortPath Sent")
+    #time.sleep(10)
     client.send_message("/StopShortPath",0)
+    print("ShortPath finished")
+
+
+
+
+
+
+    #client.send_message("/StartShortPath",1)
+    #print("Short Path Started")
+    #for i in range(len(ShortPath)):
+    #    client.send_message("/ShortPath", "{0}".format(ShortPath[i]))
+        #time.sleep(1)
+    #    print("Short Path: " + str(ShortPath[i]))
+    #    if i == len(ShortPath)-1:
+    #        break
+    
+    #client.send_message("/StopShortPath",0)
+    #print("Short Path Stopped")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", default="127.0.0.1",

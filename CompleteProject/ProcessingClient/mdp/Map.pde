@@ -17,6 +17,7 @@ class Map{
       m.show();
     }
     if(pathDone){
+      path.show();
       line.show();
     }   
   }
@@ -39,6 +40,10 @@ class Map{
     this.line = new MapLine(this.path); 
   }
   
+  MapPoint getMapPoint(int id){
+    return this.mapPoints.get(id);
+  }
+  
 
   ArrayList<MapPoint> loadMapPoints(){
     
@@ -51,7 +56,8 @@ class Map{
     
     mapJson = loadJSONObject("graphMilan.json");
     features = mapJson.getJSONArray("features");
-    map.add(new MapPoint(0,0,0));
+    
+    map.add(new MapPoint(0,0,0)); // Offset to get that Id of the MapPoint = index in the ArrayList
     for(int i = 0; i<features.size(); i++) {
       JSONObject obj = features.getJSONObject(i);
       JSONObject el = obj.getJSONObject("geometry");
@@ -71,6 +77,7 @@ class Map{
     
     //The map is already sorted in theory but sort it at startup just to be sure
     Collections.sort(map, new MapPointSorter());
+    
     return map;
   }
 }
