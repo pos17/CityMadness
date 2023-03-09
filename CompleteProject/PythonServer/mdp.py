@@ -1,4 +1,5 @@
 import json
+from multiprocessing.connection import wait
 import numpy as np
 import matplotlib.pyplot as plt
 import mdptoolbox
@@ -12,8 +13,11 @@ from pythonosc import udp_client
 from pythonosc import osc_server
 from pythonosc import dispatcher
 np.random.seed(0)
+inport = 5004
 
-client = udp_client.SimpleUDPClient("127.0.0.1", 1234)
+outport = 1234
+
+client = udp_client.SimpleUDPClient("127.0.0.1", outport)
 
 def NormalizeMusic(data):
     return (((data - np.min(data)) / (np.max(data) - np.min(data))) - 0.5)*2
@@ -91,6 +95,7 @@ def loadNodes(features):
     nodes = []
     for i in range(len(features)):
         if features[i]["geometry"]["type"] == "Point":
+
             nodes.append ([i,features[i]["geometry"]["coordinates"][0],features[i]["geometry"]["coordinates"][1],[]])
     for i in range(len(features)):
         if features[i]["geometry"]["type"] == "LineString":
@@ -123,50 +128,71 @@ def getMaxC():
     return maxC
 
 def targetHandler(unused_addr, target):
+    print("targetHandler")
+    print(target)
+    #target = 508
+    
     r_shortest = reward(nodes,target,0,1,5,maxC,notes,dm)
     ql_shortest = mdptoolbox.mdp.RelativeValueIteration(tm_sparse, r_shortest, 0.99)
-    ql_shortest.setVerbose()
+    #ql_shortest.setVerbose()
     ql_shortest.run()
-
+    print("targetHandler2")
     r_musical = reward(nodes,target,2,0,1,maxC,notes,dm)
     ql_musical = mdptoolbox.mdp.RelativeValueIteration(tm_sparse, r_musical, 0.99)
-    ql_musical.setVerbose()
+    #ql_musical.setVerbose()
     ql_musical.run()
-
+    print("targetHandler3")
     global pol_shortest
     pol_shortest= ql_shortest.policy
     global pol_musical
     pol_musical= ql_musical.policy
     global targetG
     targetG = target
-
+    print("target: " + str(target))
+    
 def startHandler(unused_addr, start):
+    time.sleep(7)
+    print("startHandler")
     steps_ = getPath(start, targetG, pol_shortest)
     steps = getPath(start, targetG, pol_musical)
 
 
     MusPath = notes[steps]
     ShortPath = notes[steps_]
-    client.send_message("/MusPath", "Start")
+    client.send_message("/StartMusPath",len(MusPath))
+    print("Path Started")
+    #client.send_message("/MusPath",MusPath)
+    msg = osc_message_builder.OscMessageBuilder(address = '/MusPath')
     for i in range(len(MusPath)):
-        client.send_message("/MusPath", "{0}".format(MusPath[i]))
+        #client.send_message("/MusPath", "{0}".format(MusPath[i]))
+        msg.add_arg(MusPath[i], arg_type='i')
+        print(MusPath)
         #time.sleep(1)
         if i == len(MusPath)-1:
             break
-    client.send_message("/MusPath", "Stop")
-    client.send_message("/ShortPath", "Start")
+    msg = msg.build()
+    print("done path")
+    #time.sleep(2)
+    client.send(msg)
+    
+    #client.send_message("MusPath",MusPath)
+    print("MusPath Sent")
+    #time.sleep(10)
+    client.send_message("/StopMusPath",0)
+    print("MusPath finished")
+    client.send_message("/StartShortPath",1)
     for i in range(len(ShortPath)):
         client.send_message("/ShortPath", "{0}".format(ShortPath[i]))
         #time.sleep(1)
         if i == len(ShortPath)-1:
             break
     
-    client.send_message("/ShortPath", "Stop")
+    client.send_message("/StopShortPath",0)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", default="127.0.0.1",
         help="The ip of the OSC server")
-    parser.add_argument("--port", type=int, default=5005,
+    parser.add_argument("--port", type=int, default=inport,
         help="The port the OSC server is listening on")
     args = parser.parse_args()
 

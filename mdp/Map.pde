@@ -18,7 +18,7 @@ class Map{
     }
     if(pathDone){
       line.show();
-      
+    }   
   }
   
   void createMapPath(){
@@ -51,7 +51,7 @@ class Map{
     
     mapJson = loadJSONObject("graphMilan.json");
     features = mapJson.getJSONArray("features");
-    
+    map.add(new MapPoint(0,0,0));
     for(int i = 0; i<features.size(); i++) {
       JSONObject obj = features.getJSONObject(i);
       JSONObject el = obj.getJSONObject("geometry");

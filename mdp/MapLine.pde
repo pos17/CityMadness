@@ -76,6 +76,6 @@ class MapLine{
        //point(p2.x, p2.y);
        p1 = p2;
     }
-    println(alpha);
+    //println(alpha);
   }
 }

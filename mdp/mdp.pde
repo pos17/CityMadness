@@ -8,14 +8,16 @@ OscP5 oscP52;
 NetAddress myRemoteLocation;
 
 Map map;
+int inport = 1234;
+int outport = 5004;
 
 void setup(){
   size(900,800);
   pixelDensity(displayDensity());
   
-  oscP5 = new OscP5(this,1234);
-  oscP52 = new OscP5(this,1234);
-  myRemoteLocation = new NetAddress("127.0.0.1", 5005);
+  oscP5 = new OscP5(this,inport);
+  oscP52 = new OscP5(this,inport);
+  myRemoteLocation = new NetAddress("127.0.0.1", outport);
   
   strokeJoin(MITER);
   

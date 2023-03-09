@@ -1,3 +1,4 @@
+
 class MapPoint{
  PVector coordinates;
  int id;
