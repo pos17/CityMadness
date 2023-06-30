@@ -1,3 +1,4 @@
+(
 if(s.hasBooted != true,{
 	s.boot;
 	"STARTING THE SERVER...".postln;
@@ -39,3 +40,4 @@ Atk.downloadKernels;
 Atk.downloadMatrices;
 Atk.downloadSounds;
 Atk.openUserSupportDir
+)
