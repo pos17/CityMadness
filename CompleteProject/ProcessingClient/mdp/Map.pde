@@ -54,7 +54,7 @@ class Map{
     JSONObject mapJson;
     JSONArray features = new JSONArray();
     
-    mapJson = loadJSONObject("graphMilan.json");
+    mapJson = loadJSONObject("graphCremona.json");
     features = mapJson.getJSONArray("features");
     
     // map.add(new MapPoint(0,0,0)); // Offset to get that Id of the MapPoint = index in the ArrayList
@@ -68,8 +68,15 @@ class Map{
         y = el.getJSONArray("coordinates").getFloat(1);
         id = obj.getInt("id")-1;
         
+        // MILAN
+        /*
         x = ((x - 9.15040660361177) * width) / (9.231021608560354 - 9.15040660361177);
         y = ((y - 45.49082190275931)* height)/ (45.44414445567239 - 45.49082190275931);
+        */
+        
+        // CREMONA
+        x = ((x - 10.012826061753287) * width) / (10.031731839461685 - 10.012826061753287);
+        y = ((y - 45.138503171087336)* height)/ (45.13185662179308 - 45.138503171087336);
         
         map.add(new MapPoint(id,x,y));
       }
