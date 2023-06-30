@@ -239,7 +239,7 @@ if __name__ == "__main__":
         help="The port the OSC server is listening on")
     args = parser.parse_args()
 
-    f = open("graphMilan.json")
+    f = open("graphCremona.json")
     graph = json.load(f)
     features = graph["features"]
     loadNodes(features)
