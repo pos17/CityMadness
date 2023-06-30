@@ -11,10 +11,10 @@ NetAddress myRemoteLocation;
 void setup() {
   size(400,400);
   frameRate(25);
-  oscP5 = new OscP5(this,1234);
-  oscP52 = new OscP5(this,1234);
+  oscP5 = new OscP5(this,1236);
+  oscP52 = new OscP5(this,1236);
 
-  myRemoteLocation = new NetAddress("127.0.0.1", 5004);
+  myRemoteLocation = new NetAddress("127.0.0.1", 5010);
 }
 
 void draw() {

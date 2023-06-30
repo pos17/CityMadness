@@ -100,7 +100,7 @@ def loadNodes(features):
     for i in range(len(features)):
         if features[i]["geometry"]["type"] == "LineString":
             source = features[i]["src"] - 1
-            target = features[i]["tgt"]-1
+            target = features[i]["tgt"] - 1
             print(str(source) + ", " + str(target))
             nodes[source][3].append(target)
             nodes[target][3].append(source)
