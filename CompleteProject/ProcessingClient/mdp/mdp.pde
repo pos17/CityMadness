@@ -2,6 +2,7 @@ import oscP5.*;
 import netP5.*;
 import java.util.*;
 
+int NMAPPARTICLES = 200;
 
 OscP5 oscP5;
 OscP5 oscP52;
@@ -14,7 +15,7 @@ int outport = 5004;
 PFont font;
 
 void setup(){
-  size(900,800);
+  size(900,800,P2D);
   pixelDensity(displayDensity());
   
   oscP5 = new OscP5(this,inport);
@@ -23,7 +24,7 @@ void setup(){
   
   strokeJoin(MITER);
   
-  font = createFont("Arial", 20);
+  font = createFont("Arial", 15);
   textFont(font);
   
   map = new Map();

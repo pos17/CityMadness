@@ -2,23 +2,31 @@ class Map{
   ArrayList<MapPoint> mapPoints = new ArrayList<MapPoint>();
   MapPath path;
   MapLine line;
+  MapParticle system;
   
   boolean pathDone;
+  
+  PGraphics city;
   
   Map(){
     this.mapPoints = loadMapPoints();
     this.pathDone = false;
+    this.renderMap();
   }
   
   void show(){
+    /*
     ListIterator<MapPoint> iter = mapPoints.listIterator();
     while(iter.hasNext()){
       MapPoint m = iter.next();
       m.show();
     }
+    */
+    image(this.city,0,0);
     if(pathDone){
       path.show();
-      line.show();
+      system.show();
+      //line.show();
     }   
   }
   
@@ -33,11 +41,17 @@ class Map{
   void endMapPath(){
     this.path.end();
     this.pathDone = true;
-    this.createLine();
+    // this.createLine();
+    this.createParticleSystem();
   }
   
   void createLine(){
     this.line = new MapLine(this.path); 
+  }
+  
+  void createParticleSystem(){
+    println("SYSTEM CREATED");
+    this.system = new MapParticle(this.path); 
   }
   
   MapPoint getMapPoint(int id){
@@ -86,5 +100,19 @@ class Map{
     Collections.sort(map, new MapPointSorter());
     
     return map;
+  }
+  
+  void renderMap(){
+    this.city = createGraphics(width, height, P2D);
+    this.city.beginDraw();
+    this.city.background(0);
+    this.city.stroke(255,0,0);
+    this.city.noFill();
+    this.city.strokeWeight(5);
+    for(int i = 0; i<mapPoints.size(); i++){
+      PVector pos = mapPoints.get(i).getCoords();
+      this.city.point(pos.x, pos.y);
+    }
+    this.city.endDraw();
   }
 }

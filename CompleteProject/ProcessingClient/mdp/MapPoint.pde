@@ -2,7 +2,7 @@
 class MapPoint{
  PVector coordinates;
  int id;
- ArrayList<MapPoint> line;
+ ArrayList<MapPoint> line; 
  
   MapPoint(int id, float x, float y){
     this.coordinates = new PVector(x, y);

@@ -62,7 +62,7 @@ void oscEvent(OscMessage msg) {
 
 void keyPressed() {
   OscMessage myMessage = new OscMessage("/target");
-  myMessage.add(789);
+  myMessage.add(20);
   oscP52.send(myMessage, myRemoteLocation);
   println("sender target");
   
@@ -72,7 +72,7 @@ void keyPressed() {
   /* Man kan tilføje int, float, text, byte OG arrays*/
   // Denne beskedID indeholder 3 beskeder, hvilket skal tages i mente
   // for den modtagende handler-funktion
-  myMessage2.add(500);
+  myMessage2.add(200);
   /* Hvad der sendes, og hvor til */
   oscP5.send(myMessage2, myRemoteLocation);
   println("sender start");
