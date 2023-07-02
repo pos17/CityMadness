@@ -36,20 +36,6 @@ class MapLine{
     for(int i = 0; i<numSegments; i++){
        buffer.add((PVector.lerp(this.current, this.next, map(i,0,numSegments,0,1))));
     }
-    /*
-    println("Current: ");
-    println("x: " + this.current.x + " y: " + this.current.y);
-    println("Next: ");
-    println("x: " + this.next.x + " y: " + this.next.y);
-    */
-    //println(this.alpha);
-    /*
-    for(int i = 0; i<line.size(); i++){
-      PVector p = line.get(i);
-       println("x: " + p.x + " y: " + p.y);
-    }
-    
-    */
   }
   
   void show(){
@@ -77,6 +63,5 @@ class MapLine{
        //point(p2.x, p2.y);
        p1 = p2;
     }
-    //println(alpha);
   }
 }

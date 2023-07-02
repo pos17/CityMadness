@@ -13,11 +13,14 @@ class MapPathAttractor{
     MapPoint start,end;
     PVector p1 = new PVector();
     PVector p2 = new PVector();
+    PVector p3 = new PVector();
+    PVector p4 = new PVector();
     
     PVector startCoord = new PVector();
     PVector endCoord = new PVector();
     PVector connecting = new PVector();
     PVector norm = new PVector();
+    PVector mid = new PVector();
     
     for(int i = 1; i < path.size(); i++){
       start = path.get(i-1);
@@ -34,6 +37,15 @@ class MapPathAttractor{
       
       this.pos.add(p1);
       this.pos.add(p2);
+      this.clockwise.add(new Boolean(false)); // STANDARD ORIENTATION
+      this.clockwise.add(new Boolean(true));
+      
+      mid = PVector.sub(startCoord,PVector.div(connecting,2)); // ADDED MID ATTRACTORS TO HAVE 90° CURVES BE MORE SHARP
+      
+      p3 = PVector.add(mid,norm);
+      p4 = PVector.sub(mid,norm);
+      this.pos.add(p3);
+      this.pos.add(p4);
       this.clockwise.add(new Boolean(false)); // STANDARD ORIENTATION
       this.clockwise.add(new Boolean(true));
       
@@ -59,7 +71,6 @@ class MapPathAttractor{
       partPos = part.getPos();
       
       for(int j = 0; j<this.pos.size(); j++){
-        //if(PVector.dist(this.quad[j],p[i].getQuad()) < 2*DQUAD){
           acc = PVector.sub(partPos,this.pos.get(j));
           acc.setMag(1/acc.mag());
           if(this.clockwise.get(j).booleanValue())
@@ -68,13 +79,10 @@ class MapPathAttractor{
             acc.rotate(HALF_PI);
             
           a.add(acc);
-       // }
       }
-      //v.sub((PVector.sub(p[i],mid)).setMag(0.01));
       a.div(PMASS);
       part.setA(a);
       part.move();
-      //p.set(i,part);
     }
     
     return p;

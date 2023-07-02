@@ -57,23 +57,4 @@ class MapPath{
   ArrayList<MapPoint> getPath(){
     return this.path;
   }
-  
-  /*
-  ArrayList<MapPointAttractor> generateAttractors(){
-    ArrayList<MapPointAttractor> attractorList = new ArrayList<MapPointAttractor>();
-    MapPoint a,b;
-    for(int i = 1; i<this.path.size(); i++){
-       a = this.path.get(i-1);
-       b = this.path.get(i);
-       MapPointAttractor attractor = new MapPointAttractor(a,b);
-       attractorList.add(attractor);
-    }
-    
-    // MANUALLY SET LAST ATTRACTOR TO BE NULL
-    a = this.path.get(path.size()-1);
-    attractorList.add(new MapPointAttractor());
-    return attractorList;
-  }
-  */
-  
 }

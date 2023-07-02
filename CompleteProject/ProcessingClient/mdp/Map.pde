@@ -4,6 +4,8 @@ class Map{
   MapPath path;
   MapLine line;
   MapParticleSystem system;
+  MapAttractor attractor;
+  ArrayList<Particle> mapParticles = new ArrayList<Particle>();
   
   boolean pathDone;
   
@@ -13,22 +15,23 @@ class Map{
     this.mapPoints = loadMapPoints();
     this.pathDone = false;
     this.renderMap();
+    this.attractor = new MapAttractor(20);
+    
+    for(int i = 0; i < NMAPPARTICLES; i++){
+      mapParticles.add(new Particle()); 
+    }
   }
   
   void show(){
-    /*
-    ListIterator<MapPoint> iter = mapPoints.listIterator();
-    while(iter.hasNext()){
-      MapPoint m = iter.next();
-      m.show();
-    }
-    */
     image(this.city,0,0);
     if(pathDone){
       path.show();
       system.show();
-      //line.show();
-    }   
+    }
+    
+    mapParticles = attractor.moveParticle(mapParticles);
+    this.attractor.show();
+    this.showParticles();
   }
   
   void createMapPath(){
@@ -115,5 +118,20 @@ class Map{
       this.city.point(pos.x, pos.y);
     }
     this.city.endDraw();
+  }
+  
+  void showParticles(){
+    
+    PGraphics render = createGraphics(width,height,P2D);
+    render.beginDraw();
+    render.noFill();
+    render.stroke(255);
+    render.strokeWeight(2);
+    for(int i = 0; i<this.mapParticles.size(); i++){
+      PVector p = this.mapParticles.get(i).getPos();
+      render.point(p.x,p.y);
+    }
+    render.endDraw();
+    image(render,0,0);
   }
 }
