@@ -1,16 +1,19 @@
-class MapParticle{
+
+class MapParticleSystem{
   ArrayList<Particle> system;
   MapPath path;
   MapPoint current, next;
-  ArrayList<MapPointAttractor> attractors;
+  //ArrayList<MapPointAttractor> attractors;
+  MapPathAttractor att;
   
   PGraphics render;
   
-  MapParticle(MapPath mp){
+  MapParticleSystem(MapPath mp){
     this.path = mp;
     // Initialize the attractors
-    attractors = new ArrayList<MapPointAttractor>();
-    attractors = this.path.generateAttractors();
+    // attractors = new ArrayList<MapPointAttractor>();
+    //attractors = this.path.generateAttractors();
+    att = new MapPathAttractor(this.path);
     
     // Set the first two points
     this.current = this.path.getNextPoint();
@@ -27,6 +30,8 @@ class MapParticle{
   
   void show(){
     
+    system = att.moveParticle(system);
+    
     this.render.beginDraw();
     this.render.clear();
     this.render.noFill();
@@ -37,7 +42,7 @@ class MapParticle{
       PVector p = iter.next().getPos();
       this.render.point(p.x, p.y);
     }
-    
+    /*
     this.render.stroke(0,0,255);
     this.render.strokeWeight(5);
     this.render.noFill();
@@ -52,10 +57,13 @@ class MapParticle{
       this.render.point(p[2].x,p[2].y);
       this.render.point(p[3].x,p[3].y);
     }
+    */
     
     this.render.endDraw();
     
     image(this.render,0,0);
+    
+    this.att.show();
     
   }
   

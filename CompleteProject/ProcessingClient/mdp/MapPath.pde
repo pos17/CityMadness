@@ -1,3 +1,4 @@
+
 class MapPath{
   ArrayList<MapPoint> path;
   boolean finished;
@@ -33,7 +34,7 @@ class MapPath{
       MapPoint m = path.get(i);
       PVector p = m.getCoords();
       point(p.x, p.y);
-      text("Id: " + m.getId(), p.x + 20, p.y + 20);
+      text(i, p.x + 20, p.y + 20);
     }
   }
   
@@ -53,6 +54,11 @@ class MapPath{
       return new MapPoint(0,0,-1); //Path is not finished
   }
   
+  ArrayList<MapPoint> getPath(){
+    return this.path;
+  }
+  
+  /*
   ArrayList<MapPointAttractor> generateAttractors(){
     ArrayList<MapPointAttractor> attractorList = new ArrayList<MapPointAttractor>();
     MapPoint a,b;
@@ -68,5 +74,6 @@ class MapPath{
     attractorList.add(new MapPointAttractor());
     return attractorList;
   }
+  */
   
 }

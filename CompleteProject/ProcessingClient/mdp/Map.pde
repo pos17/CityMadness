@@ -1,8 +1,9 @@
+
 class Map{
   ArrayList<MapPoint> mapPoints = new ArrayList<MapPoint>();
   MapPath path;
   MapLine line;
-  MapParticle system;
+  MapParticleSystem system;
   
   boolean pathDone;
   
@@ -51,7 +52,7 @@ class Map{
   
   void createParticleSystem(){
     println("SYSTEM CREATED");
-    this.system = new MapParticle(this.path); 
+    this.system = new MapParticleSystem(this.path); 
   }
   
   MapPoint getMapPoint(int id){
