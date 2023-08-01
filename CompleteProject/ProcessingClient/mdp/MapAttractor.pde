@@ -35,22 +35,6 @@ class MapAttractor{
     }
   }
   
-  void show(){
-    this.update();
-    
-    PGraphics render = createGraphics(width,height,P2D);
-    render.beginDraw();
-    render.noFill();
-    render.stroke(0,0,255);
-    render.strokeWeight(2);
-    for(int i = 0; i<this.pos.size(); i++){
-      PVector p = this.pos.get(i);
-      render.point(p.x,p.y);
-    }
-    render.endDraw();
-    image(render,0,0);
-  }
-  
   ArrayList<Particle> moveParticle(ArrayList<Particle> p){
     
     for(int i = 0; i<p.size(); i++){
@@ -77,5 +61,9 @@ class MapAttractor{
     }
     
     return p;
+  }
+  
+  ArrayList<PVector> getPos(){
+    return this.pos; 
   }
 }

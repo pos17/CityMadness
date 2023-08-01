@@ -5,8 +5,6 @@ class MapParticleSystem{
   MapPoint current, next;
   MapPathAttractor att;
   
-  PGraphics render;
-  
   MapParticleSystem(MapPath mp){
     this.path = mp;
     // Initialize the attractors
@@ -21,30 +19,14 @@ class MapParticleSystem{
       system.add(new Particle()); 
     }
     
-    this.render = createGraphics(width,height,P2D);
     
   }
   
-  void show(){
-    
+  ArrayList<Particle> getSystem(){
+    return this.system;
+  }
+  
+  void moveParticles(){
     system = att.moveParticle(system);
-    
-    this.render.beginDraw();
-    this.render.clear();
-    this.render.noFill();
-    this.render.stroke(255);
-    this.render.strokeWeight(3);
-    ListIterator<Particle> iter = this.system.listIterator();
-    while(iter.hasNext()){
-      PVector p = iter.next().getPos();
-      this.render.point(p.x, p.y);
-    }
-    
-    this.render.endDraw();
-    
-    image(this.render,0,0);
-    
-    this.att.show();
-    
   }
 }

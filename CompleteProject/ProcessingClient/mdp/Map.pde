@@ -9,14 +9,14 @@ class Map{
   
   boolean pathDone;
   
-  PGraphics city;
+  PGraphics city, render;
   
   Map(){
     this.mapPoints = loadMapPoints();
     this.pathDone = false;
     this.renderMap();
     this.attractor = new MapAttractor(20);
-    
+    this.render = createGraphics(width, height, P2D);
     for(int i = 0; i < NMAPPARTICLES; i++){
       mapParticles.add(new Particle()); 
     }
@@ -24,14 +24,47 @@ class Map{
   
   void show(){
     image(this.city,0,0);
+    this.render.beginDraw();
+    this.render.clear();
+    
     if(pathDone){
-      path.show();
-      system.show();
+      path.show(); // TEMPORARY, WILL BE DELETED LATER
+      
+      //SHOW PATH PARTICLES
+      ArrayList<Particle> systemParticles = system.getSystem();
+      this.render.stroke(255);
+      this.render.strokeWeight(3);
+      ListIterator<Particle> systemParticlesIter = systemParticles.listIterator();
+      while(systemParticlesIter.hasNext()){
+        PVector p = systemParticlesIter.next().getPos();
+        this.render.point(p.x, p.y);
+      }
+      system.moveParticles();
     }
     
     mapParticles = attractor.moveParticle(mapParticles);
-    this.attractor.show();
-    this.showParticles();
+
+    
+    //SHOW ATTRACTORS
+    ArrayList<PVector> attractorPos = this.attractor.getPos();
+    this.render.stroke(0,0,255);
+    this.render.strokeWeight(2);
+    ListIterator<PVector> attractorIter = attractorPos.listIterator();
+    while(attractorIter.hasNext()){
+      PVector p = attractorIter.next();
+      this.render.point(p.x,p.y);
+    }
+    
+    //SHOW CHAOTIC PARTICLES
+    this.render.stroke(255);
+    this.render.strokeWeight(2);
+    ListIterator<Particle> mapParticlesIter = this.mapParticles.listIterator();
+    while(mapParticlesIter.hasNext()){
+      PVector p = mapParticlesIter.next().getPos();
+      render.point(p.x,p.y);
+    }
+    this.render.endDraw();
+    image(this.render,0,0);
   }
   
   void createMapPath(){
@@ -120,18 +153,5 @@ class Map{
     this.city.endDraw();
   }
   
-  void showParticles(){
-    
-    PGraphics render = createGraphics(width,height,P2D);
-    render.beginDraw();
-    render.noFill();
-    render.stroke(255);
-    render.strokeWeight(2);
-    for(int i = 0; i<this.mapParticles.size(); i++){
-      PVector p = this.mapParticles.get(i).getPos();
-      render.point(p.x,p.y);
-    }
-    render.endDraw();
-    image(render,0,0);
-  }
+
 }

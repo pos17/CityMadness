@@ -16,12 +16,6 @@ class MapPoint{
   int getId(){
     return this.id;
   }
-  
-  void show(){
-    stroke(255,0,0);
-    strokeWeight(3);
-    point(this.coordinates.x,this.coordinates.y);
-  }
 }
 
 class MapPointSorter implements Comparator<MapPoint> {
