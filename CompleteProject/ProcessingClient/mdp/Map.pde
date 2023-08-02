@@ -171,7 +171,7 @@ class Map{
   
   int getClosestPointId(float x, float y){
     PVector p = new PVector(x,y);
-    ArrayList<MapPoint> distSorted = this.mapPoints;
+    ArrayList<MapPoint> distSorted = new ArrayList<MapPoint>(this.mapPoints);
     distSorted.sort(new MapPointDistanceSorter(p));
     strokeWeight(9);
     stroke(25,200,100);
