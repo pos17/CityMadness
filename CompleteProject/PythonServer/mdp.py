@@ -150,14 +150,72 @@ def targetHandler(unused_addr, target):
     global targetG
     targetG = target
     print("target: " + str(target))
+
+    print("generating optimal paths")
+    pathSender()
+    print("finished")
+
+def randPathsHandler(unused_addr, start):
+    print("RandHandler")
+    global startG
+    startG = start
+    lenpath = 10
+    randPath = []
+    randPath.append(start)
+    print("generating random path")
+    for i in range (lenpath):
+        randPath.append(random.choice(nodes[randPath[i]][3]))
+
+    msg = osc_message_builder.OscMessageBuilder(address = '/RandPath1')
+    for i in range(len(randPath)):
+        msg.add_arg(randPath[i], arg_type='i')
+        print(randPath[i])
+    msg = msg.build()
+    client.send(msg)
+    print("random path sent")
+
+# def startHandler(unused_addr, start):
+#     time.sleep(7)
+#     print("startHandler")
+#     print("start: " + str(start) )
+#     print("targetG: "+str(targetG))
+#     steps_ = getPath(start, targetG, pol_shortest)
+#     steps = getPath(start, targetG, pol_musical)
+
+
+#     #MusPath = notes[steps]
+#     #ShortPath = notes[steps_]
+#     MusPath = steps
+#     ShortPath = steps_
+#     client.send_message("/StartMusPath",len(MusPath))
+#     print("Path Started")
+#     #client.send_message("/MusPath",MusPath)
+#     msg = osc_message_builder.OscMessageBuilder(address = '/MusPath')
+#     for i in range(len(MusPath)):
+#         #client.send_message("/MusPath", "{0}".format(MusPath[i]))
+#         msg.add_arg(MusPath[i], arg_type='i')
+#         print(MusPath[i])
+#         #time.sleep(1)
+#         if i == len(MusPath)-1:
+#             break
+#     msg = msg.build()
+#     print("done path")
+#     #time.sleep(2)
+#     client.send(msg)
     
-def startHandler(unused_addr, start):
+#     #client.send_message("MusPath",MusPath)
+#     print("MusPath Sent")
+#     #time.sleep(10)
+#     client.send_message("/StopMusPath",0)
+#     print("MusPath finished")
+
+def pathSender():
     time.sleep(7)
-    print("startHandler")
-    print("start: " + str(start) )
+    print("startPathSender")
+    print("start: " + str(startG) )
     print("targetG: "+str(targetG))
-    steps_ = getPath(start, targetG, pol_shortest)
-    steps = getPath(start, targetG, pol_musical)
+    steps_ = getPath(startG, targetG, pol_shortest)
+    steps = getPath(startG, targetG, pol_musical)
 
 
     #MusPath = notes[steps]
@@ -185,11 +243,6 @@ def startHandler(unused_addr, start):
     #time.sleep(10)
     client.send_message("/StopMusPath",0)
     print("MusPath finished")
-
-    
-
-
-
 
     client.send_message("/StartShortPath",len(ShortPath))
     print("Short Path Started")
@@ -255,9 +308,10 @@ if __name__ == "__main__":
     notes = np.random.randint(12,size=len(nodes))
     
     dispatcher = dispatcher.Dispatcher()
-    dispatcher.map("/target",targetHandler)
-    dispatcher.map("/start",startHandler)
 
+    dispatcher.map("/start",randPathsHandler)
+    dispatcher.map("/target",targetHandler)
+    
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
 
     print("Serving on {}".format(server.server_address))
