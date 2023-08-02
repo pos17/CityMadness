@@ -159,11 +159,14 @@ def randPathsHandler(unused_addr, start):
     print("RandHandler")
     global startG
     startG = start
-    lenpath = 10
+    lenpath = 3
     randPath = []
     randPath.append(start)
     print("generating random path")
     for i in range (lenpath):
+        rand = random.choice(nodes[randPath[i]][3])
+        while (rand in randPath):
+            rand = random.choice(nodes[randPath[i]][3])
         randPath.append(random.choice(nodes[randPath[i]][3]))
 
     msg = osc_message_builder.OscMessageBuilder(address = '/RandPath1')
