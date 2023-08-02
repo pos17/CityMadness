@@ -10,6 +10,12 @@ class MapPath{
     this.index = 0;
   }
   
+  MapPath(ArrayList<MapPoint> path){
+    this.path = path;
+    this.finished = true;
+    this.index = 0;
+  }
+  
   void appendPoint(MapPoint m){
      path.add(m);
   }
@@ -34,7 +40,7 @@ class MapPath{
       MapPoint m = path.get(i);
       PVector p = m.getCoords();
       point(p.x, p.y);
-      text(i, p.x + 20, p.y + 20);
+      text(m.getId(), p.x + 20, p.y + 20);
     }
   }
   

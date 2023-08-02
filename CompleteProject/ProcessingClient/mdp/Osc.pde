@@ -21,13 +21,12 @@ void oscEvent(OscMessage msg) {
     iter++;
     println("Length: " + shortPathLen);
   }
+  
   else if(msg.checkAddrPattern("/ShortPath")){
     println("parsed");
     println("iter=" + iter );
     iter++;
-      //println(msg.get(0).stringValue());
       
-      //println(parseInt(msg.get(0).stringValue()));
       for(int i = 0; i <shortPathLen; i++) {
         println("parsed");
         map.addToPath(msg.get(i).intValue());
@@ -40,6 +39,16 @@ void oscEvent(OscMessage msg) {
     iter++;
     map.endMapPath();
       
+  }
+  else if(msg.checkAddrPattern("/RandPath1")){
+    // First element is the length, all other elements are the IDs
+    //println(msg);
+    int len = msg.get(0).intValue();
+    IntList addresses = new IntList();
+    for(int i = 0; i<len; i++){
+      addresses.append(msg.get(i+1).intValue()); 
+    }
+    map.addRandPath(addresses);
   }
   else {
   println("something else");
@@ -68,26 +77,22 @@ void keyPressed() {
   println("sender target");
   
   
-  OscMessage myMessage2 = new OscMessage("/start");
-  
-  /* Man kan tilføje int, float, text, byte OG arrays*/
-  // Denne beskedID indeholder 3 beskeder, hvilket skal tages i mente
-  // for den modtagende handler-funktion
+  OscMessage myMessage2 = new OscMessage("/start");  
   myMessage2.add(180);
-  /* Hvad der sendes, og hvor til */
   oscP5.send(myMessage2, myRemoteLocation);
   println("sender start");
 }
-/*
+
 void mousePressed(){
-  OscMessage myMessage = new OscMessage("/start");
-  
-  Man kan tilføje int, float, text, byte OG arrays
-  // Denne beskedID indeholder 3 beskeder, hvilket skal tages i mente
-  // for den modtagende handler-funktion
-  myMessage.add(500);
-   Hvad der sendes, og hvor til 
-  oscP5.send(myMessage, myRemoteLocation);
-  println("sender start");
+  if(!startup){
+    
+  }
+  else{
+    OscMessage myMessage = new OscMessage("/start");
+    int id = map.getClosestPointId(mouseX, mouseY);
+    myMessage.add(id);
+    oscP5.send(myMessage, myRemoteLocation);
+    println("Random Start Path Sent");
+    startup = false;
+  }
 }
-*/

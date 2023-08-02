@@ -29,3 +29,21 @@ class MapPointSorter implements Comparator<MapPoint> {
             return -1;
     }
 }
+
+class MapPointDistanceSorter implements Comparator<MapPoint>{
+  PVector p;
+  
+  MapPointDistanceSorter(PVector p){
+    this.p = p; 
+  }
+  
+  public int compare(MapPoint m1, MapPoint m2){
+    float d1 = PVector.dist(m1.getCoords(),this.p);
+    float d2 = PVector.dist(m2.getCoords(),this.p);
+    
+    if(d1>d2)
+      return 1;
+    else
+      return -1;
+  }
+}

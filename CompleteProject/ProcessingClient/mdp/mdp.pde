@@ -8,6 +8,7 @@ float PMASS = 0.1;
 OscP5 oscP5;
 OscP5 oscP52;
 NetAddress myRemoteLocation;
+boolean startup = true;
 
 Map map;
 int inport = 1234;

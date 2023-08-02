@@ -2,7 +2,8 @@
 class Map{
   ArrayList<MapPoint> mapPoints = new ArrayList<MapPoint>();
   MapPath path;
-  MapLine line;
+  ArrayList<MapPath> randPath;
+  //MapLine line;
   MapParticleSystem system;
   MapAttractor attractor;
   ArrayList<Particle> mapParticles = new ArrayList<Particle>();
@@ -17,6 +18,7 @@ class Map{
     this.renderMap();
     this.attractor = new MapAttractor(20);
     this.render = createGraphics(width, height, P2D);
+    this.randPath = new ArrayList<MapPath>();
     for(int i = 0; i < NMAPPARTICLES; i++){
       mapParticles.add(new Particle()); 
     }
@@ -40,6 +42,12 @@ class Map{
         this.render.point(p.x, p.y);
       }
       system.moveParticles();
+    }
+    
+    if(!startup){
+      for(int i = 0; i<randPath.size(); i++){
+        randPath.get(i).show(); 
+      }
     }
     
     mapParticles = attractor.moveParticle(mapParticles);
@@ -81,11 +89,11 @@ class Map{
     // this.createLine();
     this.createParticleSystem();
   }
-  
+  /*
   void createLine(){
     this.line = new MapLine(this.path); 
   }
-  
+  */
   void createParticleSystem(){
     println("SYSTEM CREATED");
     this.system = new MapParticleSystem(this.path); 
@@ -93,6 +101,14 @@ class Map{
   
   MapPoint getMapPoint(int id){
     return this.mapPoints.get(id);
+  }
+  
+  void addRandPath(IntList addr){
+    ArrayList<MapPoint> randPoints = new ArrayList<MapPoint>();
+    for(int i = 0; i<addr.size(); i++){
+      randPoints.add(this.getMapPoint(addr.get(i))); 
+    }
+    this.randPath.add(new MapPath(randPoints));
   }
   
 
@@ -151,6 +167,16 @@ class Map{
       this.city.point(pos.x, pos.y);
     }
     this.city.endDraw();
+  }
+  
+  int getClosestPointId(float x, float y){
+    PVector p = new PVector(x,y);
+    ArrayList<MapPoint> distSorted = this.mapPoints;
+    distSorted.sort(new MapPointDistanceSorter(p));
+    strokeWeight(9);
+    stroke(25,200,100);
+    point(distSorted.get(0).getCoords().x,distSorted.get(0).getCoords().y);
+    return distSorted.get(0).getId();
   }
   
 

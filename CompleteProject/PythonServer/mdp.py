@@ -167,6 +167,7 @@ def randPathsHandler(unused_addr, start):
         randPath.append(random.choice(nodes[randPath[i]][3]))
 
     msg = osc_message_builder.OscMessageBuilder(address = '/RandPath1')
+    msg.add_arg(lenpath, arg_type='i')
     for i in range(len(randPath)):
         msg.add_arg(randPath[i], arg_type='i')
         print(randPath[i])
