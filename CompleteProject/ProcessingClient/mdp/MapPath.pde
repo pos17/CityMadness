@@ -40,7 +40,7 @@ class MapPath{
       MapPoint m = path.get(i);
       PVector p = m.getCoords();
       point(p.x, p.y);
-      text(m.getId(), p.x + 20, p.y + 20);
+      text(i, p.x + 20, p.y + 20);
     }
   }
   

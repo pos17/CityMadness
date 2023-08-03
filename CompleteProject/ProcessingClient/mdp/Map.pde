@@ -1,7 +1,8 @@
 
 class Map{
   ArrayList<MapPoint> mapPoints = new ArrayList<MapPoint>();
-  MapPath path;
+  MapPath musicPath;
+  MapPath shortPath;
   ArrayList<MapPath> randPath;
   //MapLine line;
   MapParticleSystem system;
@@ -30,7 +31,7 @@ class Map{
     this.render.clear();
     
     if(pathDone){
-      path.show(); // TEMPORARY, WILL BE DELETED LATER
+      musicPath.show(); // TEMPORARY, WILL BE DELETED LATER
       
       //SHOW PATH PARTICLES
       ArrayList<Particle> systemParticles = system.getSystem();
@@ -74,7 +75,7 @@ class Map{
     this.render.endDraw();
     image(this.render,0,0);
   }
-  
+  /*
   void createMapPath(){
     this.path = new MapPath();
   }
@@ -89,6 +90,26 @@ class Map{
     // this.createLine();
     this.createParticleSystem();
   }
+  */
+  
+  void addMusicPath(IntList addr){
+    ArrayList<MapPoint> musicPoints = new ArrayList<MapPoint>();
+    for(int i = 0; i<addr.size(); i++){
+      musicPoints.add(this.getMapPoint(addr.get(i))); 
+    }
+    this.musicPath = new MapPath(musicPoints);
+    this.pathDone = true;
+    
+    this.createParticleSystem();
+  }
+  
+  void addShortPath(IntList addr){
+    ArrayList<MapPoint> shortPoints = new ArrayList<MapPoint>();
+    for(int i = 0; i<addr.size(); i++){
+      shortPoints.add(this.getMapPoint(addr.get(i))); 
+    }
+    this.shortPath = new MapPath(shortPoints);
+  }
   /*
   void createLine(){
     this.line = new MapLine(this.path); 
@@ -96,7 +117,7 @@ class Map{
   */
   void createParticleSystem(){
     println("SYSTEM CREATED");
-    this.system = new MapParticleSystem(this.path); 
+    this.system = new MapParticleSystem(this.musicPath); 
   }
   
   MapPoint getMapPoint(int id){
