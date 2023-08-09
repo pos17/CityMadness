@@ -260,6 +260,7 @@ def pathHanlder(unused_addr, currentNode):
     print("Path Handler")
     print("Retrieving neighboor nodes")
     msg = osc_message_builder.OscMessageBuilder(address = '/nextNodes')
+    msg.add_arg(len(nodes[currentNode][3]), arg_type='i')
     for i in range(len(nodes[currentNode][3])):
         msg.add_arg(nodes[currentNode][3][i], arg_type='i')
         print(nodes[currentNode][3][i])
