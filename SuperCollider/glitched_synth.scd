@@ -1,10 +1,52 @@
-~n1 = NetAddr.new("127.0.0.1",1201);
+~n1 = NetAddr.new("127.0.0.1",57120);
+NetAddr.localAddr;
 
-o = OSCFunc({ arg msg, time, addr, recvPort; [msg, time, addr, recvPort].postln; }, '/goodbye', ~n);
-NetAddr.localAddr
+OSCFunc.trace(true);
+OSCFunc.trace(false);
 
 
-OSCresponder.all.postln;
+~notes = Array.newClear(128);
+
+(
+f = { |msg, time, addr|
+    if(msg[0] != '/status.reply') {
+        //"time: % sender: %\nmessage: %\n".postf(time, addr, msg);
+    }
+};
+thisProcess.addOSCRecvFunc(f);
+
+
+OSCdef.new(\noteOn,{
+	arg msg, time, addr, port;
+	var note;
+	postln("AAAAAAAAAAAAA");
+	~notes [msg[1]] = Synth("noiseToPitch", [\freq, msg[1].midicps.postln, \out, 0, \mul, 1]);
+	postln("freqqqqq");
+	msg[1].midicps.postln
+
+
+	},
+path: "/noteOn"
+);
+
+OSCdef.new(\noteOff,{
+	arg msg, time, addr, port;
+	var note;
+	postln("AAAAAAAAAAAAA");
+	~notes [msg[1]].release;
+	postln("freqqqqq");
+	msg[1].midicps.postln
+
+
+	},
+path: "/noteOff"
+)
+
+
+)
+
+// stop posting.
+thisProcess.removeOSCRecvFunc(f);
 
 
 

@@ -71,7 +71,7 @@ def parseNotes(s, tBase, baseNote,client,scheduler):
 
 def main():
     inport = 5004
-    outport = 1234  
+    outport = 57120  
     client = udp_client.SimpleUDPClient("127.0.0.1", outport)
     scheduler = sched.scheduler(time.monotonic, time.sleep)
 
@@ -90,7 +90,7 @@ def main():
     length = 10
     angle = 60
     iterations = 5
-    startingNoteMidi = 50
+    startingNoteMidi = 69
     tBase = 1
     lsysString = lSysGenerate(axiom, iterations)
     parseNotes(lsysString,tBase,startingNoteMidi,client,scheduler)
