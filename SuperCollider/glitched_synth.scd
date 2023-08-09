@@ -4,6 +4,21 @@ NetAddr.localAddr;
 OSCFunc.trace(true);
 OSCFunc.trace(false);
 
+(
+
+var notes = nil!128; //make Array of 128 slots, initially with nil objects in to represent nothing
+var releasefunction = {|index|
+
+		//release existing note if present already
+	if(activenotes[index].notNil) {
+		activenotes[index].release; //will send gate=0
+		activenotes[index] = nil; //make sure now empty slot ready
+	}
+
+};
+)
+
+
 
 ~notes = Array.newClear(128);
 
@@ -19,10 +34,10 @@ thisProcess.addOSCRecvFunc(f);
 OSCdef.new(\noteOn,{
 	arg msg, time, addr, port;
 	var note;
-	postln("AAAAAAAAAAAAA");
-	~notes [msg[1]] = Synth("noiseToPitch", [\freq, msg[1].midicps.postln, \out, 0, \mul, 1]);
-	postln("freqqqqq");
-	msg[1].midicps.postln
+	//postln("AAAAAAAAAAAAA");
+	~notes [msg[1]] = Synth("noiseToPitch", [\freq, msg[1].midicps,\gate,1, \out, 0, \mul, 1]);
+	postln("on");
+	//msg[1].midicps.postln
 
 
 	},
@@ -32,11 +47,11 @@ path: "/noteOn"
 OSCdef.new(\noteOff,{
 	arg msg, time, addr, port;
 	var note;
-	postln("AAAAAAAAAAAAA");
-	~notes [msg[1]].release;
-	postln("freqqqqq");
-	msg[1].midicps.postln
-
+	//postln("AAAAAAAAAAAAA");
+	~notes [msg[1]] = Synth("noiseToPitch", [\freq, msg[1].midicps,\gate, 0,\out, 0, \mul, 1]);
+	postln("off");
+	//msg[1].midicps.postln
+	//msg[1].gate.postln;
 
 	},
 path: "/noteOff"
@@ -51,15 +66,15 @@ thisProcess.removeOSCRecvFunc(f);
 
 
 (
-SynthDef("noiseToPitch", { arg freq=440, amp=2, mul=1, out = 0;
-	var env = Env(levels: [0, 1, 0.5, 0], times: [2, 2, 0.6], curve: [-6,0, 1]);
+SynthDef("noiseToPitch", { arg freq=440, amp=2, mul=1, out = 0, gate =1;
+	var env = Env(levels: [0, 1, 0.5, 0],times: [0.1, 0.5, 0.3], curve: [-6,0, 1]);
     Out.ar(
         out,
         Resonz.ar(
             SinOsc.ar(BrownNoise.ar(300, 400)) * mul,
 			freq,
 			[0.001, 0.001],
-			amp * EnvGen.kr(env, doneAction: 2),
+			amp * EnvGen.kr(env, gate,doneAction: 2),
             //LFNoise0.kr(4, 110, 660),
         )
     )
