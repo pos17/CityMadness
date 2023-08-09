@@ -2,7 +2,7 @@ import oscP5.*;
 import netP5.*;
 import java.util.*;
 
-int NMAPPARTICLES = 500;
+int NMAPPARTICLES = 5000;
 float PMASS = 0.1;
 
 OscP5 oscP5;

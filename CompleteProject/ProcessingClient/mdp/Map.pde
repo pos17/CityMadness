@@ -17,7 +17,7 @@ class Map{
     this.mapPoints = loadMapPoints();
     this.pathDone = false;
     this.renderMap();
-    this.attractor = new MapAttractor(20);
+    this.attractor = new MapAttractor(5);
     this.render = createGraphics(width, height, P2D);
     this.randPath = new ArrayList<MapPath>();
     for(int i = 0; i < NMAPPARTICLES; i++){
@@ -66,7 +66,7 @@ class Map{
     
     //SHOW CHAOTIC PARTICLES
     this.render.stroke(255);
-    this.render.strokeWeight(2);
+    this.render.strokeWeight(3);
     ListIterator<Particle> mapParticlesIter = this.mapParticles.listIterator();
     while(mapParticlesIter.hasNext()){
       PVector p = mapParticlesIter.next().getPos();
