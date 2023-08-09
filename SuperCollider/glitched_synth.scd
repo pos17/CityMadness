@@ -1,4 +1,21 @@
 (
+
+
+SynthDef("noiseToPitch", { arg freq=440, amp=2, mul=1, out = 0;
+	var env = Env(levels: [0, 1, 0.5, 0], times: [2, 2, 0.6], curve: [-6,0, 1]);
+    Out.ar(
+        out,
+        Resonz.ar(
+            SinOsc.ar(BrownNoise.ar(300, 400)) * mul,
+			freq,
+			[0.001, 0.001],
+			amp * EnvGen.kr(env, doneAction: 2),
+            //LFNoise0.kr(4, 110, 660),
+
+        )
+    )
+}).add;
+
 SynthDef(\,{
 	var snd, freqs, n, scale;
 	n=(1..16);
@@ -157,7 +174,7 @@ var song = l.value(5);
 var cursor = 0.0;
 var stack = List.new();
 var midi = 50;
-var noteLen = 2;
+var noteLen = 6;
 
 stack.add(midi);
 
@@ -167,10 +184,12 @@ song.do({
 		$N, {
 			var f = midi.midicps;
 			SystemClock.sched(cursor, {
-				Synth(\fx, [\freq, f, \amp, 0.2 ])
-				Synth(\beep, [\freq, f, \amp, 0.2 ]),
-				Synth(\, [freq: f, duration: exprand(0.01,1)*10]);
+				//Synth(\fx, [\freq, f, \amp, 0.2 ])
+				//Synth(\beep, [\freq, f ])
+				Synth("noiseToPitch", [\freq, f, \out, 0, \mul, 1])
+				//Synth(\, [freq: f, duration: exprand(0.01,1)*10]);
 			});
+
 			cursor = cursor + noteLen;
 		},
 		$+, { midi = midi + 1 },
