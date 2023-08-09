@@ -1,17 +1,15 @@
 
-int iter = 0 ;
-int shortPathLen = 0;
 void oscEvent(OscMessage msg) {
   
   if(msg.checkAddrPattern("/ShortPath")==true) {
     IntList addresses = oscPathParser(msg);
-    map.addShortPath(addresses);
+   // map.addShortPath(addresses);
     println("Short path parsed");
   }
   
   else if(msg.checkAddrPattern("/MusPath")){
    IntList addresses = oscPathParser(msg);
-   map.addMusicPath(addresses);
+   //map.addMusicPath(addresses);
    println("Music path parsed");
   }
   
@@ -19,6 +17,12 @@ void oscEvent(OscMessage msg) {
     IntList addresses = oscPathParser(msg);
     map.addRandPath(addresses);
     println("Random path parsed");
+  }
+  
+  else if(msg.checkAddrPattern("/nextNodes")){
+    IntList addresses = oscPathParser(msg);
+    map.setNextPoints(addresses);
+    println("Next Points Set");
   }
   
   else {
@@ -32,6 +36,7 @@ void keyPressed() {
 }
 
 void mousePressed(){
+  /*
   if(!startup){
     OscMessage myMessage = new OscMessage("/target");
     int id = map.getClosestPointId(mouseX, mouseY);
@@ -47,6 +52,16 @@ void mousePressed(){
     println("Random Start Path Sent");
     startup = false;
   }
+  */
+  //if(!startup){
+    OscMessage myMessage = new OscMessage("/currentNode");
+    int id = map.getClosestPointId(mouseX, mouseY);
+    myMessage.add(id);
+    oscP5.send(myMessage, myRemoteLocation);
+    println("Send Current Node");
+    map.updatePath(id);
+    
+  //}
 }
 
 IntList oscPathParser(OscMessage msg){

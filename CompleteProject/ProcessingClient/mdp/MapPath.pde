@@ -3,11 +3,13 @@ class MapPath{
   ArrayList<MapPoint> path;
   boolean finished;
   int index;
+  int len;
   
   MapPath(){
     this.path = new ArrayList<MapPoint>();
     this.finished = false;
     this.index = 0;
+    this.len = 0;
   }
   
   MapPath(ArrayList<MapPoint> path){
@@ -62,5 +64,19 @@ class MapPath{
   
   ArrayList<MapPoint> getPath(){
     return this.path;
+  }
+  
+  int getLength(){
+    return this.len; 
+  }
+  
+  void updatePath(MapPoint p){
+    this.path.add(p);
+    this.len++;
+    
+    if(this.len > 10){
+      path.remove(0);
+      this.len--;
+    }
   }
 }

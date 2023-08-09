@@ -1,25 +1,21 @@
 
 class MapParticleSystem{
   ArrayList<Particle> system;
-  MapPath path;
-  MapPoint current, next;
   MapPathAttractor att;
   
   MapParticleSystem(MapPath mp){
-    this.path = mp;
+    
     // Initialize the attractors
-    att = new MapPathAttractor(this.path);
+    this.att = new MapPathAttractor(mp);
     
-    // Set the first two points
-    this.current = this.path.getNextPoint();
-    this.next = this.path.getNextPoint();
-    
-    system = new ArrayList<Particle>();
+    this.system = new ArrayList<Particle>();
     for(int i = 0; i < NMAPPARTICLES; i++){
       system.add(new Particle()); 
     }
-    
-    
+  }
+  
+  void generateAttractors(MapPath mp){
+    this.att = new MapPathAttractor(mp);
   }
   
   ArrayList<Particle> getSystem(){
