@@ -5,7 +5,7 @@ class Map{
   //MapPath shortPath;
   MapPath path;
   ArrayList<MapPath> randPath;
-  //MapLine line;
+  MapLine line;
   MapParticleSystem system;
   MapAttractor attractor;
   ArrayList<Particle> mapParticles = new ArrayList<Particle>();
@@ -25,6 +25,7 @@ class Map{
     this.render = createGraphics(width, height, P2D);
     this.randPath = new ArrayList<MapPath>();
     this.path = new MapPath();
+    this.line = new MapLine(this.path);
     for(int i = 0; i < NMAPPARTICLES; i++){
       mapParticles.add(new Particle()); 
     }
@@ -64,6 +65,17 @@ class Map{
       ListIterator<MapPoint> nextPointIter = nextPoints.listIterator();
       while(nextPointIter.hasNext()){
         PVector p = nextPointIter.next().getCoords();
+        this.render.point(p.x, p.y);
+      }
+    }
+    
+    if(this.line.exists()){
+      ArrayList<PVector> lineList = line.show();
+      ListIterator<PVector> linetIter = lineList.listIterator();
+      
+      while(linetIter.hasNext()){
+        PVector p = linetIter.next();
+        this.render.stroke(255, map(linetIter.nextIndex(),0,lineList.size(),0,255));
         this.render.point(p.x, p.y);
       }
     }
@@ -114,11 +126,11 @@ class Map{
     this.shortPath = new MapPath(shortPoints);
   }
   */
-  /*
+  
   void createLine(){
     this.line = new MapLine(this.path); 
   }
-  */
+  
   void createParticleSystem(){
     println("SYSTEM CREATED");
     this.system = new MapParticleSystem(this.path); 
@@ -226,6 +238,8 @@ class Map{
     if(systemCreated){
       this.system.generateAttractors(this.path);
       println("UPDATE PATH");
+      
+      this.line.updatePath(this.path);
     }
     
     if(startup){

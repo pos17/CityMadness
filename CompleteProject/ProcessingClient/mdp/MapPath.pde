@@ -1,7 +1,7 @@
 
 class MapPath{
   ArrayList<MapPoint> path;
-  boolean finished;
+  boolean finished; // Check if path exists
   int index;
   int len;
   
@@ -54,7 +54,7 @@ class MapPath{
         return nextPoint;
       }
       else{
-        this.index--;
+        this.index = 0;
         return this.path.get(this.index);
       }
     }
