@@ -256,7 +256,17 @@ def pathSender():
     client.send(shortPathMsg)
     print("End Short Path")
 
-
+def pathHandler(unused_addr, currentNode):
+    print("Path Handler")
+    print("Retrieving neighboor nodes")
+    msg = osc_message_builder.OscMessageBuilder(address = '/nextNodes')
+    msg.add_arg(len(nodes[currentNode][3]), arg_type='i')
+    for i in range(len(nodes[currentNode][3])):
+        msg.add_arg(nodes[currentNode][3][i], arg_type='i')
+        print(nodes[currentNode][3][i])
+    msg = msg.build()
+    client.send(msg)
+    print("neighboor nodes sent")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -271,20 +281,21 @@ if __name__ == "__main__":
     features = graph["features"]
     loadNodes(features)
 
-    dm = distMatrix(nodes)
-    maxC = getMaxC()
-    tm = transMatrix(nodes,maxC)
+    # dm = distMatrix(nodes)
+    # maxC = getMaxC()
+    # tm = transMatrix(nodes,maxC)
 
-    tm_sparse = []
-    for i in range(len(tm)):
-        tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
+    # tm_sparse = []
+    # for i in range(len(tm)):
+    #     tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
 
-    notes = np.random.randint(12,size=len(nodes))
+    # notes = np.random.randint(12,size=len(nodes))
     
     dispatcher = dispatcher.Dispatcher()
 
-    dispatcher.map("/start",randPathsHandler)
-    dispatcher.map("/target",targetHandler)
+    # dispatcher.map("/start",randPathsHandler)
+    # dispatcher.map("/target",targetHandler)
+    dispatcher.map("/currentNode", pathHandler)
     
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
 
