@@ -33,7 +33,9 @@ OSCdef.new(\noteOff,{
 	arg msg, time, addr, port;
 	var note;
 	postln("AAAAAAAAAAAAA");
-	~notes [msg[1]].release;
+	//~notes [msg[1]] = Synth("noiseToPitch", [\freq, 0, \out, 0, \mul, 1]);
+	//~notes [msg[1]].release;
+	~notes [msg[1]].free;
 	postln("freqqqqq");
 	msg[1].midicps.postln
 

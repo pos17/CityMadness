@@ -91,7 +91,7 @@ def main():
     angle = 60
     iterations = 5
     startingNoteMidi = 69
-    tBase = 1
+    tBase = 2
     lsysString = lSysGenerate(axiom, iterations)
     parseNotes(lsysString,tBase,startingNoteMidi,client,scheduler)
     # draw(tBase, lsysString, length)
