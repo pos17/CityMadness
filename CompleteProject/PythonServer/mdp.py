@@ -213,6 +213,15 @@ def randPathsHandler(unused_addr, start):
 #     client.send_message("/StopMusPath",0)
 #     print("MusPath finished")
 
+def interestPlaces(interestNodes, maxC, notes, dm, tm_sparse):
+    pol_shortest = []
+    for i in range(len(interestNodes)):
+        r_shortest = reward(nodes,interestNodes[i],0,1,5, maxC, notes, dm)
+        ql_shortest = mdptoolbox.mdp.RelativeValueIteration(tm_sparse, r_shortest, 0.99)
+        ql_shortest.run()
+        pol_shortest.append(ql_shortest.policy)
+    return pol_shortest
+
 def pathSender():
     time.sleep(7)
     print("startPathSender")
@@ -268,6 +277,34 @@ def pathHandler(unused_addr, currentNode):
     client.send(msg)
     print("neighboor nodes sent")
 
+def interestPathHandler(unused_addr, interest_pol, interestNodes, currentNode):
+    steps = []
+    for i in range(len(interestNodes)):
+        steps.append( getPath(currentNode, interestNodes[i], interest_pol))
+    msg = osc_message_builder.OscMessageBuilder(address = '/interestPath1')
+    msg.add_arg(len(steps[0]), arg_type='i')
+    for i in range(len(steps[0])):
+        msg.add_arg(steps[0][i], arg_type='i')
+        #print(nodes[currentNode][3][i])
+    msg = msg.build()
+    client.send(msg)
+
+    msg = osc_message_builder.OscMessageBuilder(address = '/interestPath2')
+    msg.add_arg(len(steps[1]), arg_type='i')
+    for i in range(len(steps[1])):
+        msg.add_arg(steps[1][i], arg_type='i')
+        #print(nodes[currentNode][3][i])
+    msg = msg.build()
+    client.send(msg)
+
+    msg = osc_message_builder.OscMessageBuilder(address = '/interestPath3')
+    msg.add_arg(len(steps[2]), arg_type='i')
+    for i in range(len(steps[2])):
+        msg.add_arg(steps[2][i], arg_type='i')
+        #print(nodes[currentNode][3][i])
+    msg = msg.build()
+    client.send(msg)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", default="127.0.0.1",
@@ -281,21 +318,23 @@ if __name__ == "__main__":
     features = graph["features"]
     loadNodes(features)
 
-    # dm = distMatrix(nodes)
-    # maxC = getMaxC()
-    # tm = transMatrix(nodes,maxC)
-
-    # tm_sparse = []
-    # for i in range(len(tm)):
-    #     tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
-
-    # notes = np.random.randint(12,size=len(nodes))
+    dm = distMatrix(nodes)
+    maxC = getMaxC()
+    notes = np.random.randint(12,size=len(nodes))
+    tm = transMatrix(nodes,maxC)
+    tm_sparse = []
+    for i in range(len(tm)):
+        tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
+    interestNodes = (243, 111, 239)
+    interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
+    
     
     dispatcher = dispatcher.Dispatcher()
 
     # dispatcher.map("/start",randPathsHandler)
     # dispatcher.map("/target",targetHandler)
     dispatcher.map("/currentNode", pathHandler)
+    dispatcher.map("/currentNode", interestPathHandler, interest_pol, interestNodes)
     
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
 
