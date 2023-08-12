@@ -1,6 +1,58 @@
+~n1 = NetAddr.new("127.0.0.1",57120);
+NetAddr.localAddr;
+
+OSCFunc.trace(true);
+OSCFunc.trace(false);
+
+
+~notes = Array.newClear(128);
+
 (
+f = { |msg, time, addr|
+    if(msg[0] != '/status.reply') {
+        //"time: % sender: %\nmessage: %\n".postf(time, addr, msg);
+    }
+};
+thisProcess.addOSCRecvFunc(f);
 
 
+OSCdef.new(\noteOn,{
+	arg msg, time, addr, port;
+	var note;
+	postln("AAAAAAAAAAAAA");
+	~notes [msg[1]] = Synth("noiseToPitch", [\freq, msg[1].midicps.postln, \out, 0, \mul, 1]);
+	postln("freqqqqq");
+	msg[1].midicps.postln
+
+
+	},
+path: "/noteOn"
+);
+
+OSCdef.new(\noteOff,{
+	arg msg, time, addr, port;
+	var note;
+	postln("AAAAAAAAAAAAA");
+	//~notes [msg[1]] = Synth("noiseToPitch", [\freq, 0, \out, 0, \mul, 1]);
+	//~notes [msg[1]].release;
+	~notes [msg[1]].free;
+	postln("freqqqqq");
+	msg[1].midicps.postln
+
+
+	},
+path: "/noteOff"
+)
+
+
+)
+
+// stop posting.
+thisProcess.removeOSCRecvFunc(f);
+
+
+
+(
 SynthDef("noiseToPitch", { arg freq=440, amp=2, mul=1, out = 0;
 	var env = Env(levels: [0, 1, 0.5, 0], times: [2, 2, 0.6], curve: [-6,0, 1]);
     Out.ar(
@@ -11,7 +63,6 @@ SynthDef("noiseToPitch", { arg freq=440, amp=2, mul=1, out = 0;
 			[0.05, 0.05 ],
 			amp * EnvGen.kr(env, doneAction: 2),
             //LFNoise0.kr(4, 110, 660),
-
         )
     )
 }).add;
@@ -75,54 +126,6 @@ SynthDef(\fx,{
 	snd = Limiter.ar(snd);
 	ReplaceOut.ar(\out.kr(0),snd);
 }).add;
-)
-
-
-(
-var s,scale,chords;
-s = Server.default;
-
-scale = [0,2,3,5,7,10];
-chords = [
-	([0] + (12 * -2)) ++ ([0,7]+(12 * -1)) ++ (scale + (12*0)) ++ (scale + (12 * 1)),
-	([-4] + (12 * -2)) ++ ([-4,3]+(12 * -1)) ++ (scale + (12*0)) ++ (scale + (12 * 1)),
-];
-
-Routine({
-	var chord;
-	s.bind{Synth.tail(nil,\fx)};
-	chord = chords[0];
-
-	Routine({
-		var synth;
-		loop {
-			rrand(1.0,8.0).wait;
-			s.bind{synth = Synth(\beep,[freq:(48+chord).midicps.choose]); };
-			rrand(5,10).do{
-				s.bind{synth.set(\freq,(48+chord).midicps,\trigger,1)};
-				rrand(0.01,0.1).wait;
-			};
-			s.bind{synth.set(\gate,0);};
-		};
-	}).play;
-
-	loop{
-		chords.do{|argChord|
-			chord = argChord;
-			100.do{
-				var freqs,duration;
-				freqs = {(48+chord).midicps.choose } ! ([3,2,1].wchoose([5,2,1].normalizeSum));
-				duration = exprand(0.01,1);
-				s.bind{
-					freqs.do{|freq|
-						Synth(\,[freq: freq, decay: duration*10]);
-					};
-				};
-				duration.wait;
-			};
-		};
-	};
-}).play;
 )
 
 
@@ -204,4 +207,51 @@ song.do({
 
 
 
-s.record(duration: 30);
+/*
+
+(
+var s,scale,chords;
+s = Server.default;
+
+scale = [0,2,3,5,7,10];
+chords = [
+	([0] + (12 * -2)) ++ ([0,7]+(12 * -1)) ++ (scale + (12*0)) ++ (scale + (12 * 1)),
+	([-4] + (12 * -2)) ++ ([-4,3]+(12 * -1)) ++ (scale + (12*0)) ++ (scale + (12 * 1)),
+];
+
+Routine({
+	var chord;
+	s.bind{Synth.tail(nil,\fx)};
+	chord = chords[0];
+
+	Routine({
+		var synth;
+		loop {
+			rrand(1.0,8.0).wait;
+			s.bind{synth = Synth(\beep,[freq:(48+chord).midicps.choose]); };
+			rrand(5,10).do{
+				s.bind{synth.set(\freq,(48+chord).midicps,\trigger,1)};
+				rrand(0.01,0.1).wait;
+			};
+			s.bind{synth.set(\gate,0);};
+		};
+	}).play;
+
+	loop{
+		chords.do{|argChord|
+			chord = argChord;
+			100.do{
+				var freqs,duration;
+				freqs = {(48+chord).midicps.choose } ! ([3,2,1].wchoose([5,2,1].normalizeSum));
+				duration = exprand(0.01,1);
+				s.bind{
+					freqs.do{|freq|
+						Synth(\,[freq: freq, decay: duration*10]);
+					};
+				};
+				duration.wait;
+			};
+		};
+	};
+}).play;
+)*/
