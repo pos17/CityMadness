@@ -1,13 +1,12 @@
 
 class Map{
   ArrayList<MapPoint> mapPoints = new ArrayList<MapPoint>();
-  //MapPath musicPath;
-  //MapPath shortPath;
   MapPath path;
   ArrayList<MapPath> randPath;
   MapLine line;
   MapParticleSystem system;
   MapAttractor attractor;
+  
   ArrayList<Particle> mapParticles = new ArrayList<Particle>();
   
   ArrayList<MapPoint> nextPoints = new ArrayList<MapPoint>();
@@ -32,16 +31,51 @@ class Map{
   }
   
   void show(){
-    image(this.city,0,0);
     this.render.beginDraw();
-    this.render.clear();
+    //this.render.clear();
+    
+    this.render.noStroke();
+    this.render.fill(0,50);
+    this.render.rect(0,0,width,height);
+    
+    this.render.push();
+    this.render.translate(HALF_WIDTH,HALF_HEIGHT);
+    
+    //SHOW CHAOTIC PARTICLES
+    this.render.stroke(255,100);
+    this.render.strokeWeight(3);
+    
+    if(this.pathDone){
+      ListIterator<Particle> mapParticlesIter = this.mapParticles.listIterator();
+      ArrayList<MapPoint> pathPos = this.path.getPath();
+      float alpha;
+      while(mapParticlesIter.hasNext()){
+        Particle m = mapParticlesIter.next();
+        alpha = m.moveNoiseReturnAlpha(pathPos);
+        PVector p = m.getPos();
+      
+        render.stroke(255,alpha);
+        render.point(p.x,p.y);
+      }
+    }
+    else{
+      ListIterator<Particle> mapParticlesIter = this.mapParticles.listIterator();
+      while(mapParticlesIter.hasNext()){
+        Particle m = mapParticlesIter.next();
+        m.moveNoise();
+        PVector p = m.getPos();
+        render.point(p.x,p.y);
+      }
+    }
     
     
     path.show(); // TEMPORARY, WILL BE DELETED LATER
     if(systemCreated){
       //SHOW PATH PARTICLES
+      if(system.getSize()<NPATHPARTICLES)
+        system.addParticle(new Particle());
       ArrayList<Particle> systemParticles = system.getSystem();
-      this.render.stroke(255);
+      this.render.stroke(13, 152, 186);
       this.render.strokeWeight(3);
       ListIterator<Particle> systemParticlesIter = systemParticles.listIterator();
       while(systemParticlesIter.hasNext()){
@@ -49,6 +83,7 @@ class Map{
         this.render.point(p.x, p.y);
       }
       system.moveParticles();
+      
     }
     
     
@@ -58,7 +93,6 @@ class Map{
         randPath.get(i).show(); 
       }
       */
-      
       //println("RENDERING NEXT POINTS");
       this.render.stroke(0,0,255);
       this.render.strokeWeight(8);
@@ -75,13 +109,13 @@ class Map{
       
       while(linetIter.hasNext()){
         PVector p = linetIter.next();
-        this.render.stroke(255, map(linetIter.nextIndex(),0,lineList.size(),0,255));
+        this.render.stroke(255, map(linetIter.nextIndex(),0,lineList.size(),0,70));
         this.render.point(p.x, p.y);
       }
     }
     
     
-    mapParticles = attractor.moveParticle(mapParticles);
+    //mapParticles = attractor.moveParticle(mapParticles);
 
     
     //SHOW ATTRACTORS
@@ -94,16 +128,17 @@ class Map{
       this.render.point(p.x,p.y);
     }
     
-    //SHOW CHAOTIC PARTICLES
-    this.render.stroke(255);
-    this.render.strokeWeight(3);
-    ListIterator<Particle> mapParticlesIter = this.mapParticles.listIterator();
-    while(mapParticlesIter.hasNext()){
-      PVector p = mapParticlesIter.next().getPos();
-      render.point(p.x,p.y);
-    }
+    this.render.pop();
     this.render.endDraw();
     image(this.render,0,0);
+    image(this.city,0,0);
+    
+    
+    if(systemCreated){
+       system.showAttractors(); 
+       //println("showing");
+    }
+    
   }
   
   /*
@@ -179,8 +214,8 @@ class Map{
         */
         
         // CREMONA
-        x = ((x - 10.012826061753287) * width) / (10.031731839461685 - 10.012826061753287);
-        y = ((y - 45.138503171087336)* height)/ (45.13185662179308 - 45.138503171087336);
+        x = ((x - 10.012826061753287) * width) / (10.031731839461685 - 10.012826061753287) - HALF_WIDTH;
+        y = ((y - 45.138503171087336)* height)/ (45.13185662179308 - 45.138503171087336) - HALF_HEIGHT;
         
         map.add(new MapPoint(id,x,y));
       }
@@ -195,7 +230,8 @@ class Map{
   void renderMap(){
     this.city = createGraphics(width, height, P2D);
     this.city.beginDraw();
-    this.city.background(0);
+    this.city.translate(HALF_WIDTH, HALF_HEIGHT);
+    //this.city.background(0);
     this.city.stroke(255,0,0);
     this.city.noFill();
     this.city.strokeWeight(5);
@@ -247,8 +283,7 @@ class Map{
       this.createParticleSystem();
       this.systemCreated = true;
     }
-    
-    
     startup = false; //After second click we exit map startup
   }
+  
 }

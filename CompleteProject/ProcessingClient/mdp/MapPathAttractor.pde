@@ -77,15 +77,27 @@ class MapPathAttractor{
             acc.rotate(-HALF_PI);
           else
             acc.rotate(HALF_PI);
-            
+          //println(acc);
           a.add(acc);
       }
       a.div(PMASS);
       part.setA(a);
       part.move();
+      
     }
     
     return p;
   }
   
+  
+  void show(){
+    stroke(255);
+    strokeWeight(20);
+    for(int i = 0; i<pos.size(); i++){
+      PVector p = pos.get(i);
+      
+      point(p.x,p.y);
+    }
+    //println(pos.get(0));
+  }
 }

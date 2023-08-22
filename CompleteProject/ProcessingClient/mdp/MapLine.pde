@@ -24,13 +24,10 @@ class MapLine{
   }
   
   void createLine(){
-    println("AAAA");
     ArrayList<MapPoint> p = this.buffer.getPath();
    
-    
     this.line.clear();
     this.index = 0;
-    
     
     for(int i = 0; i<p.size()-1; i++){
       PVector a = p.get(i).getCoords();
@@ -73,6 +70,10 @@ class MapLine{
     return showLine;
   }
   
+  PVector getPos(){
+   return(this.line.get(this.index<this.line.size()? this.index : 0)); 
+  }
+  
   boolean exists(){
      return this.exists;
   }
@@ -86,6 +87,11 @@ class MapLine{
       }
       this.exists = true;
       this.pathHasChanged = true;
+      
+      if(this.line.size() == 0){
+        this.appendToLine();
+        this.pathHasChanged = false;
+      }
     }
     else
       return;
