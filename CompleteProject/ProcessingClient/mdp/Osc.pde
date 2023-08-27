@@ -55,10 +55,11 @@ void mousePressed(){
   */
   //if(!startup){
     OscMessage myMessage = new OscMessage("/currentNode");
-    int id = map.getClosestPointId(mouseX, mouseY);
+    int id = map.getClosestPointId(mouseX-HALF_WIDTH, mouseY-HALF_HEIGHT);
     myMessage.add(id);
     oscP5.send(myMessage, myRemoteLocation);
     println("Send Current Node");
+    
     map.updatePath(id);
     
   //}

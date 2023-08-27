@@ -79,4 +79,12 @@ class MapPath{
       this.len--;
     }
   }
+  
+  boolean isNear(PVector p){
+    println("WOW");
+    if(PVector.dist(p,this.path.get(0).getCoords()) < 100)
+      return true;
+    else
+      return false;
+  }
 }

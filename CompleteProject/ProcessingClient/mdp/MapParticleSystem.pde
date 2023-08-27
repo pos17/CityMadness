@@ -2,6 +2,7 @@
 class MapParticleSystem{
   ArrayList<Particle> system;
   MapPathAttractor att;
+  int size;
   
   MapParticleSystem(MapPath mp){
     
@@ -9,9 +10,12 @@ class MapParticleSystem{
     this.att = new MapPathAttractor(mp);
     
     this.system = new ArrayList<Particle>();
+    this.size = 0;
+    /*
     for(int i = 0; i < NMAPPARTICLES; i++){
       system.add(new Particle()); 
     }
+    */
   }
   
   void generateAttractors(MapPath mp){
@@ -24,5 +28,20 @@ class MapParticleSystem{
   
   void moveParticles(){
     system = att.moveParticle(system);
+    
   }
+  
+  void addParticle(Particle p){
+    system.add(p);
+    this.size++;
+  }
+  
+  void showAttractors(){
+    this.att.show(); 
+  }
+  int getSize(){
+    return this.size; 
+  }
+  
+  
 }

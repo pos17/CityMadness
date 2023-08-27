@@ -2,7 +2,11 @@ import oscP5.*;
 import netP5.*;
 import java.util.*;
 
-int NMAPPARTICLES = 500;
+int NMAPPARTICLES = 5000;
+int NPATHPARTICLES = 1000;
+float HALF_WIDTH;
+float HALF_HEIGHT;
+float QUARTER_WIDTH;
 float PMASS = 0.1;
 
 OscP5 oscP5;
@@ -14,11 +18,16 @@ Map map;
 int inport = 1234;
 int outport = 5004;
 
+
+
 PFont font;
 
 void setup(){
   size(900,800,P2D);
   pixelDensity(displayDensity());
+  HALF_WIDTH = width/2;
+  HALF_HEIGHT = height/2;
+  QUARTER_WIDTH = width/4;
   
   oscP5 = new OscP5(this,inport);
   oscP52 = new OscP5(this,inport);
