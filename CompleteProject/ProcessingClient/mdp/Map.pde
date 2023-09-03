@@ -10,6 +10,8 @@ class Map{
   ArrayList<Particle> mapParticles = new ArrayList<Particle>();
   
   ArrayList<MapPoint> nextPoints = new ArrayList<MapPoint>();
+  MapPoint toInterestPoint;
+  MapPoint interestPoint;
   
   boolean pathDone, systemCreated;
   
@@ -42,7 +44,7 @@ class Map{
     this.render.translate(HALF_WIDTH,HALF_HEIGHT);
     
     //SHOW CHAOTIC PARTICLES
-    this.render.stroke(255,100);
+    this.render.stroke(255,MAPPARTICLEALPHA);
     this.render.strokeWeight(3);
     
     if(this.pathDone){
@@ -101,6 +103,14 @@ class Map{
         PVector p = nextPointIter.next().getCoords();
         this.render.point(p.x, p.y);
       }
+      
+      this.render.stroke(0,255,255);
+      PVector p = toInterestPoint.getCoords();
+      this.render.point(p.x,p.y);
+      
+      this.render.strokeWeight(12);
+      PVector q = interestPoint.getCoords();
+      this.render.point(q.x,q.y);
     }
     
     if(this.line.exists()){
@@ -284,6 +294,15 @@ class Map{
       this.systemCreated = true;
     }
     startup = false; //After second click we exit map startup
+  }
+  
+  void setNextInterestPoint(int p){
+    this.interestPoint = this.getMapPoint(p);
+    println(p);
+  }
+  
+  void updatePathToInterestPoint(int p){
+    this.toInterestPoint = this.getMapPoint(p);
   }
   
 }

@@ -46,9 +46,9 @@ class Particle{
       
     }
     
-    if(alpha<100){
-        alpha/=100;
-        return alpha < 0.5 ? 800 * alpha * alpha * alpha * alpha : 100*(1 - pow(-2 * alpha + 2, 4) / 2);
+    if(alpha<MAPPARTICLEALPHA){
+        alpha/=MAPPARTICLEALPHA;
+        return alpha < 0.5 ? 800 * alpha * alpha * alpha * alpha : MAPPARTICLEALPHA*(1 - pow(-2 * alpha + 2, 4) / 2);
       }
     
     return 100;

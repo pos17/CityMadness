@@ -25,6 +25,18 @@ void oscEvent(OscMessage msg) {
     println("Next Points Set");
   }
   
+  else if(msg.checkAddrPattern("/interestPath")){
+    // MSG STRUCTURE: 1-CLOSEST INTERESTING NODE ID 2-NEXTNODE TO ARRIVE TO 1
+    int interestPointId = msg.get(0).intValue();
+    int toInterestPointId = msg.get(1).intValue();
+    
+    println("GOT INTEREST NODE");
+    println(interestPointId);
+    println(toInterestPointId);
+    map.setNextInterestPoint(interestPointId);
+    map.updatePathToInterestPoint(toInterestPointId);
+  }
+  
   else {
   println("something else");
   println(msg);

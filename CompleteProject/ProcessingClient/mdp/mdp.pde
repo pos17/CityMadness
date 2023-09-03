@@ -4,6 +4,7 @@ import java.util.*;
 
 int NMAPPARTICLES = 5000;
 int NPATHPARTICLES = 1000;
+int MAPPARTICLEALPHA = 70;
 float HALF_WIDTH;
 float HALF_HEIGHT;
 float QUARTER_WIDTH;
