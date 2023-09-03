@@ -278,30 +278,50 @@ def pathHandler(unused_addr, currentNode):
     print("neighboor nodes sent")
 
 def interestPathHandler(unused_addr, interest_pol, interestNodes, currentNode):
-    steps = []
+    # steps = []
+    # for i in range(len(interestNodes)):
+    #     steps.append( getPath(currentNode, interestNodes[i], interest_pol))
+    # msg = osc_message_builder.OscMessageBuilder(address = '/interestPath1')
+    # msg.add_arg(len(steps[0]), arg_type='i')
+    # for i in range(len(steps[0])):
+    #     msg.add_arg(steps[0][i], arg_type='i')
+    #     #print(nodes[currentNode][3][i])
+    # msg = msg.build()
+    # client.send(msg)
+
+    # msg = osc_message_builder.OscMessageBuilder(address = '/interestPath2')
+    # msg.add_arg(len(steps[1]), arg_type='i')
+    # for i in range(len(steps[1])):
+    #     msg.add_arg(steps[1][i], arg_type='i')
+    #     #print(nodes[currentNode][3][i])
+    # msg = msg.build()
+    # client.send(msg)
+
+    # msg = osc_message_builder.OscMessageBuilder(address = '/interestPath3')
+    # msg.add_arg(len(steps[2]), arg_type='i')
+    # for i in range(len(steps[2])):
+    #     msg.add_arg(steps[2][i], arg_type='i')
+    #     #print(nodes[currentNode][3][i])
+    # msg = msg.build()
+    # client.send(msg)
+
+    # check if interest is reached
     for i in range(len(interestNodes)):
-        steps.append( getPath(currentNode, interestNodes[i], interest_pol))
-    msg = osc_message_builder.OscMessageBuilder(address = '/interestPath1')
-    msg.add_arg(len(steps[0]), arg_type='i')
-    for i in range(len(steps[0])):
-        msg.add_arg(steps[0][i], arg_type='i')
-        #print(nodes[currentNode][3][i])
-    msg = msg.build()
-    client.send(msg)
+        if dm[currentNode, interestNodes[i]] == 0:
+            del interestNodes[i]
 
-    msg = osc_message_builder.OscMessageBuilder(address = '/interestPath2')
-    msg.add_arg(len(steps[1]), arg_type='i')
-    for i in range(len(steps[1])):
-        msg.add_arg(steps[1][i], arg_type='i')
-        #print(nodes[currentNode][3][i])
-    msg = msg.build()
-    client.send(msg)
 
-    msg = osc_message_builder.OscMessageBuilder(address = '/interestPath3')
-    msg.add_arg(len(steps[2]), arg_type='i')
-    for i in range(len(steps[2])):
-        msg.add_arg(steps[2][i], arg_type='i')
-        #print(nodes[currentNode][3][i])
+    # send next node for closer interest
+    min_dist = 9999
+    for i in range(len(interestNodes)):
+        this_dist = dm[currentNode, interestNodes[i]]
+        if this_dist < min_dist:
+            min_dist = this_dist
+            closer_interest = i
+    interest_path = getPath(currentNode, interestNodes[closer_interest], interest_pol)
+    msg = osc_message_builder.OscMessageBuilder(address = '/interestPath')
+    msg.add_arg(closer_interest, arg_type='i')
+    msg.add_arg(interest_path[1], arg_type='i')
     msg = msg.build()
     client.send(msg)
 
