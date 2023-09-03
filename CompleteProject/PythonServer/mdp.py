@@ -325,7 +325,7 @@ def interestPathHandler(unused_addr, currentNode):
             if this_dist < min_dist:
                 min_dist = this_dist
                 closer_interest = i
-        interest_path = getPath(currentNode, interestNodes[closer_interest], interest_pol)
+        interest_path = getPath(currentNode, interestNodes[closer_interest], interest_pol[closer_interest])
         msg = osc_message_builder.OscMessageBuilder(address = '/interestPath')
         msg.add_arg(closer_interest, arg_type='i')
         msg.add_arg(interest_path[1], arg_type='i')
