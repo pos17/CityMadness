@@ -305,32 +305,46 @@ def interestPathHandler(unused_addr, currentNode):
     # msg = msg.build()
     # client.send(msg)
     #check if there are still interest points
-    if not interestNodes:
+    if interestNodes == []:
         print("There are no more interest places to reach")
         msg = osc_message_builder.OscMessageBuilder(address = '/interestPath')
         msg.add_arg(-1, arg_type='i')
         msg = msg.build()
         client.send(msg)
     else:
+        print(interestNodes)
         # check if interest is reached
         for i in range(len(interestNodes)):
             if dm[currentNode, interestNodes[i]] == 0:
+                print("interest point reached")
                 del interestNodes[i]
+                del interest_pol[i]
+                print(interestNodes)
+                break
 
-
-        # send next node for closer interest
-        min_dist = 9999
-        for i in range(len(interestNodes)):
-            this_dist = dm[currentNode, interestNodes[i]]
-            if this_dist < min_dist:
-                min_dist = this_dist
-                closer_interest = i
-        interest_path = getPath(currentNode, interestNodes[closer_interest], interest_pol[closer_interest])
-        msg = osc_message_builder.OscMessageBuilder(address = '/interestPath')
-        msg.add_arg(closer_interest, arg_type='i')
-        msg.add_arg(interest_path[1], arg_type='i')
-        msg = msg.build()
-        client.send(msg)
+        if interestNodes == []:
+            print("There are no more interest places to reach")
+            msg = osc_message_builder.OscMessageBuilder(address = '/interestPath')
+            msg.add_arg(-1, arg_type='i')
+            msg = msg.build()
+            client.send(msg)
+        else:
+            # send next node for closer interest
+            min_dist = 9999
+            for i in range(len(interestNodes)):
+                this_dist = dm[currentNode, interestNodes[i]]
+                if this_dist < min_dist:
+                    min_dist = this_dist
+                    closer_interest = i
+            print("closer interest:", interestNodes[closer_interest])
+            print(interest_pol[closer_interest])
+            interest_path = getPath(currentNode, interestNodes[closer_interest], interest_pol[closer_interest])
+            msg = osc_message_builder.OscMessageBuilder(address = '/interestPath')
+            msg.add_arg(interestNodes[closer_interest], arg_type='i')
+            msg.add_arg(interest_path[1], arg_type='i')
+            print(interest_path[1])
+            msg = msg.build()
+            client.send(msg)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -358,7 +372,7 @@ if __name__ == "__main__":
 
     global interestNodes
     global interest_pol
-    interestNodes = (243, 111, 239)
+    interestNodes = [55, 275, 239]
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     
     dispatcher = dispatcher.Dispatcher()
