@@ -326,7 +326,6 @@ def interestPathHandler(unused_addr, currentNode):
                 min_dist = this_dist
                 closer_interest = i
 
-        dm = distMatrix(nodes)
         maxC = getMaxC()
         notes = np.random.randint(12,size=len(nodes))
         tm = transMatrix(nodes,maxC)
@@ -354,8 +353,11 @@ if __name__ == "__main__":
     graph = json.load(f)
     features = graph["features"]
     loadNodes(features)
-
+    global dm
+    dm = distMatrix(nodes)
+    
     global interestNodes
+
     #global interest_pol
     interestNodes = (243, 111, 239)
     #interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
