@@ -96,7 +96,7 @@ class Map{
       }
       */
       //println("RENDERING NEXT POINTS");
-      this.render.stroke(0,0,255);
+      this.render.stroke(0,0,255, 255*sin(4*radians(frameCount)));
       this.render.strokeWeight(8);
       ListIterator<MapPoint> nextPointIter = nextPoints.listIterator();
       while(nextPointIter.hasNext()){
