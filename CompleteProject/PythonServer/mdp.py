@@ -277,7 +277,7 @@ def pathHandler(unused_addr, currentNode):
     client.send(msg)
     print("neighboor nodes sent")
 
-def interestPathHandler(unused_addr, interest_pol, interestNodes, currentNode):
+def interestPathHandler(unused_addr, currentNode):
     # steps = []
     # for i in range(len(interestNodes)):
     #     steps.append( getPath(currentNode, interestNodes[i], interest_pol))
@@ -352,6 +352,9 @@ if __name__ == "__main__":
     tm_sparse = []
     for i in range(len(tm)):
         tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
+
+    global interestNodes
+    global interest_pol
     interestNodes = (243, 111, 239)
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     
@@ -361,7 +364,7 @@ if __name__ == "__main__":
     # dispatcher.map("/start",randPathsHandler)
     # dispatcher.map("/target",targetHandler)
     dispatcher.map("/currentNode", pathHandler)
-    dispatcher.map("/currentNode", interestPathHandler, interest_pol, interestNodes)
+    dispatcher.map("/currentNode", interestPathHandler)
     
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
 
