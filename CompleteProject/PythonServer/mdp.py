@@ -325,6 +325,8 @@ def interestPathHandler(unused_addr, currentNode):
             if this_dist < min_dist:
                 min_dist = this_dist
                 closer_interest = i
+        
+        interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
         interest_path = getPath(currentNode, interestNodes[closer_interest], interest_pol[closer_interest])
         msg = osc_message_builder.OscMessageBuilder(address = '/interestPath')
         msg.add_arg(closer_interest, arg_type='i')
@@ -354,10 +356,9 @@ if __name__ == "__main__":
         tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
 
     global interestNodes
-    global interest_pol
+    #global interest_pol
     interestNodes = (243, 111, 239)
-    interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
-    
+    #interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     
     dispatcher = dispatcher.Dispatcher()
 
