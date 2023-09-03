@@ -325,6 +325,14 @@ def interestPathHandler(unused_addr, currentNode):
             if this_dist < min_dist:
                 min_dist = this_dist
                 closer_interest = i
+
+        dm = distMatrix(nodes)
+        maxC = getMaxC()
+        notes = np.random.randint(12,size=len(nodes))
+        tm = transMatrix(nodes,maxC)
+        tm_sparse = []
+        for i in range(len(tm)):
+            tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
         
         interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
         interest_path = getPath(currentNode, interestNodes[closer_interest], interest_pol[closer_interest])
@@ -346,14 +354,6 @@ if __name__ == "__main__":
     graph = json.load(f)
     features = graph["features"]
     loadNodes(features)
-
-    dm = distMatrix(nodes)
-    maxC = getMaxC()
-    notes = np.random.randint(12,size=len(nodes))
-    tm = transMatrix(nodes,maxC)
-    tm_sparse = []
-    for i in range(len(tm)):
-        tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
 
     global interestNodes
     #global interest_pol
