@@ -19,8 +19,6 @@ Map map;
 int inport = 1234;
 int outport = 5004;
 
-
-
 PFont font;
 
 void setup(){
@@ -33,6 +31,9 @@ void setup(){
   oscP5 = new OscP5(this,inport);
   oscP52 = new OscP5(this,inport);
   myRemoteLocation = new NetAddress("127.0.0.1", outport);
+  
+  OscMessage myMessage = new OscMessage("/reset");
+  oscP5.send(myMessage, myRemoteLocation);
   
   strokeJoin(MITER);
   

@@ -38,7 +38,7 @@ class Particle{
     float alpha_temp;
     for(int i = 0; i<m.size(); i++){
       PVector mc = m.get(i).getCoords();
-      alpha_temp = sqrt(sq(this.p.x - mc.x)+sq(this.p.y - mc.y));
+      alpha_temp = 0.7*sqrt(sq(this.p.x - mc.x)+sq(this.p.y - mc.y));
       
       if(alpha_temp<alpha){
         alpha = alpha_temp; 
@@ -48,10 +48,10 @@ class Particle{
     
     if(alpha<MAPPARTICLEALPHA){
         alpha/=MAPPARTICLEALPHA;
-        return alpha < 0.5 ? 800 * alpha * alpha * alpha * alpha : MAPPARTICLEALPHA*(1 - pow(-2 * alpha + 2, 4) / 2);
+        return alpha < 0.7 ? 800 * alpha * alpha * alpha * alpha : MAPPARTICLEALPHA*(1 - pow(-2 * alpha + 2, 4) / 2);
       }
     
-    return 100;
+    return MAPPARTICLEALPHA;
   }
   
   void moveNoise(){

@@ -12,6 +12,7 @@ class Map{
   ArrayList<MapPoint> nextPoints = new ArrayList<MapPoint>();
   MapPoint toInterestPoint;
   MapPoint interestPoint;
+  MapPoint currentPoint;
   
   boolean pathDone, systemCreated;
   
@@ -96,7 +97,7 @@ class Map{
       }
       */
       //println("RENDERING NEXT POINTS");
-      this.render.stroke(0,0,255, 255*sin(4*radians(frameCount)));
+      this.render.stroke(0,0,255, 255*sin(5*radians(frameCount)));
       this.render.strokeWeight(8);
       ListIterator<MapPoint> nextPointIter = nextPoints.listIterator();
       while(nextPointIter.hasNext()){
@@ -104,13 +105,20 @@ class Map{
         this.render.point(p.x, p.y);
       }
       
-      this.render.stroke(0,255,255);
-      PVector p = toInterestPoint.getCoords();
+      // CURRENT POINT
+      this.render.stroke(255,0,0);
+      PVector p = currentPoint.getCoords();
       this.render.point(p.x,p.y);
       
+      // PATH TO INTEREST POINT
+      this.render.stroke(0,255,255, 255*sin(5*radians(frameCount)));
+      p = toInterestPoint.getCoords();
+      this.render.point(p.x,p.y);
+      
+      // TEMP, CURRENT INTEREST POINT
       this.render.strokeWeight(12);
-      PVector q = interestPoint.getCoords();
-      this.render.point(q.x,q.y);
+      p = interestPoint.getCoords();
+      this.render.point(p.x,p.y);
     }
     
     if(this.line.exists()){
@@ -124,11 +132,8 @@ class Map{
       }
     }
     
-    
-    //mapParticles = attractor.moveParticle(mapParticles);
-
-    
     //SHOW ATTRACTORS
+    
     ArrayList<PVector> attractorPos = this.attractor.getPos();
     this.render.stroke(0,0,255);
     this.render.strokeWeight(2);
@@ -141,13 +146,7 @@ class Map{
     this.render.pop();
     this.render.endDraw();
     image(this.render,0,0);
-    image(this.city,0,0);
-    
-    
-    if(systemCreated){
-       system.showAttractors(); 
-       //println("showing");
-    }
+    //image(this.city,0,0);
     
   }
   
@@ -177,7 +176,7 @@ class Map{
   }
   
   void createParticleSystem(){
-    println("SYSTEM CREATED");
+    //println("SYSTEM CREATED");
     this.system = new MapParticleSystem(this.path); 
   }
   
@@ -283,13 +282,13 @@ class Map{
     
     if(systemCreated){
       this.system.generateAttractors(this.path);
-      println("UPDATE PATH");
+      //println("UPDATE PATH");
       
       this.line.updatePath(this.path);
     }
     
     if(startup){
-      println("CREATING PARTICLE SYSTEM");
+     // println("CREATING PARTICLE SYSTEM");
       this.createParticleSystem();
       this.systemCreated = true;
     }
@@ -298,11 +297,15 @@ class Map{
   
   void setNextInterestPoint(int p){
     this.interestPoint = this.getMapPoint(p);
-    println(p);
+    //println(p);
   }
   
   void updatePathToInterestPoint(int p){
     this.toInterestPoint = this.getMapPoint(p);
+  }
+  
+  void setCurrentPoint(int p){
+    this.currentPoint = this.getMapPoint(p); 
   }
   
 }

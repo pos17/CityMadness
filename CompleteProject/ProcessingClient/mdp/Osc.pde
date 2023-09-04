@@ -22,7 +22,7 @@ void oscEvent(OscMessage msg) {
   else if(msg.checkAddrPattern("/nextNodes")){
     IntList addresses = oscPathParser(msg);
     map.setNextPoints(addresses);
-    println("Next Points Set");
+    //println("Next Points Set");
   }
   
   else if(msg.checkAddrPattern("/interestPath")){
@@ -30,9 +30,6 @@ void oscEvent(OscMessage msg) {
     int interestPointId = msg.get(0).intValue();
     int toInterestPointId = msg.get(1).intValue();
     
-    println("GOT INTEREST NODE");
-    println(interestPointId);
-    println(toInterestPointId);
     map.setNextInterestPoint(interestPointId);
     map.updatePathToInterestPoint(toInterestPointId);
   }
@@ -70,9 +67,12 @@ void mousePressed(){
     int id = map.getClosestPointId(mouseX-HALF_WIDTH, mouseY-HALF_HEIGHT);
     myMessage.add(id);
     oscP5.send(myMessage, myRemoteLocation);
-    println("Send Current Node");
+    //println("Send Current Node");
     
     map.updatePath(id);
+    map.setCurrentPoint(id);
+    
+    println(id);
     
   //}
 }
