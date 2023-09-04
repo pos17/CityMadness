@@ -19,6 +19,8 @@ outport = 1234
 
 client = udp_client.SimpleUDPClient("127.0.0.1", outport)
 
+
+
 def NormalizeMusic(data):
     return (((data - np.min(data)) / (np.max(data) - np.min(data))) - 0.5)*2
 
@@ -278,6 +280,8 @@ def pathHandler(unused_addr, currentNode):
     print("neighboor nodes sent")
 
 def interestPathHandler(unused_addr, currentNode):
+    global interestNodes
+    print(interestNodes)
     # steps = []
     # for i in range(len(interestNodes)):
     #     steps.append( getPath(currentNode, interestNodes[i], interest_pol))
@@ -312,7 +316,7 @@ def interestPathHandler(unused_addr, currentNode):
         msg = msg.build()
         client.send(msg)
     else:
-        print(interestNodes)
+        
         # check if interest is reached
         for i in range(len(interestNodes)):
             if dm[currentNode, interestNodes[i]] == 0:
@@ -336,8 +340,8 @@ def interestPathHandler(unused_addr, currentNode):
                 if this_dist < min_dist:
                     min_dist = this_dist
                     closer_interest = i
-            print("closer interest:", interestNodes[closer_interest])
-            print(interest_pol[closer_interest])
+            #print("closer interest:", interestNodes[closer_interest])
+            #print(interest_pol[closer_interest])
             interest_path = getPath(currentNode, interestNodes[closer_interest], interest_pol[closer_interest])
             msg = osc_message_builder.OscMessageBuilder(address = '/interestPath')
             msg.add_arg(interestNodes[closer_interest], arg_type='i')
@@ -345,6 +349,13 @@ def interestPathHandler(unused_addr, currentNode):
             print(interest_path[1])
             msg = msg.build()
             client.send(msg)
+
+def resetHandler(unused_addr):
+    global interestNodes
+    global interest_pol
+    interestNodes = [55, 275, 239]
+    interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
+    print(interestNodes)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -369,16 +380,16 @@ if __name__ == "__main__":
     tm_sparse = []
     for i in range(len(tm)):
         tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
-
     global interestNodes
-    global interest_pol
     interestNodes = [55, 275, 239]
+    global interest_pol
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     
     dispatcher = dispatcher.Dispatcher()
 
     # dispatcher.map("/start",randPathsHandler)
     # dispatcher.map("/target",targetHandler)
+    dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
     
