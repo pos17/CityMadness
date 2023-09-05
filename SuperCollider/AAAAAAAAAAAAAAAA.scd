@@ -2,11 +2,11 @@
 NetAddr.localAddr;
 (
 // INPUT PARAMETERS
-~octaves = 2;
-~tempo = 80;
-~arp_rate = 0.5;
-~mode = "random"; // up, down, up-down, down-up, funnel-up, funnel-down, stairs, random
-~amp_mode = "ascend"; // static, ascend, descend, drunk, random
+~octaves = 1;
+~tempo = 100;
+~arp_rate = 0.25;
+~mode = "stairs"; // up, down, up-down, down-up, funnel-up, funnel-down, stairs, random
+~amp_mode = "drunk"; // static, ascend, descend, drunk, random
 ~pan_mode = "ping-pong"; // static, waveLR, waveRL, ping-pong, random
 ~density = 1;
 ~chord_chance = 0.1;
