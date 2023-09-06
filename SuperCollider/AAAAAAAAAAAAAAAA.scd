@@ -2,14 +2,14 @@
 NetAddr.localAddr;
 (
 // INPUT PARAMETERS
-~octaves = 1;
+~octaves = 2;
 ~tempo = 100;
 ~arp_rate = 0.25;
 ~mode = "stairs"; // up, down, up-down, down-up, funnel-up, funnel-down, stairs, random
 ~amp_mode = "drunk"; // static, ascend, descend, drunk, random
 ~pan_mode = "ping-pong"; // static, waveLR, waveRL, ping-pong, random
 ~density = 1;
-~chord_chance = 0.1;
+~chord_chance = 0;
 ~swap_chance = 0.2;
 ~chaos = 0;
 
@@ -60,7 +60,7 @@ OSCdef('noteOn',{
 OSCdef('noteOff',{
     arg msg, time, addr, recvPort;
     // remove note from active note list when it gets note off message
-	~active[msg[1]].remove(msg[1]);
+	~active.remove(msg[1]);
 },path:"/noteOff");
 
 // Midi CC function
@@ -123,7 +123,7 @@ OSCdef('noteOff',{
 });
 
 // Create SynthDef for playing notes
-/*SynthDef.new(\tone, {
+SynthDef.new(\tone, {
     arg freqs=#[0, 0, 0, 0, 0], amp=0.3, amps=#[0.1,0,0,0,0], pos=0;
     var sig, sig1, sig2, sig3, sig4, sig5, env;
     sig1 = Pan2.ar(LFTri.ar(freqs[0]), pos, amps[0]);
@@ -135,7 +135,7 @@ OSCdef('noteOff',{
     sig = Mix([sig1, sig2, sig3, sig4, sig5]) * env * amp;
     Out.ar(0, sig);
 }).add;
-*/
+/*
 SynthDef.new(\tone, {
 	arg freqs=#[0, 0, 0, 0, 0], amp=1, amps=#[0.1,0,0,0,0], pos=0;
 	var sig, sig1, sig2, sig3, sig4, sig5, env;
@@ -153,7 +153,7 @@ SynthDef.new(\tone, {
 	sig = Splay.ar(sig);
     Out.ar(0, sig);
 }).add;
-
+*/
 // Scheduler for handling all of the arpeggiation algorithms and sequencing them
 ~scheduler = Routine.new({
     var octave = 0;
@@ -404,3 +404,5 @@ SynthDef.new(\tone, {
 1.rand;
 
 s.makeGui;
+
+Scale.directory
