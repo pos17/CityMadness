@@ -1,17 +1,32 @@
 ~n = NetAddr("127.0.0.1", NetAddr.langPort);
 NetAddr.localAddr;
+~tempo = 60;
+~arp_rate = 1;
+~amp_mode = "static";
+~pan_mode = "static";
+~swap_chance = 0;
+~octaves = 1;
+~scales[0][7];
+~active = 60;
+~scale_notes = [~active + ~scales[0][1],~active + ~scales[0][2],~active + ~scales[0][3],~active + ~scales[0][4],~active + ~scales[0][5],~active + ~scales[0][6], ~active + ~scales[0][7]];
+~scale_notes;
+~allNotes;
+
+~mode = "random";
 (
 // INPUT PARAMETERS
-~octaves = 2;
-~tempo = 100;
-~arp_rate = 0.25;
-~mode = "stairs"; // up, down, up-down, down-up, funnel-up, funnel-down, stairs, random
-~amp_mode = "drunk"; // static, ascend, descend, drunk, random
-~pan_mode = "ping-pong"; // static, waveLR, waveRL, ping-pong, random
+~octaves = 1;
+~tempo = 60;
+~arp_rate = 1;
+~mode = "random"; // up, down, up-down, down-up, funnel-up, funnel-down, stairs, random
+~amp_mode = "static"; // static, ascend, descend, drunk, random
+~pan_mode = "static"; // static, waveLR, waveRL, ping-pong, random
 ~density = 1;
 ~chord_chance = 0;
-~swap_chance = 0.2;
+~swap_chance = 0;
 ~chaos = 0;
+~scales = [0,2,4,6,7,9,11,12];
+//~scales = [[0,2,4,6,7,9,11,12],[0,2,4,5,7,9,11,12],[0,2,4,5,7,9,10,12],[0,2,3,5,7,9,11,12],[0,2,3,5,7,8,10,12],[0,1,3,5,7,8,10,12],[0,1,3,5,6,8,10,12],[0,4,7],[0,3,7]];
 
 ~cc1 = 14; // Controls ~tempo
 ~cc2 = 15; /* Controls ~mode (the 128 values are divided equally among the 8 modes, such that 0-15 correspond to the "up" mode,
@@ -60,7 +75,7 @@ OSCdef('noteOn',{
 OSCdef('noteOff',{
     arg msg, time, addr, recvPort;
     // remove note from active note list when it gets note off message
-	~active.remove(msg[1]);
+	//~active.remove(msg[1]);
 },path:"/noteOff");
 
 // Midi CC function
@@ -181,6 +196,9 @@ SynthDef.new(\tone, {
                 {octCount = octCount + 1}
             );
         });
+		~scale_notes = [~active + ~scales[1],~active + ~scales[2],~active + ~scales[3],~active + ~scales[4],~active + ~scales[5],~active + ~scales[6], ~active + ~scales[7]];
+		//~allNotes.add(~scale_notes);
+		~allNotes = ~allNotes ++ ~scale_notes;
 
         // Remove duplicates
         ~allNotes = ~allNotes.as(Set).as(Array);
