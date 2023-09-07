@@ -68,6 +68,11 @@ class ImageToMap:
         plt.title("Image with Reference Points")
         plt.show()
 
+
+def RGBValuesOSCMessage(imToMap, mapCoordinates,client):
+    rgb_value = imToMap.get_rgb_at_map_coordinates(mapCoordinates)
+    client.send_message("/RGBValues",rgb_value[0],rgb_value[1],rgb_value[2])
+
 # Example usage
 image_path = 'assets/COLORMAPTEST.png'
 map_reference_points = [(10.060950707625352,
