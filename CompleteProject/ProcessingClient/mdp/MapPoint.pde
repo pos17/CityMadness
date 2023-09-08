@@ -2,7 +2,7 @@
 class MapPoint{
  PVector coordinates;
  int id;
- ArrayList<MapPoint> line;
+ ArrayList<MapPoint> line; 
  
   MapPoint(int id, float x, float y){
     this.coordinates = new PVector(x, y);
@@ -16,12 +16,6 @@ class MapPoint{
   int getId(){
     return this.id;
   }
-  
-  void show(){
-    stroke(255,0,0);
-    strokeWeight(3);
-    point(this.coordinates.x,this.coordinates.y);
-  }
 }
 
 class MapPointSorter implements Comparator<MapPoint> {
@@ -34,4 +28,22 @@ class MapPointSorter implements Comparator<MapPoint> {
         else
             return -1;
     }
+}
+
+class MapPointDistanceSorter implements Comparator<MapPoint>{
+  PVector p;
+  
+  MapPointDistanceSorter(PVector p){
+    this.p = p; 
+  }
+  
+  public int compare(MapPoint m1, MapPoint m2){
+    float d1 = PVector.dist(m1.getCoords(),this.p);
+    float d2 = PVector.dist(m2.getCoords(),this.p);
+    
+    if(d1>d2)
+      return 1;
+    else
+      return -1;
+  }
 }

@@ -1,81 +1,100 @@
+
 class MapLine{
   ArrayList<PVector> line;
-  ArrayList<PVector> buffer;
-  MapPath path;
-  PVector current, next;
+  
+  MapPath buffer;
   int lineLength;
-  //int numSegments;
+  int index;
+  
+  boolean exists;
+  boolean pathHasChanged;
   
   MapLine(MapPath path){
     line = new ArrayList<PVector>();
-    buffer = new ArrayList<PVector>();
-    this.path = path;
-    lineLength = 200;
-    //numSegments = 100;
+    lineLength = 20;
     
-    this.next = path.getNextPoint().getCoords();
-    this.setNextPoint();
-  }
-  
-  void appendCoordinate(PVector p){
-    line.add(p);
-    if(line.size() > lineLength){
-      line.remove(0);
+    this.pathHasChanged = false;
+    
+    if(path.getPath().size()>1){
+      this.buffer = path;
+      this.createLine();
+      this.exists = true; 
+      this.pathHasChanged = true;
     }
   }
   
-  void setNextPoint(){
-    this.current = this.next;
-    this.next = path.getNextPoint().getCoords();
-    this.lerpCoordinates();
+  void createLine(){
+    ArrayList<MapPoint> p = this.buffer.getPath();
+   
+    this.line.clear();
+    this.index = 0;
+    
+    for(int i = 0; i<p.size()-1; i++){
+      PVector a = p.get(i).getCoords();
+      PVector b = p.get(i+1).getCoords();
+      
+      int numSegments = floor(PVector.dist(a,b)/2);
+      for(int j = 0; j<numSegments; j++){
+       line.add((PVector.lerp(a, b, map(j,0,numSegments,0,1))));
+      }
+    }
   }
   
-  void lerpCoordinates(){
-    int numSegments = floor(PVector.dist(this.current,this.next)/2);
-    for(int i = 0; i<numSegments; i++){
-       buffer.add((PVector.lerp(this.current, this.next, map(i,0,numSegments,0,1))));
+  void appendToLine(){
+    ArrayList<MapPoint> p = this.buffer.getPath();
+    
+    PVector a = p.get(p.size()-2).getCoords();
+    PVector b = p.get(p.size()-1).getCoords();
+      
+    int numSegments = floor(PVector.dist(a,b)/2);
+    for(int j = 0; j<numSegments; j++){
+     line.add((PVector.lerp(a, b, map(j,0,numSegments,0,1))));
     }
-    /*
-    println("Current: ");
-    println("x: " + this.current.x + " y: " + this.current.y);
-    println("Next: ");
-    println("x: " + this.next.x + " y: " + this.next.y);
-    */
-    //println(this.alpha);
-    /*
-    for(int i = 0; i<line.size(); i++){
-      PVector p = line.get(i);
-       println("x: " + p.x + " y: " + p.y);
+  }
+ 
+  ArrayList<PVector> show(){
+    ArrayList<PVector> showLine = new ArrayList<PVector>();
+    
+    if(this.index>line.size()){
+       this.index = 0;
+       if(this.pathHasChanged){
+         this.createLine();
+         this.pathHasChanged = false;
+       }
     }
     
-    */
+    for(int i = this.index>this.lineLength? this.index-this.lineLength : 0 ; i<this.index; i++){
+      showLine.add(this.line.get(i));
+    }
+    this.index+=3;
+    return showLine;
   }
   
-  void show(){
-    PVector p1, p2;
-    
-    float alpha = 0;
-    strokeWeight(5);
-    
-    if(buffer.size() > 0){
-      this.appendCoordinate(buffer.get(0));
-      buffer.remove(0);
+  PVector getPos(){
+   return(this.line.get(this.index<this.line.size()? this.index : 0)); 
+  }
+  
+  boolean exists(){
+     return this.exists;
+  }
+  
+  void updatePath(MapPath m){
+    if(m.getPath().size()>1){
+      
+      this.buffer = m; 
+      if(this.exists){
+        this.appendToLine();
+      }
+      this.exists = true;
+      this.pathHasChanged = true;
+      
+      if(this.line.size() == 0){
+        this.appendToLine();
+        this.pathHasChanged = false;
+      }
     }
-    else{
-       this.setNextPoint();
-    }
+    else
+      return;
     
-    ListIterator<PVector> iter = line.listIterator();
-    p1 = iter.next();
-    while(iter.hasNext()){
-       p2 = iter.next();
-       
-       alpha = map(iter.nextIndex(), 0, line.size(), 10, 255);
-       stroke(255,alpha);
-       line(p1.x, p1.y, p2.x, p2.y);
-       //point(p2.x, p2.y);
-       p1 = p2;
-    }
-    //println(alpha);
   }
 }
