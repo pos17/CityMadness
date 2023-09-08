@@ -1,11 +1,20 @@
+
 class MapPath{
   ArrayList<MapPoint> path;
-  boolean finished;
+  boolean finished; // Check if path exists
   int index;
+  int len;
   
   MapPath(){
     this.path = new ArrayList<MapPoint>();
     this.finished = false;
+    this.index = 0;
+    this.len = 0;
+  }
+  
+  MapPath(ArrayList<MapPoint> path){
+    this.path = path;
+    this.finished = true;
     this.index = 0;
   }
   
@@ -33,7 +42,7 @@ class MapPath{
       MapPoint m = path.get(i);
       PVector p = m.getCoords();
       point(p.x, p.y);
-      text("Id: " + m.getId(), p.x + 20, p.y + 20);
+      text(i, p.x + 20, p.y + 20);
     }
   }
   
@@ -45,11 +54,37 @@ class MapPath{
         return nextPoint;
       }
       else{
-        this.index--;
+        this.index = 0;
         return this.path.get(this.index);
       }
     }
     else
       return new MapPoint(0,0,-1); //Path is not finished
+  }
+  
+  ArrayList<MapPoint> getPath(){
+    return this.path;
+  }
+  
+  int getLength(){
+    return this.len; 
+  }
+  
+  void updatePath(MapPoint p){
+    this.path.add(p);
+    this.len++;
+    
+    if(this.len > 10){
+      path.remove(0);
+      this.len--;
+    }
+  }
+  
+  boolean isNear(PVector p){
+    println("WOW");
+    if(PVector.dist(p,this.path.get(0).getCoords()) < 100)
+      return true;
+    else
+      return false;
   }
 }

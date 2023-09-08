@@ -1,92 +1,89 @@
-int iter = 0 ;
-int shortPathLen = 0;
+
 void oscEvent(OscMessage msg) {
-  String start = "Start";
-  String end = "Stop";
-  boolean StartedPath = true;
-  //println("MessageStart \n");
-  //println(msg.toString());
-  //println("MessageEnd \n");
-  print("msg"+msg);
   
-  if(msg.checkAddrPattern("/StartShortPath")==true) {
+  if(msg.checkAddrPattern("/ShortPath")==true) {
+    IntList addresses = oscPathParser(msg);
+   // map.addShortPath(addresses);
+    println("Short path parsed");
+  }
+  
+  else if(msg.checkAddrPattern("/MusPath")){
+   IntList addresses = oscPathParser(msg);
+   //map.addMusicPath(addresses);
+   println("Music path parsed");
+  }
+  
+  else if(msg.checkAddrPattern("/RandPath1")){
+    IntList addresses = oscPathParser(msg);
+    map.addRandPath(addresses);
+    println("Random path parsed");
+  }
+  
+  else if(msg.checkAddrPattern("/nextNodes")){
+    IntList addresses = oscPathParser(msg);
+    map.setNextPoints(addresses);
+    //println("Next Points Set");
+  }
+  
+  else if(msg.checkAddrPattern("/interestPath")){
+    // MSG STRUCTURE: 1-CLOSEST INTERESTING NODE ID 2-NEXTNODE TO ARRIVE TO 1
+    int interestPointId = msg.get(0).intValue();
+    int toInterestPointId = msg.get(1).intValue();
     
-    println(msg.get(0).intValue());
-    StartedPath = true;
-    shortPathLen = msg.get(0).intValue();
-    map.createMapPath();
-    println("Started Path Parsing");
-    println("iter=" + iter );
-    iter++;
-    println("Length: " + shortPathLen);
+    map.setNextInterestPoint(interestPointId);
+    map.updatePathToInterestPoint(toInterestPointId);
   }
-  else if(msg.checkAddrPattern("/ShortPath")){
-    println("parsed");
-    println("iter=" + iter );
-    iter++;
-      //println(msg.get(0).stringValue());
-      
-      //println(parseInt(msg.get(0).stringValue()));
-      for(int i = 0; i <shortPathLen; i++) {
-        println("parsed");
-        map.addToPath(msg.get(i).intValue());
-        println(msg.get(i).intValue());
-      }  
-  }
-  else if(msg.checkAddrPattern("/StopShortPath")) {
-    println("ended");
-    println("iter=" + iter );
-    iter++;
-    map.endMapPath();
-      
-  }
+  
   else {
   println("something else");
   println(msg);
   }
-  /*
-  if(msg.checkAddrPattern("/ShortPath")==true){
-    if(start.equalsIgnoreCase(msg.get(0).stringValue())){
-      map.createMapPath();
-    }
-    else if(end.equalsIgnoreCase(msg.get(0).stringValue())){
-      map.endMapPath();
-    }
-    else{
-      map.addToPath(msg.get(0).intValue());
-    }
-  }
-  */
 }
 
 
 void keyPressed() {
-  OscMessage myMessage = new OscMessage("/target");
-  myMessage.add(789);
-  oscP52.send(myMessage, myRemoteLocation);
-  println("sender target");
-  
-  
-  OscMessage myMessage2 = new OscMessage("/start");
-  
-  /* Man kan tilføje int, float, text, byte OG arrays*/
-  // Denne beskedID indeholder 3 beskeder, hvilket skal tages i mente
-  // for den modtagende handler-funktion
-  myMessage2.add(500);
-  /* Hvad der sendes, og hvor til */
-  oscP5.send(myMessage2, myRemoteLocation);
-  println("sender start");
 }
-/*
+
 void mousePressed(){
-  OscMessage myMessage = new OscMessage("/start");
-  
-  Man kan tilføje int, float, text, byte OG arrays
-  // Denne beskedID indeholder 3 beskeder, hvilket skal tages i mente
-  // for den modtagende handler-funktion
-  myMessage.add(500);
-   Hvad der sendes, og hvor til 
-  oscP5.send(myMessage, myRemoteLocation);
-  println("sender start");
+  /*
+  if(!startup){
+    OscMessage myMessage = new OscMessage("/target");
+    int id = map.getClosestPointId(mouseX, mouseY);
+    myMessage.add(id);
+    oscP5.send(myMessage, myRemoteLocation);
+    println("Send Target");
+  }
+  else{
+    OscMessage myMessage = new OscMessage("/start");
+    int id = map.getClosestPointId(mouseX, mouseY);
+    myMessage.add(id);
+    oscP5.send(myMessage, myRemoteLocation);
+    println("Random Start Path Sent");
+    startup = false;
+  }
+  */
+  //if(!startup){
+    OscMessage myMessage = new OscMessage("/currentNode");
+    int id = map.getClosestPointId(mouseX-HALF_WIDTH, mouseY-HALF_HEIGHT);
+    myMessage.add(id);
+    oscP5.send(myMessage, myRemoteLocation);
+    //println("Send Current Node");
+    
+    map.updatePath(id);
+    map.setCurrentPoint(id);
+    
+    println(id);
+    
+  //}
 }
-*/
+
+IntList oscPathParser(OscMessage msg){
+  // First element is the length, all other elements are the IDs
+  int len = msg.get(0).intValue();
+  IntList addresses = new IntList();
+  for(int i = 0; i<len; i++){
+    addresses.append(msg.get(i+1).intValue()); 
+  }
+  
+  return addresses;
+}
