@@ -139,8 +139,12 @@ OSCdef('noteOff',{
 
 // Create SynthDef for playing notes
 SynthDef.new(\tone, {
-    arg freqs=#[0, 0, 0, 0, 0], amp=0.3, amps=#[0.1,0,0,0,0], pos=0;
+    arg freqs=#[0, 0, 0, 0, 0], amp=0.3, amps=#[0.1,0,0,0,0], pos=0, overlap=2, tFreq=20;
     var sig, sig1, sig2, sig3, sig4, sig5, env;
+	var phasor, bufrd, gran, env;
+	var bufFrames = BufFrames.ir(bufnum);
+	var t = Impulse.ar(tFreq);
+
     sig1 = Pan2.ar(LFTri.ar(freqs[0]), pos, amps[0]);
     sig2 = Pan2.ar(LFTri.ar(freqs[1]), pos, amps[1]);
     sig3 = Pan2.ar(LFTri.ar(freqs[2]), pos, amps[2]);
@@ -148,6 +152,9 @@ SynthDef.new(\tone, {
     sig5 = Pan2.ar(LFTri.ar(freqs[4]), pos, amps[4]);
     env = EnvGen.kr(Env.perc, doneAction:2);
     sig = Mix([sig1, sig2, sig3, sig4, sig5]) * env * amp;
+
+
+
     Out.ar(0, sig);
 }).add;
 /*
