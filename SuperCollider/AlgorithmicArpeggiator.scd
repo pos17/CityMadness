@@ -70,13 +70,18 @@ All input parameters can be set either by hard coding the values at the top of t
 
 */
 ~mode = "random";
-~arp_rate = 0.25;
+~chord_chance = 0;
+~arp_rate = 1;
+
+~tempo = 60;
+~chaos = 0.5;
+~n = NetAddr("127.0.0.1", NetAddr.langPort);
+NetAddr.localAddr;
 
 (
 s.latency = nil;            // for immediate response;
 
-MIDIdef.trace(true);
-MIDIdef.trace(false);
+
 
 ~grainsin_pulsar = ~grainsin_pulsar ? ();
 
@@ -88,14 +93,14 @@ Ndef( ~grainsin_pulsar[\name] ).clear;
 Ndef( ~grainsin_pulsar[\name] ).ar(2);
 // INPUT PARAMETERS
 ~octaves = 1;
-~tempo = 120;
+~tempo = 60;
 ~arp_rate = 1;
-~mode = "up-down"; // up, down, up-down, down-up, funnel-up, funnel-down, stairs, random
+~mode = "up"; // up, down, up-down, down-up, funnel-up, funnel-down, stairs, random
 ~amp_mode = "ascend"; // static, ascend, descend, drunk, random
 ~pan_mode = "random"; // static, waveLR, waveRL, ping-pong, random
 ~density = 1;
-~chord_chance = 0.1;
-~swap_chance = 0.2;
+~chord_chance = 0;
+~swap_chance = 0;
 ~chaos = 0;
 
 ~cc1 = 14; // Controls ~tempo
@@ -121,35 +126,35 @@ s.boot;
 ~pattern = Array.new(30);
 
 // Start Midi client
-MIDIClient.init;
-MIDIIn.connectAll;
 
 // Create tempo clock
 t = TempoClock.new();
 t.tempo = ~tempo/60;
 
 // MIDI Input func
-~on = MIDIFunc.noteOn({
-    arg vel, nn, chan, src;
+// MIDI Input func
+OSCdef('noteOn',{
+    arg msg, time, addr, recvPort;
 
     // If Routine was yielded because there were no active notes, start it again
-    if (~active.size == 0,
+	if (~active.size == 0,
         {~scheduler.play(t)}
     );
-
     // Add new note to currently active notes
-    ~active.add(nn);
+	~active.add(msg[1]);
 
-});
+
+},path:"/noteOn");
+
+
 
 // Midi note off function
-~off = MIDIFunc.noteOff({
-    arg vel, nn;
-
+OSCdef('noteOff',{
+    arg msg, time, addr, recvPort;
     // remove note from active note list when it gets note off message
-    ~active.remove(nn);
-
-});
+	//~active.remove(msg[1]);
+	("off").postln;
+},path:"/noteOff");
 
 // Midi CC function
 ~ccFunc = MIDIFunc.cc({
@@ -213,7 +218,7 @@ t.tempo = ~tempo/60;
 // Create SynthDef for playing notes
 
 
-/*
+
 SynthDef.new(\tone, {
     arg freqs=#[0, 0, 0, 0, 0], amp=0.3, amps=#[0.1,0,0,0,0], pos=0;
     var sig, sig1, sig2, sig3, sig4, sig5, env;
@@ -227,14 +232,14 @@ SynthDef.new(\tone, {
     Out.ar(0, sig);
 }).add;
 
-*/
+
 
 
 SynthDef(\sin_pulsar, { |out=0|
 	var a,b,c,d,e,f=#[0, 0, 0, 0, 0], f_ ,t,lev, formantA, formantB, overlapA, overlapB;
 
 	lev = \lev.kr(0.3);
-	//f = \freq.kr();
+	f = \freq.kr(440);
 	f_ = f.clip(50, 1500);
 
 	formantA = \formantA.kr(2);
@@ -583,18 +588,19 @@ Ndef(~grainsin_pulsar.name).objects;
 
             // Instantiate Synth and set it's values to the parameters we just calculated
 			{
-				Ndef(~grainsin_pulsar[\name]).set([\freq, freqArray, \gt, 1, \lev, 1]);
 
-				/*
-				 ~grainsin_pulsar[\name] ++ "_On".asSymbol;
-					Ndef(~grainsin_pulsar[\name]).put(
-						freqArray,
-						Ndef(~grainsin_pulsar[\name]).source,
-						0,
-						[\freq, ~allNotes, \gt, 1, \lev, 1]
-					);*/
-					//freqArray.postln;
-			},
+			Synth.new (
+                \tone,
+                [
+                    \freqs, freqArray,
+                    \amp, [0, amp].wchoose([1 - ~density, ~density]),
+                    \amps, ampArray,
+                    \pos, panPos
+                ]
+
+
+
+			)},
             // Else yield routine and clear pattern if there were not active notes
             {
                 ~scheduler.yield;
@@ -605,7 +611,7 @@ Ndef(~grainsin_pulsar.name).objects;
         );
 
         // Wait for duration set by tempoClock before playing next note
-        ~arp_rate.wait;
+        ~a,ate.wait;
     };
     });
 )
