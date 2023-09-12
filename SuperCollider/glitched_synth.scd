@@ -119,7 +119,7 @@ SynthDef("noiseToPitch", { arg freq=440, amp=2, mul=1, out = 0;
         Resonz.ar(
             SinOsc.ar(BrownNoise.ar(300, 400)) * mul,
 			freq,
-			[0.001, 0.001],
+			[0.05, 0.05 ],
 			amp * EnvGen.kr(env, doneAction: 2),
             //LFNoise0.kr(4, 110, 660),
 
@@ -1021,7 +1021,7 @@ var song = l.value(5);
 var cursor = 0.0;
 var stack = List.new();
 var midi = 50;
-var noteLen = 6;
+var noteLen = 2;
 
 stack.add(midi);
 

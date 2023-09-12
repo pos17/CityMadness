@@ -1,47 +1,195 @@
+
 class Map{
   ArrayList<MapPoint> mapPoints = new ArrayList<MapPoint>();
   MapPath path;
+  ArrayList<MapPath> randPath;
   MapLine line;
+  MapParticleSystem system;
+  MapAttractor attractor;
   
-  boolean pathDone;
+  ArrayList<Particle> mapParticles = new ArrayList<Particle>();
+  
+  ArrayList<MapPoint> nextPoints = new ArrayList<MapPoint>();
+  MapPoint toInterestPoint;
+  MapPoint interestPoint;
+  MapPoint currentPoint;
+  
+  boolean pathDone, systemCreated;
+  
+  PGraphics city, render;
   
   Map(){
     this.mapPoints = loadMapPoints();
     this.pathDone = false;
+    this.systemCreated = false;
+    this.renderMap();
+    this.attractor = new MapAttractor(5);
+    this.render = createGraphics(width, height, P2D);
+    this.randPath = new ArrayList<MapPath>();
+    this.path = new MapPath();
+    this.line = new MapLine(this.path);
+    for(int i = 0; i < NMAPPARTICLES; i++){
+      mapParticles.add(new Particle()); 
+    }
   }
   
   void show(){
-    ListIterator<MapPoint> iter = mapPoints.listIterator();
-    while(iter.hasNext()){
-      MapPoint m = iter.next();
-      m.show();
+    this.render.beginDraw();
+    //this.render.clear();
+    
+    this.render.noStroke();
+    this.render.fill(0,50);
+    this.render.rect(0,0,width,height);
+    
+    this.render.push();
+    this.render.translate(HALF_WIDTH,HALF_HEIGHT);
+    
+    //SHOW CHAOTIC PARTICLES
+    this.render.stroke(255,MAPPARTICLEALPHA);
+    this.render.strokeWeight(3);
+    
+    if(this.pathDone){
+      ListIterator<Particle> mapParticlesIter = this.mapParticles.listIterator();
+      ArrayList<MapPoint> pathPos = this.path.getPath();
+      float alpha;
+      while(mapParticlesIter.hasNext()){
+        Particle m = mapParticlesIter.next();
+        alpha = m.moveNoiseReturnAlpha(pathPos);
+        PVector p = m.getPos();
+      
+        render.stroke(255,alpha);
+        render.point(p.x,p.y);
+      }
     }
+    else{
+      ListIterator<Particle> mapParticlesIter = this.mapParticles.listIterator();
+      while(mapParticlesIter.hasNext()){
+        Particle m = mapParticlesIter.next();
+        m.moveNoise();
+        PVector p = m.getPos();
+        render.point(p.x,p.y);
+      }
+    }
+    
+    
+    path.show(); // TEMPORARY, WILL BE DELETED LATER
+    if(systemCreated){
+      //SHOW PATH PARTICLES
+      if(system.getSize()<NPATHPARTICLES)
+        system.addParticle(new Particle());
+      ArrayList<Particle> systemParticles = system.getSystem();
+      this.render.stroke(13, 152, 186);
+      this.render.strokeWeight(3);
+      ListIterator<Particle> systemParticlesIter = systemParticles.listIterator();
+      while(systemParticlesIter.hasNext()){
+        PVector p = systemParticlesIter.next().getPos();
+        this.render.point(p.x, p.y);
+      }
+      system.moveParticles();
+      
+    }
+    
+    
     if(pathDone){
-      path.show();
-      line.show();
-    }   
+      /*
+      for(int i = 0; i<randPath.size(); i++){
+        randPath.get(i).show(); 
+      }
+      */
+      //println("RENDERING NEXT POINTS");
+      this.render.stroke(0,0,255, 255*sin(5*radians(frameCount)));
+      this.render.strokeWeight(8);
+      ListIterator<MapPoint> nextPointIter = nextPoints.listIterator();
+      while(nextPointIter.hasNext()){
+        PVector p = nextPointIter.next().getCoords();
+        this.render.point(p.x, p.y);
+      }
+      
+      // CURRENT POINT
+      this.render.stroke(255,0,0);
+      PVector p = currentPoint.getCoords();
+      this.render.point(p.x,p.y);
+      
+      // PATH TO INTEREST POINT
+      this.render.stroke(0,255,255, 255*sin(5*radians(frameCount)));
+      p = toInterestPoint.getCoords();
+      this.render.point(p.x,p.y);
+      
+      // TEMP, CURRENT INTEREST POINT
+      this.render.strokeWeight(12);
+      p = interestPoint.getCoords();
+      this.render.point(p.x,p.y);
+    }
+    
+    if(this.line.exists()){
+      ArrayList<PVector> lineList = line.show();
+      ListIterator<PVector> linetIter = lineList.listIterator();
+      
+      while(linetIter.hasNext()){
+        PVector p = linetIter.next();
+        this.render.stroke(255, map(linetIter.nextIndex(),0,lineList.size(),0,70));
+        this.render.point(p.x, p.y);
+      }
+    }
+    
+    //SHOW ATTRACTORS
+    
+    ArrayList<PVector> attractorPos = this.attractor.getPos();
+    this.render.stroke(0,0,255);
+    this.render.strokeWeight(2);
+    ListIterator<PVector> attractorIter = attractorPos.listIterator();
+    while(attractorIter.hasNext()){
+      PVector p = attractorIter.next();
+      this.render.point(p.x,p.y);
+    }
+    
+    this.render.pop();
+    this.render.endDraw();
+    image(this.render,0,0);
+    //image(this.city,0,0);
+    
   }
   
-  void createMapPath(){
-    this.path = new MapPath();
-  }
-  
-  void addToPath(int id){
-    this.path.appendPoint(mapPoints.get(id)); 
-  }
-  
-  void endMapPath(){
-    this.path.end();
+  /*
+  void addMusicPath(IntList addr){
+    ArrayList<MapPoint> musicPoints = new ArrayList<MapPoint>();
+    for(int i = 0; i<addr.size(); i++){
+      musicPoints.add(this.getMapPoint(addr.get(i))); 
+    }
+    this.musicPath = new MapPath(musicPoints);
     this.pathDone = true;
-    this.createLine();
+    
+    this.createParticleSystem();
   }
+  
+  void addShortPath(IntList addr){
+    ArrayList<MapPoint> shortPoints = new ArrayList<MapPoint>();
+    for(int i = 0; i<addr.size(); i++){
+      shortPoints.add(this.getMapPoint(addr.get(i))); 
+    }
+    this.shortPath = new MapPath(shortPoints);
+  }
+  */
   
   void createLine(){
     this.line = new MapLine(this.path); 
   }
   
+  void createParticleSystem(){
+    //println("SYSTEM CREATED");
+    this.system = new MapParticleSystem(this.path); 
+  }
+  
   MapPoint getMapPoint(int id){
     return this.mapPoints.get(id);
+  }
+  
+  void addRandPath(IntList addr){
+    ArrayList<MapPoint> randPoints = new ArrayList<MapPoint>();
+    for(int i = 0; i<addr.size(); i++){
+      randPoints.add(this.getMapPoint(addr.get(i))); 
+    }
+    this.randPath.add(new MapPath(randPoints));
   }
   
 
@@ -75,8 +223,8 @@ class Map{
         */
         
         // CREMONA
-        x = ((x - 10.012826061753287) * width) / (10.031731839461685 - 10.012826061753287);
-        y = ((y - 45.138503171087336)* height)/ (45.13185662179308 - 45.138503171087336);
+        x = ((x - 10.012826061753287) * width) / (10.031731839461685 - 10.012826061753287) - HALF_WIDTH;
+        y = ((y - 45.138503171087336)* height)/ (45.13185662179308 - 45.138503171087336) - HALF_HEIGHT;
         
         map.add(new MapPoint(id,x,y));
       }
@@ -87,4 +235,77 @@ class Map{
     
     return map;
   }
+  
+  void renderMap(){
+    this.city = createGraphics(width, height, P2D);
+    this.city.beginDraw();
+    this.city.translate(HALF_WIDTH, HALF_HEIGHT);
+    //this.city.background(0);
+    this.city.stroke(255,0,0);
+    this.city.noFill();
+    this.city.strokeWeight(5);
+    for(int i = 0; i<mapPoints.size(); i++){
+      PVector pos = mapPoints.get(i).getCoords();
+      this.city.point(pos.x, pos.y);
+    }
+    this.city.endDraw();
+  }
+  
+  int getClosestPointId(float x, float y){
+    PVector p = new PVector(x,y);
+    ArrayList<MapPoint> distSorted;
+    // If an element has alredy been clicked only check in the next points
+    if(!pathDone){
+      distSorted = new ArrayList<MapPoint>(this.mapPoints);
+    }
+    else{
+      distSorted = new ArrayList<MapPoint>(this.nextPoints);
+    }
+    distSorted.sort(new MapPointDistanceSorter(p));
+    strokeWeight(9);
+    stroke(25,200,100);
+    point(distSorted.get(0).getCoords().x,distSorted.get(0).getCoords().y);
+    return distSorted.get(0).getId();
+  }
+  
+  void setNextPoints(IntList addr){
+    this.nextPoints.clear();
+    for(int i = 0; i<addr.size(); i++){
+      this.nextPoints.add(this.getMapPoint(addr.get(i))); 
+    }
+    
+    this.pathDone = true;
+  }
+  
+  void updatePath(int id){
+    this.path.updatePath(this.getMapPoint(id));
+    
+    if(systemCreated){
+      this.system.generateAttractors(this.path);
+      //println("UPDATE PATH");
+      
+      this.line.updatePath(this.path);
+    }
+    
+    if(startup){
+     // println("CREATING PARTICLE SYSTEM");
+      this.createParticleSystem();
+      this.systemCreated = true;
+    }
+    startup = false; //After second click we exit map startup
+  }
+  
+  void setNextInterestPoint(int p){
+    this.interestPoint = this.getMapPoint(p);
+    //println(p);
+  }
+  
+  void updatePathToInterestPoint(int p){
+    this.toInterestPoint = this.getMapPoint(p);
+  }
+  
+  void setCurrentPoint(int p){
+    this.currentPoint = this.getMapPoint(p); 
+  }
+  
 }

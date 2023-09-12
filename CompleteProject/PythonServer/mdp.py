@@ -19,6 +19,8 @@ outport = 1234
 
 client = udp_client.SimpleUDPClient("127.0.0.1", outport)
 
+
+
 def NormalizeMusic(data):
     return (((data - np.min(data)) / (np.max(data) - np.min(data))) - 0.5)*2
 
@@ -150,86 +152,210 @@ def targetHandler(unused_addr, target):
     global targetG
     targetG = target
     print("target: " + str(target))
+
+    print("generating optimal paths")
+    pathSender()
+    print("finished")
+
+def randPathsHandler(unused_addr, start):
+    print("RandHandler")
+    global startG
+    startG = start
+    lenpath = 3
+    randPath = []
+    randPath.append(start)
+    print("generating random path")
+    for i in range (lenpath):
+        rand = random.choice(nodes[randPath[i]][3])
+        while (rand in randPath):
+            rand = random.choice(nodes[randPath[i]][3])
+        randPath.append(random.choice(nodes[randPath[i]][3]))
+
+    msg = osc_message_builder.OscMessageBuilder(address = '/RandPath1')
+    msg.add_arg(lenpath, arg_type='i')
+    for i in range(len(randPath)):
+        msg.add_arg(randPath[i], arg_type='i')
+        print(randPath[i])
+    msg = msg.build()
+    client.send(msg)
+    print("random path sent")
+
+# def startHandler(unused_addr, start):
+#     time.sleep(7)
+#     print("startHandler")
+#     print("start: " + str(start) )
+#     print("targetG: "+str(targetG))
+#     steps_ = getPath(start, targetG, pol_shortest)
+#     steps = getPath(start, targetG, pol_musical)
+
+
+#     #MusPath = notes[steps]
+#     #ShortPath = notes[steps_]
+#     MusPath = steps
+#     ShortPath = steps_
+#     client.send_message("/StartMusPath",len(MusPath))
+#     print("Path Started")
+#     #client.send_message("/MusPath",MusPath)
+#     msg = osc_message_builder.OscMessageBuilder(address = '/MusPath')
+#     for i in range(len(MusPath)):
+#         #client.send_message("/MusPath", "{0}".format(MusPath[i]))
+#         msg.add_arg(MusPath[i], arg_type='i')
+#         print(MusPath[i])
+#         #time.sleep(1)
+#         if i == len(MusPath)-1:
+#             break
+#     msg = msg.build()
+#     print("done path")
+#     #time.sleep(2)
+#     client.send(msg)
     
-def startHandler(unused_addr, start):
+#     #client.send_message("MusPath",MusPath)
+#     print("MusPath Sent")
+#     #time.sleep(10)
+#     client.send_message("/StopMusPath",0)
+#     print("MusPath finished")
+
+def interestPlaces(interestNodes, maxC, notes, dm, tm_sparse):
+    pol_shortest = []
+    for i in range(len(interestNodes)):
+        r_shortest = reward(nodes,interestNodes[i],0,1,5, maxC, notes, dm)
+        ql_shortest = mdptoolbox.mdp.RelativeValueIteration(tm_sparse, r_shortest, 0.99)
+        ql_shortest.run()
+        pol_shortest.append(ql_shortest.policy)
+    return pol_shortest
+
+def pathSender():
     time.sleep(7)
-    print("startHandler")
-    print("start: " + str(start) )
+    print("startPathSender")
+    print("start: " + str(startG) )
     print("targetG: "+str(targetG))
-    steps_ = getPath(start, targetG, pol_shortest)
-    steps = getPath(start, targetG, pol_musical)
+    steps_ = getPath(startG, targetG, pol_shortest)
+    steps = getPath(startG, targetG, pol_musical)
 
 
     #MusPath = notes[steps]
     #ShortPath = notes[steps_]
     MusPath = steps
     ShortPath = steps_
-    client.send_message("/StartMusPath",len(MusPath))
-    print("Path Started")
-    #client.send_message("/MusPath",MusPath)
-    msg = osc_message_builder.OscMessageBuilder(address = '/MusPath')
+
+    
+    musPathMsg = osc_message_builder.OscMessageBuilder(address = '/MusPath')
+    musPathMsg.add_arg(len(MusPath), arg_type='i')
+    print("Music Path:")
     for i in range(len(MusPath)):
         #client.send_message("/MusPath", "{0}".format(MusPath[i]))
-        msg.add_arg(MusPath[i], arg_type='i')
+        musPathMsg.add_arg(MusPath[i], arg_type='i')
         print(MusPath[i])
         #time.sleep(1)
         if i == len(MusPath)-1:
             break
-    msg = msg.build()
-    print("done path")
-    #time.sleep(2)
-    client.send(msg)
-    
-    #client.send_message("MusPath",MusPath)
-    print("MusPath Sent")
-    #time.sleep(10)
-    client.send_message("/StopMusPath",0)
-    print("MusPath finished")
-
-    
+    musPathMsg = musPathMsg.build()
+    client.send(musPathMsg)
+    print("End Music Path")
 
 
-
-
-    client.send_message("/StartShortPath",len(ShortPath))
-    print("Short Path Started")
-    #client.send_message("/MusPath",MusPath)
-    msg2 = osc_message_builder.OscMessageBuilder(address = '/ShortPath')
+    shortPathMsg = osc_message_builder.OscMessageBuilder(address = '/ShortPath')
+    shortPathMsg.add_arg(len(ShortPath), arg_type='i')
+    print("Short Path:")
     for i in range(len(ShortPath)):
-        #client.send_message("/MusPath", "{0}".format(MusPath[i]))
-        msg2.add_arg(ShortPath[i], arg_type='i')
+        shortPathMsg.add_arg(ShortPath[i], arg_type='i')
         print(ShortPath[i])
         #time.sleep(1)
         if i == len(ShortPath)-1:
             break
-    msg2 = msg2.build()
-    print("done path short")
-    #time.sleep(2)
-    client.send(msg2)
-    
-    #client.send_message("MusPath",MusPath)
-    print("ShortPath Sent")
-    #time.sleep(10)
-    client.send_message("/StopShortPath",0)
-    print("ShortPath finished")
+    shortPathMsg = shortPathMsg.build()
+    client.send(shortPathMsg)
+    print("End Short Path")
 
+def pathHandler(unused_addr, currentNode):
+    print("Path Handler")
+    print("Retrieving neighboor nodes")
+    msg = osc_message_builder.OscMessageBuilder(address = '/nextNodes')
+    msg.add_arg(len(nodes[currentNode][3]), arg_type='i')
+    for i in range(len(nodes[currentNode][3])):
+        msg.add_arg(nodes[currentNode][3][i], arg_type='i')
+        print(nodes[currentNode][3][i])
+    msg = msg.build()
+    client.send(msg)
+    print("neighboor nodes sent")
 
+def interestPathHandler(unused_addr, currentNode):
+    global interestNodes
+    print(interestNodes)
+    # steps = []
+    # for i in range(len(interestNodes)):
+    #     steps.append( getPath(currentNode, interestNodes[i], interest_pol))
+    # msg = osc_message_builder.OscMessageBuilder(address = '/interestPath1')
+    # msg.add_arg(len(steps[0]), arg_type='i')
+    # for i in range(len(steps[0])):
+    #     msg.add_arg(steps[0][i], arg_type='i')
+    #     #print(nodes[currentNode][3][i])
+    # msg = msg.build()
+    # client.send(msg)
 
+    # msg = osc_message_builder.OscMessageBuilder(address = '/interestPath2')
+    # msg.add_arg(len(steps[1]), arg_type='i')
+    # for i in range(len(steps[1])):
+    #     msg.add_arg(steps[1][i], arg_type='i')
+    #     #print(nodes[currentNode][3][i])
+    # msg = msg.build()
+    # client.send(msg)
 
+    # msg = osc_message_builder.OscMessageBuilder(address = '/interestPath3')
+    # msg.add_arg(len(steps[2]), arg_type='i')
+    # for i in range(len(steps[2])):
+    #     msg.add_arg(steps[2][i], arg_type='i')
+    #     #print(nodes[currentNode][3][i])
+    # msg = msg.build()
+    # client.send(msg)
+    #check if there are still interest points
+    if interestNodes == []:
+        print("There are no more interest places to reach")
+        msg = osc_message_builder.OscMessageBuilder(address = '/interestPath')
+        msg.add_arg(-1, arg_type='i')
+        msg = msg.build()
+        client.send(msg)
+    else:
+        
+        # check if interest is reached
+        for i in range(len(interestNodes)):
+            if dm[currentNode, interestNodes[i]] == 0:
+                print("interest point reached")
+                del interestNodes[i]
+                del interest_pol[i]
+                print(interestNodes)
+                break
 
+        if interestNodes == []:
+            print("There are no more interest places to reach")
+            msg = osc_message_builder.OscMessageBuilder(address = '/interestPath')
+            msg.add_arg(-1, arg_type='i')
+            msg = msg.build()
+            client.send(msg)
+        else:
+            # send next node for closer interest
+            min_dist = 9999
+            for i in range(len(interestNodes)):
+                this_dist = dm[currentNode, interestNodes[i]]
+                if this_dist < min_dist:
+                    min_dist = this_dist
+                    closer_interest = i
+            #print("closer interest:", interestNodes[closer_interest])
+            #print(interest_pol[closer_interest])
+            interest_path = getPath(currentNode, interestNodes[closer_interest], interest_pol[closer_interest])
+            msg = osc_message_builder.OscMessageBuilder(address = '/interestPath')
+            msg.add_arg(interestNodes[closer_interest], arg_type='i')
+            msg.add_arg(interest_path[1], arg_type='i')
+            print(interest_path[1])
+            msg = msg.build()
+            client.send(msg)
 
-    #client.send_message("/StartShortPath",1)
-    #print("Short Path Started")
-    #for i in range(len(ShortPath)):
-    #    client.send_message("/ShortPath", "{0}".format(ShortPath[i]))
-        #time.sleep(1)
-    #    print("Short Path: " + str(ShortPath[i]))
-    #    if i == len(ShortPath)-1:
-    #        break
-    
-    #client.send_message("/StopShortPath",0)
-    #print("Short Path Stopped")
-
+def resetHandler(unused_addr):
+    global interestNodes
+    global interest_pol
+    interestNodes = [55, 275, 239]
+    interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
+    print(interestNodes)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -243,21 +369,30 @@ if __name__ == "__main__":
     graph = json.load(f)
     features = graph["features"]
     loadNodes(features)
-
+    global dm
     dm = distMatrix(nodes)
+    global maxC
     maxC = getMaxC()
+    global notes
+    notes = np.random.randint(12,size=len(nodes))
     tm = transMatrix(nodes,maxC)
-
+    global tm_sparse
     tm_sparse = []
     for i in range(len(tm)):
         tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
-
-    notes = np.random.randint(12,size=len(nodes))
+    global interestNodes
+    interestNodes = [55, 275, 239]
+    global interest_pol
+    interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     
     dispatcher = dispatcher.Dispatcher()
-    dispatcher.map("/target",targetHandler)
-    dispatcher.map("/start",startHandler)
 
+    # dispatcher.map("/start",randPathsHandler)
+    # dispatcher.map("/target",targetHandler)
+    dispatcher.map("/reset", resetHandler)
+    dispatcher.map("/currentNode", pathHandler)
+    dispatcher.map("/currentNode", interestPathHandler)
+    
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
 
     print("Serving on {}".format(server.server_address))
