@@ -80,11 +80,12 @@ class MapPath{
     }
   }
   
-  boolean isNear(PVector p){
-    println("WOW");
-    if(PVector.dist(p,this.path.get(0).getCoords()) < 100)
-      return true;
-    else
-      return false;
+  PVector getStartPath(){
+    return this.path.get(0).getCoords(); 
   }
+  
+  PVector getEndPath(){
+    return this.path.get(this.path.size()-1).getCoords(); 
+  }
+  
 }

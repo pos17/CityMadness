@@ -2,9 +2,11 @@ import oscP5.*;
 import netP5.*;
 import java.util.*;
 
-int NMAPPARTICLES = 5000;
+int NMAPPARTICLES = 10000;
 int NPATHPARTICLES = 1000;
 int MAPPARTICLEALPHA = 70;
+int TRANSITION_RANGE = 50;
+int RETURN_RANGE = 20;
 float HALF_WIDTH;
 float HALF_HEIGHT;
 float QUARTER_WIDTH;
@@ -46,6 +48,8 @@ void setup(){
 
 void draw(){
   background(0);
+  
+  windowTitle(String.valueOf(frameRate));
   
   map.show();
   

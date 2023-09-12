@@ -7,6 +7,9 @@ class Map{
   MapParticleSystem system;
   MapAttractor attractor;
   
+  PVector startPath;
+  PVector endPath;
+  
   ArrayList<Particle> mapParticles = new ArrayList<Particle>();
   
   ArrayList<MapPoint> nextPoints = new ArrayList<MapPoint>();
@@ -31,6 +34,9 @@ class Map{
     for(int i = 0; i < NMAPPARTICLES; i++){
       mapParticles.add(new Particle()); 
     }
+    
+    this.startPath = new PVector();
+    this.endPath = new PVector();
   }
   
   void show(){
@@ -48,20 +54,30 @@ class Map{
     this.render.stroke(255,MAPPARTICLEALPHA);
     this.render.strokeWeight(3);
     
-    if(this.pathDone){
+    if(this.pathDone){ // BEHAVIOUR IF WE HAVE A PATH
+      
+      //Set first and last path point
+      this.startPath = this.path.getStartPath();
+      this.endPath = this.path.getEndPath();
+      
       ListIterator<Particle> mapParticlesIter = this.mapParticles.listIterator();
-      ArrayList<MapPoint> pathPos = this.path.getPath();
-      float alpha;
       while(mapParticlesIter.hasNext()){
         Particle m = mapParticlesIter.next();
-        alpha = m.moveNoiseReturnAlpha(pathPos);
+        //alpha = m.moveNoiseReturnAlpha(pathPos);
+        m.moveNoise();
         PVector p = m.getPos();
-      
-        render.stroke(255,alpha);
-        render.point(p.x,p.y);
+        
+        if(particleIsNearStartPath(p)){
+          float[]f = p.array();
+          system.addParticle(new Particle(f[0],f[1]));
+          mapParticlesIter.remove();
+        }
+        else{
+          render.point(p.x,p.y);
+        }
       }
     }
-    else{
+    else{ // BEHAVIOUR IF WE DON'T HAVE A PATH
       ListIterator<Particle> mapParticlesIter = this.mapParticles.listIterator();
       while(mapParticlesIter.hasNext()){
         Particle m = mapParticlesIter.next();
@@ -73,17 +89,22 @@ class Map{
     
     
     path.show(); // TEMPORARY, WILL BE DELETED LATER
-    if(systemCreated){
-      //SHOW PATH PARTICLES
-      if(system.getSize()<NPATHPARTICLES)
-        system.addParticle(new Particle());
+    if(systemCreated){      
+      
       ArrayList<Particle> systemParticles = system.getSystem();
       this.render.stroke(13, 152, 186);
       this.render.strokeWeight(3);
       ListIterator<Particle> systemParticlesIter = systemParticles.listIterator();
       while(systemParticlesIter.hasNext()){
         PVector p = systemParticlesIter.next().getPos();
-        this.render.point(p.x, p.y);
+        
+        if(particleIsNearEndPath(p)){
+          float[]f = p.array();
+          mapParticles.add(new Particle(f[0],f[1]));
+          systemParticlesIter.remove();
+        }
+        else
+          this.render.point(p.x, p.y);
       }
       system.moveParticles();
       
@@ -307,5 +328,19 @@ class Map{
   void setCurrentPoint(int p){
     this.currentPoint = this.getMapPoint(p); 
   }
+  
+  boolean particleIsNearStartPath(PVector p){
+    if(sqrt(sq(p.x-this.startPath.x) + sq(p.y-this.startPath.y)) < TRANSITION_RANGE)
+      return true;
+     
+    return false;
+  }
+  
+  boolean particleIsNearEndPath(PVector p){
+    if(sqrt(sq(p.x-this.endPath.x) + sq(p.y-this.endPath.y)) < RETURN_RANGE)
+      return true;
+     
+    return false;
+  } 
   
 }
