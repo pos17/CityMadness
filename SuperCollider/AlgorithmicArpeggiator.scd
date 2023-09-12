@@ -142,6 +142,7 @@ OSCdef('noteOn',{
     );
     // Add new note to currently active notes
 	~active.add(msg[1]);
+	~active.postln;
 
 
 },path:"/noteOn");
@@ -152,8 +153,9 @@ OSCdef('noteOn',{
 OSCdef('noteOff',{
     arg msg, time, addr, recvPort;
     // remove note from active note list when it gets note off message
-	//~active.remove(msg[1]);
+	~active.remove(msg[1]);
 	("off").postln;
+	msg[1].postln;
 },path:"/noteOff");
 
 // Midi CC function
@@ -559,7 +561,7 @@ Ndef(~grainsin_pulsar.name).objects;
                 });
             });
 
-            ~pattern.postln;
+            //~pattern.postln;
 
             // Make sure the note for the current iteration exists (to prevent errors)
             if (~pattern[curNote] != nil, {
@@ -611,7 +613,7 @@ Ndef(~grainsin_pulsar.name).objects;
         );
 
         // Wait for duration set by tempoClock before playing next note
-        ~a,ate.wait;
+        ~arp_rate.wait;
     };
     });
 )
