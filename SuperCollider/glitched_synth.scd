@@ -66,6 +66,7 @@ OSCFunc.trace(false);
 ~mixerDvol = Bus.control(s, 2);
 ~mixerEvol = Bus.control(s, 2);
 
+<<<<<<< HEAD
 OSCdef.new(\noteOff,{
 	arg msg, time, addr, port;
 	var note;
@@ -75,6 +76,13 @@ OSCdef.new(\noteOff,{
 	~notes [msg[1]].free;
 	postln("freqqqqq");
 	msg[1].midicps.postln
+=======
+~mixerAsignal = Bus.audio(s, 2);
+~mixerBsignal = Bus.audio(s, 2);
+~mixerCsignal = Bus.audio(s, 2);
+~mixerDsignal = Bus.audio(s, 2);
+~mixerEsignal = Bus.audio(s, 2);
+>>>>>>> 82e414af8df9f9721851f0baae3f5aea744baccd
 
 ~mixerStripAout = Bus.audio(s, 2);
 ~mixerStripBout = Bus.audio(s, 2);
@@ -123,7 +131,7 @@ SynthDef("noiseToPitch", { arg freq=440, amp=2, mul=1, out = 0;
         Resonz.ar(
             SinOsc.ar(BrownNoise.ar(300, 400)) * mul,
 			freq,
-			[0.001, 0.001],
+			[0.05, 0.05 ],
 			amp * EnvGen.kr(env, doneAction: 2),
             //LFNoise0.kr(4, 110, 660),
 
@@ -1025,7 +1033,7 @@ var song = l.value(5);
 var cursor = 0.0;
 var stack = List.new();
 var midi = 50;
-var noteLen = 6;
+var noteLen = 2;
 
 stack.add(midi);
 
