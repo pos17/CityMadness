@@ -66,7 +66,6 @@ OSCFunc.trace(false);
 ~mixerDvol = Bus.control(s, 2);
 ~mixerEvol = Bus.control(s, 2);
 
-<<<<<<< HEAD
 OSCdef.new(\noteOff,{
 	arg msg, time, addr, port;
 	var note;
@@ -76,13 +75,6 @@ OSCdef.new(\noteOff,{
 	~notes [msg[1]].free;
 	postln("freqqqqq");
 	msg[1].midicps.postln
-=======
-~mixerAsignal = Bus.audio(s, 2);
-~mixerBsignal = Bus.audio(s, 2);
-~mixerCsignal = Bus.audio(s, 2);
-~mixerDsignal = Bus.audio(s, 2);
-~mixerEsignal = Bus.audio(s, 2);
->>>>>>> 7377f22951623cc163043f88fb361cce1687dd5b
 
 ~mixerStripAout = Bus.audio(s, 2);
 ~mixerStripBout = Bus.audio(s, 2);
