@@ -1,13 +1,12 @@
 
 class Particle{
   PVector p, v, a;
-  boolean near;
   
   Particle(){
     this.p = new PVector(random(-width/2,width/2),random(-height/2,height/2));
     this.v = new PVector(0,0);
     this.a = new PVector(0,0);
-    this.near = false;
+    
   }
   Particle(PVector p){
     this.p = p;

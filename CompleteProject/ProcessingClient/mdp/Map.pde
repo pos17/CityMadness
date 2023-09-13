@@ -205,6 +205,10 @@ class Map{
     return this.mapPoints.get(id);
   }
   
+  PVector getPointCoords(int id){
+     return this.mapPoints.get(id).getCoords();
+  }
+  
   void addRandPath(IntList addr){
     ArrayList<MapPoint> randPoints = new ArrayList<MapPoint>();
     for(int i = 0; i<addr.size(); i++){
@@ -342,5 +346,9 @@ class Map{
      
     return false;
   } 
+  
+  void addChaoticParticle(Particle p){
+    
+  }
   
 }
