@@ -7,6 +7,7 @@ import scipy
 import argparse
 import random
 import time
+import l_system
 
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
@@ -392,7 +393,8 @@ if __name__ == "__main__":
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
-    
+    dispatcher.map("/currentNode", l_system.update_L_system) #function for updating l_system
+
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
 
     print("Serving on {}".format(server.server_address))

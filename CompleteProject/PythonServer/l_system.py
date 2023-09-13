@@ -1,10 +1,16 @@
 from ast import parse
 from calendar import c
 from email.mime import base
+from platform import node
 from re import T
 import sched, time
 import string
+from turtle import position
+import numpy as np
 from tracemalloc import start
+from mdp import nodes
+from mdp import client
+
 #import turtle
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
@@ -26,6 +32,12 @@ MinArp      8
 """
 
 scales = [[0,2,4,6,7,9,11],[0,2,4,5,7,9,11],[0,2,4,5,7,9,10],[0,2,3,5,7,9,11],[0,2,3,5,7,8,10],[0,1,3,5,7,8,10],[0,1,3,5,6,8,10],[0,4,7],[0,3,7]]
+l_system_started = False
+axiom = 'NNSSEEWW'
+positionsList = []
+dirList = ""
+scheduler = None
+maxLength = 10
 
 def sendNoteOn(midiValue,client):
     client.send_message("/noteOn",midiValue)
@@ -44,13 +56,13 @@ def scheduleNote(midiValue,length,startTime,client,scheduler):
     scheduler.enter(startTime,1,sendNoteOn,argument=(midiValue,client))
     scheduler.enter(startTime+length,1,sendNoteOff,argument=(midiValue,client))
 
-def lSysGenerate(s, order):
+def lSysGenerate(s, d, order):
     for i in range(order):
         s = lSysCompute(s)
     return s
 
-def lSysCompute(s):
-    d = {'A': 'AA-A++A-AAA'}
+def lSysCompute(s,b,d):
+    d = {b: d}
     return ''.join([d.get(c) or c for c in s])
 
 
@@ -117,10 +129,13 @@ def parseChords(s, tBase, baseChord,scaleIndex,baseNote,client,scheduler):
     startTime = 0
     playablechord = False
     for c in s:
-        if c in string.ascii_letters:
-            chordLength = chordLength+tBase
+        if c == "E":
+            chordLength = tBase / 2
             playablechord=True
-        elif c == '-':
+        elif c == "W": 
+            chordLength = tBase * 2
+            playablechord=True
+        elif c == 'S':
             if playablechord == True:
                 notes= chordToMidiNotes(scaleIndex, chordValue,baseNote)
                 print(notes)
@@ -128,9 +143,8 @@ def parseChords(s, tBase, baseChord,scaleIndex,baseNote,client,scheduler):
                 playablechord=False
                 startTime=startTime+chordLength
                 chordLength=0
-            chordValue=chordValue-1
-            
-        elif c == '+':
+            chordValue=chordValue-1  
+        elif c == 'N':
             if playablechord == True:
                 notes= chordToMidiNotes(scaleIndex, chordValue,baseNote)
                 scheduleNotes(notes,chordLength,startTime,client,scheduler)
@@ -140,6 +154,70 @@ def parseChords(s, tBase, baseChord,scaleIndex,baseNote,client,scheduler):
             chordValue=chordValue+1
 
 
+def start_L_system():
+    scheduler = sched.scheduler(time.monotonic, time.sleep)
+    return scheduler
+   
+
+
+def update_L_system(unused_addr, currentNode):
+
+    print("startCurrentNode")
+    print(currentNode)
+    print("endCurrentNode")
+
+    updatePositionsList(positionsList,currentNode,maxLength)
+    dirList = returnDirList(positionsList)
+    if(l_system_started==False):
+        scheduler = start_L_system()
+        l_system_started = True
+    iterations = 1
+    char = "N"
+    startingNoteMidi = 69
+    tBase = 4
+    baseChordPos= 0
+    scaleIndex = 1
+    lsysString = lSysCompute(axiom,char,dirList)#lSysGenerate(axiom, iterations)
+    parseChords(lsysString, tBase,baseChordPos,scaleIndex,startingNoteMidi,client, scheduler)
+
+
+def calculateDir(node1x,node1y,node2x,node2y):
+    x = node2x - node1x
+    y = node2y - node1y
+    theta2PI = np.arctan2(x,y) * 180 / np.pi
+    if(theta2PI<-(5/6)*np.pi):
+        dir = "EE"
+    elif(theta2PI<-(2/3)*np.pi): 
+        dir = "SE"
+    elif(theta2PI<-(1/3)*np.pi): 
+        dir = "SS"
+    elif(theta2PI<-(1/6)*np.pi): 
+        dir = "SW"
+    elif(theta2PI<(1/6)*np.pi): 
+        dir = "WW"    
+    elif(theta2PI<(1/3)*np.pi): 
+        dir = "NW"    
+    elif(theta2PI<(2/3)*np.pi): 
+        dir = "NN"        
+    elif(theta2PI<(5/6)*np.pi): 
+        dir = "NE"
+    else:
+        dir = "EE"
+    return dir
+def updatePositionsList(positionsList,nextNodeIndex,listLength):
+    nodeX = nodes[nextNodeIndex,1]
+    nodeY = nodes[nextNodeIndex,2]
+    nodePos = [nodeX,nodeY]
+    positionsList.append(nodePos)
+    if(len(positionsList) > listLength):
+        positionsList.pop(0)
+    return positionsList
+
+def returnDirList(positionsList):
+    dirList = ""
+    for i in range(len(positionsList)-1):
+        dirList = dirList + calculateDir(positionsList(i,1),positionsList(i,2),positionsList(i+1,1),positionsList(i+1,2))
+    return dirList
 
 
 def main():
@@ -161,12 +239,12 @@ def main():
     # t.pendown()
     # t.speed(0)
 
-    axiom = 'A++-A-A+AAA'
+    axiom = 'NNSESWNENWWWEESS'
     length = 10
     angle = 60
     iterations = 5
     startingNoteMidi = 69
-    tBase = 2
+    tBase = 4
     baseChordPos= 0
     scaleIndex = 1
 
@@ -178,7 +256,9 @@ def main():
     # wn.exitonclick()
     scheduler.run()
 
-main()
+#main()
+
+
 
 
     #print(time.time())
