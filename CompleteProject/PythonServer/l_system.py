@@ -5,11 +5,11 @@ from platform import node
 from re import T
 import sched, time
 import string
-from turtle import position
+import mdp
 import numpy as np
 from tracemalloc import start
-from mdp import nodes
-from mdp import client
+
+
 
 #import turtle
 from pythonosc import osc_message_builder
@@ -38,6 +38,10 @@ positionsList = []
 dirList = ""
 scheduler = None
 maxLength = 10
+inport = 5004
+outport = 57120  
+client2 = udp_client.SimpleUDPClient("127.0.0.1", outport)
+print("client2 ok")
 
 def sendNoteOn(midiValue,client):
     client.send_message("/noteOn",midiValue)
@@ -161,13 +165,13 @@ def start_L_system():
 
 
 def update_L_system(unused_addr, currentNode):
-
     print("startCurrentNode")
     print(currentNode)
     print("endCurrentNode")
-
+    
     updatePositionsList(positionsList,currentNode,maxLength)
     dirList = returnDirList(positionsList)
+    global l_system_started
     if(l_system_started==False):
         scheduler = start_L_system()
         l_system_started = True
@@ -178,7 +182,7 @@ def update_L_system(unused_addr, currentNode):
     baseChordPos= 0
     scaleIndex = 1
     lsysString = lSysCompute(axiom,char,dirList)#lSysGenerate(axiom, iterations)
-    parseChords(lsysString, tBase,baseChordPos,scaleIndex,startingNoteMidi,client, scheduler)
+    parseChords(lsysString, tBase,baseChordPos,scaleIndex,startingNoteMidi,client2, scheduler)
 
 
 def calculateDir(node1x,node1y,node2x,node2y):
@@ -205,13 +209,17 @@ def calculateDir(node1x,node1y,node2x,node2y):
         dir = "EE"
     return dir
 def updatePositionsList(positionsList,nextNodeIndex,listLength):
-    nodeX = nodes[nextNodeIndex,1]
-    nodeY = nodes[nextNodeIndex,2]
+    print("nodesstart")
+    print(mdp.nodes)
+    print("nodesend")
+    nodeX = mdp.nodes[nextNodeIndex,1]
+    nodeY = mdp.nodes[nextNodeIndex,2]
     nodePos = [nodeX,nodeY]
     positionsList.append(nodePos)
     if(len(positionsList) > listLength):
         positionsList.pop(0)
     return positionsList
+
 
 def returnDirList(positionsList):
     dirList = ""

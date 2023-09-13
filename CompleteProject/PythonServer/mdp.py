@@ -14,9 +14,9 @@ from pythonosc import udp_client
 from pythonosc import osc_server
 from pythonosc import dispatcher
 np.random.seed(0)
-inport = 5004
+inport = 5005
 
-outport = 1234
+outport = 1235
 
 client = udp_client.SimpleUDPClient("127.0.0.1", outport)
 
@@ -396,9 +396,11 @@ if __name__ == "__main__":
     dispatcher.map("/currentNode", l_system.update_L_system) #function for updating l_system
 
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
-
+    print("These are the nodes")
+    print(nodes)
     print("Serving on {}".format(server.server_address))
     server.serve_forever()
+    
     
 
     
