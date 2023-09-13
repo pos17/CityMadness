@@ -5,7 +5,8 @@ from platform import node
 from re import T
 import sched, time
 import string
-import mdp
+#import mdp
+#from mdp import nodes
 import numpy as np
 from tracemalloc import start
 
@@ -164,12 +165,12 @@ def start_L_system():
    
 
 
-def update_L_system(unused_addr, currentNode):
+def update_L_system(unused_addr, nodes, currentNode):
     print("startCurrentNode")
     print(currentNode)
     print("endCurrentNode")
     
-    updatePositionsList(positionsList,currentNode,maxLength)
+    updatePositionsList(nodes, positionsList,currentNode,maxLength)
     dirList = returnDirList(positionsList)
     global l_system_started
     if(l_system_started==False):
@@ -208,12 +209,12 @@ def calculateDir(node1x,node1y,node2x,node2y):
     else:
         dir = "EE"
     return dir
-def updatePositionsList(positionsList,nextNodeIndex,listLength):
+def updatePositionsList(nodes, positionsList,nextNodeIndex,listLength):
     print("nodesstart")
-    print(mdp.nodes)
+    print(nodes[0])
     print("nodesend")
-    nodeX = mdp.nodes[nextNodeIndex,1]
-    nodeY = mdp.nodes[nextNodeIndex,2]
+    nodeX = nodes[0][nextNodeIndex,1]
+    nodeY = nodes[0][nextNodeIndex,2]
     nodePos = [nodeX,nodeY]
     positionsList.append(nodePos)
     if(len(positionsList) > listLength):
