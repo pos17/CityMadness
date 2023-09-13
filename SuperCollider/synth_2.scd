@@ -1,3 +1,6 @@
+s.boot;
+NetAddr.localAddr;
+(
 ~n = NetAddr("127.0.0.1", NetAddr.langPort);
 NetAddr.localAddr;
 
@@ -13,7 +16,7 @@ Ndef( ~grainsin_pulsar[\name] ).clear;
 Ndef( ~grainsin_pulsar[\name] ).ar(2);
 
 
-(
+
 SynthDef(\sin_pulsar, { |out=0|
 	var a,b,c,d,e,f, f_ ,t,lev, formantA, formantB, overlapA, overlapB;
 
@@ -105,7 +108,7 @@ SynthDef(\sin_pulsar, { |out=0|
 Ndef( ~grainsin_pulsar[\name]).prime( \sin_pulsar );
 
 /// .....prime() is same as
-// Ndef( ~grainsin_pulsar[\name], \sin_pulsar)
+ //Ndef( ~grainsin_pulsar[\name], \sin_pulsar);
 // But without starting the synth
 
 
@@ -153,24 +156,29 @@ Ndef(~grainsin_pulsar.name).objects
 
 (
 OSCdef.new((~grainsin_pulsar[\name] ++ "_On").asSymbol,{
-	arg msg, time, addr, port;
-	var note;
+	arg msg;
 	Ndef(~grainsin_pulsar[\name]).put(
 		msg[1],
 		Ndef(~grainsin_pulsar[\name]).source,
 		0,
 		[\freq, msg[1].midicps, \gt, 1, \lev, 1]
 		);
-	postln("on");
+	msg[1] = msg[1] - 12;
+	Ndef(~grainsin_pulsar[\name]).put(
+		msg[1],
+		Ndef(~grainsin_pulsar[\name]).source,
+		0,
+		[\freq, msg[1].midicps, \gt, 1, \lev, 1]
+		);
+	postln(msg[1]);
 	},
 path: "/noteOn"
 );
 
 OSCdef.new((~grainsin_pulsar[\name] ++ "_off").asSymbol,{
-	arg msg, time, addr, port;
-	var note;
+	arg msg;
 	Ndef( ~grainsin_pulsar[\name] ).removeAt( msg[1] );
-	postln("off");
+	//postln("off");
 	},
 path: "/noteOff"
 );
@@ -179,7 +187,7 @@ path: "/noteOff"
 
 
 //Arpeggio, ancora non funziona bene
-
+/*
 (
 s.waitForBoot({
  var right, left;
@@ -222,26 +230,32 @@ path: "/noteOff"
   };
  };
 
- n0 = note_getter.(0);
- n1 = note_getter.(1);
- n2 = note_getter.(2);
+	n0 = note_getter.(0);
+	n1 = note_getter.(1);
+	n2 = note_getter.(2);
+	~seq = [n0,n1,n2].scramble;
+	~seq_dur = [1, 1, 1, 1, 0.5, 0.5, 2, 0.5, 0.5, 2, 0.5, 0.5 ].scramble;
+		right =
+		Pbind(
+			\instrument, \sin_pulsar,
+			\midinote, Pseq(~seq ++ ((~seq + 12)!2).flatten),
+			\dur, Pseq(~seq_dur.normalizeSum*2)
+		);
 
-right = Pbind(
-  \instrument, \sin_pulsar,
-  \midinote, Pseq([ n0, n2, n1, n2] ++ (([ n0, n2, n1, n2] + 12)!2).flatten),
-  \dur, Pseq([1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 ].normalizeSum*2)
- );
- left = Pbind(
-  \instrument, \sin_pulsar,
-  \midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
-  \dur, Pseq([1, 1, 1, 1, 1, 1, 1, 1].normalizeSum*2)
- );
+		left =
+		Pbind(
+			\instrument,\sin_pulsar,
+			\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
+			\dur, Pseq([1, 1, 1, 1, 1, 1, 1, 1].normalizeSum*2)
+		);
+
  if (~player.notNil) { ~player.stop; };
- ~player = Pn(Ppar([right,left])).play;
+
+	~player = Pn(Ppar([right,left])).play;
+
 });
 )
 
-
+*/
 Ndef('grainsin_pulsar').set('levA', 0.49765180538124, 'formantA', 6.007874015748, 'levB', 0.31759720095202, 'spacesize', 0.16952380952381, 'overlapB', 1.0651340032941, 'wet150', 0.34391534391534, 'lev', 0.19443238886478, 'formantB', 3.2204724409449, 'diffusion', 1.6931793650794, 'overlapA', 1.8253052748325, 'freq', 69.877455494983);
-
 
