@@ -145,7 +145,7 @@ def parseChords(s, tBase, baseChord,scaleIndex,baseNote,client,scheduler):
 def main():
     print(chordToMidiNotes(1,4,33))
     inport = 5004
-    outport = 57121  
+    outport = 57120  
     client = udp_client.SimpleUDPClient("127.0.0.1", outport)
     scheduler = sched.scheduler(time.monotonic, time.sleep)
     Scale = "C"
