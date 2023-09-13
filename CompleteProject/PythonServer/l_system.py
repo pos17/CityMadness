@@ -223,7 +223,7 @@ def returnDirList(positionsList):
 def main():
     print(chordToMidiNotes(1,4,33))
     inport = 5004
-    outport = 57120  
+    outport = 57121  
     client = udp_client.SimpleUDPClient("127.0.0.1", outport)
     scheduler = sched.scheduler(time.monotonic, time.sleep)
     Scale = "C"
