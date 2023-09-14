@@ -8,6 +8,7 @@ import argparse
 import random
 import time
 import l_system
+import sched
 
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
@@ -17,9 +18,12 @@ np.random.seed(0)
 inport = 5005
 global nodes
 outport = 1235
+outport2 = 57120
 
 client = udp_client.SimpleUDPClient("127.0.0.1", outport)
-
+client2 = udp_client.SimpleUDPClient("127.0.0.1", outport2)
+scheduler = sched.scheduler(time.monotonic, time.sleep)
+l_system_started = False
 
 
 def NormalizeMusic(data):
@@ -393,7 +397,7 @@ if __name__ == "__main__":
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
-    dispatcher.map("/currentNode", l_system.update_L_system, nodes) #function for updating l_system
+    dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,l_system_started]) #function for updating l_system
 
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
     print("These are the nodes")

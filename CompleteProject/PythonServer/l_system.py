@@ -3,7 +3,7 @@ from calendar import c
 from email.mime import base
 from platform import node
 from re import T
-import sched, time
+
 import string
 #import mdp
 #from mdp import nodes
@@ -33,15 +33,15 @@ MinArp      8
 """
 
 scales = [[0,2,4,6,7,9,11],[0,2,4,5,7,9,11],[0,2,4,5,7,9,10],[0,2,3,5,7,9,11],[0,2,3,5,7,8,10],[0,1,3,5,7,8,10],[0,1,3,5,6,8,10],[0,4,7],[0,3,7]]
-l_system_started = False
+
 axiom = 'NNSSEEWW'
 positionsList = []
 dirList = ""
-scheduler = None
 maxLength = 10
 inport = 5004
-outport = 57120  
-client2 = udp_client.SimpleUDPClient("127.0.0.1", outport)
+outport2 = 57120  
+
+
 print("client2 ok")
 
 def sendNoteOn(midiValue,client):
@@ -160,30 +160,41 @@ def parseChords(s, tBase, baseChord,scaleIndex,baseNote,client,scheduler):
 
 
 def start_L_system():
-    scheduler = sched.scheduler(time.monotonic, time.sleep)
-    return scheduler
+    
+   
+    
+    print("scheduler2 created ")
+   
    
 
 
-def update_L_system(unused_addr, nodes, currentNode):
+def update_L_system(unused_addr, things, currentNode):
+    print(things)
+    print(len(things))
+    nodes = things[0][0]
+    client = things[0][1]
+    scheduler = things[0][2]
+    l_system_started = things[0][3]
     print("startCurrentNode")
     print(currentNode)
     print("endCurrentNode")
-    
     updatePositionsList(nodes, positionsList,currentNode,maxLength)
     dirList = returnDirList(positionsList)
-    global l_system_started
     if(l_system_started==False):
-        scheduler = start_L_system()
-        l_system_started = True
+        start_L_system()
     iterations = 1
     char = "N"
     startingNoteMidi = 69
     tBase = 4
     baseChordPos= 0
     scaleIndex = 1
+    global axiom
     lsysString = lSysCompute(axiom,char,dirList)#lSysGenerate(axiom, iterations)
-    parseChords(lsysString, tBase,baseChordPos,scaleIndex,startingNoteMidi,client2, scheduler)
+    parseChords(lsysString, tBase,baseChordPos,scaleIndex,startingNoteMidi,client, scheduler)
+    if(l_system_started==False):
+        scheduler.run()
+        print("scheduler running")
+        l_system_started = True
 
 
 def calculateDir(node1x,node1y,node2x,node2y):
@@ -213,8 +224,8 @@ def updatePositionsList(nodes, positionsList,nextNodeIndex,listLength):
     print("nodesstart")
     print(nodes[0])
     print("nodesend")
-    nodeX = nodes[0][nextNodeIndex,1]
-    nodeY = nodes[0][nextNodeIndex,2]
+    nodeX = nodes[nextNodeIndex,1]
+    nodeY = nodes[nextNodeIndex,2]
     nodePos = [nodeX,nodeY]
     positionsList.append(nodePos)
     if(len(positionsList) > listLength):
@@ -224,11 +235,13 @@ def updatePositionsList(nodes, positionsList,nextNodeIndex,listLength):
 
 def returnDirList(positionsList):
     dirList = ""
+    print("posList")
+    print(positionsList)
     for i in range(len(positionsList)-1):
-        dirList = dirList + calculateDir(positionsList(i,1),positionsList(i,2),positionsList(i+1,1),positionsList(i+1,2))
+        dirList = dirList + calculateDir(positionsList[i][0],positionsList[i][1],positionsList[i+1][0],positionsList[i+1][1])
     return dirList
 
-
+"""
 def main():
     print(chordToMidiNotes(1,4,33))
     inport = 5004
@@ -265,7 +278,7 @@ def main():
     # wn.exitonclick()
     scheduler.run()
 
-#main()
+# main()
 
 
 
@@ -287,3 +300,4 @@ def main():
     #s.run()
 
     #print(time.time())
+"""

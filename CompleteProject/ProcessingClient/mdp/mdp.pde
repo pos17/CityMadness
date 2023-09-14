@@ -16,7 +16,7 @@ NetAddress myRemoteLocation;
 boolean startup = true;
 
 Map map;
-int inport = 1235;
+int inport = 57120;
 int outport = 5005;
 
 PFont font;
