@@ -34,7 +34,7 @@ MinArp      8
 
 scales = [[0,2,4,6,7,9,11],[0,2,4,5,7,9,11],[0,2,4,5,7,9,10],[0,2,3,5,7,9,11],[0,2,3,5,7,8,10],[0,1,3,5,7,8,10],[0,1,3,5,6,8,10],[0,4,7],[0,3,7]]
 
-axiom = 'NNSSEEWW'
+axiom = 'NWSWSENNNEEEWWNW'
 positionsList = []
 dirList = ""
 maxLength = 10
@@ -130,7 +130,7 @@ def chordToMidiNotes(scaleIndex, chordIndex,baseNote):
 
 def parseChords(s, tBase, baseChord,scaleIndex,baseNote,client,scheduler):
     chordValue = baseChord
-    chordLength=0
+    chordLength= tBase
     startTime = 0
     playablechord = False
     for c in s:
@@ -145,17 +145,19 @@ def parseChords(s, tBase, baseChord,scaleIndex,baseNote,client,scheduler):
                 notes= chordToMidiNotes(scaleIndex, chordValue,baseNote)
                 print(notes)
                 scheduleNotes(notes,chordLength,startTime,client,scheduler)
+                print("note scheduled at time "+str(startTime))
                 playablechord=False
                 startTime=startTime+chordLength
-                chordLength=0
+                chordLength=tBase
             chordValue=chordValue-1  
         elif c == 'N':
             if playablechord == True:
                 notes= chordToMidiNotes(scaleIndex, chordValue,baseNote)
                 scheduleNotes(notes,chordLength,startTime,client,scheduler)
+                print("note scheduled at time "+str(startTime))
                 playablechord=False
                 startTime=startTime+chordLength
-                chordLength=0
+                chordLength=tBase
             chordValue=chordValue+1
 
 
@@ -191,11 +193,14 @@ def update_L_system(unused_addr, things, currentNode):
     global axiom
     lsysString = lSysCompute(axiom,char,dirList)#lSysGenerate(axiom, iterations)
     parseChords(lsysString, tBase,baseChordPos,scaleIndex,startingNoteMidi,client, scheduler)
+    # lines for rescheduling events to increase depth of the system 
+
+
     if(l_system_started==False):
         scheduler.run()
         print("scheduler running")
         l_system_started = True
-
+    return l_system_started
 
 def calculateDir(node1x,node1y,node2x,node2y):
     x = node2x - node1x
