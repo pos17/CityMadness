@@ -1,5 +1,4 @@
 s.boot;
-NetAddr.localAddr;
 
 ~n = NetAddr("127.0.0.1", NetAddr.langPort);
 NetAddr.localAddr;
@@ -8,6 +7,21 @@ s.latency = nil;            // for immediate response;
 
 
 (
+
+SynthDef(\pad, { arg freq=261, amp=2, mul=1, out = 0, gate = 1;
+	var snd, env, echo;
+	env = Env(levels: [0, 1, 0.5, 0], times: [1, 1.5, 0.6], curve: [-6,0, 1]);
+	snd = Resonz.ar(SinOsc.ar(BrownNoise.ar(300, 400)) * mul,freq,[0.001, 0.001],amp * EnvGen.kr(env,gate, doneAction: 2));
+	snd = DelayC.ar(snd,0.01,{Rand(0,0.01)}! snd.size);
+	snd = Splay.ar(snd);
+	//snd = Latch.ar(snd,Impulse.ar(Rand(8000,16e3)));
+	snd = Pan2.ar(snd, Rand(-0.5,0.5));
+	Out.ar(out,snd);
+
+}).add;
+
+
+
 SynthDef(\sin_pulsar, { |out=0|
 	var a,b,c,d,e,f, f_ ,t,lev, formantA, formantB, overlapA, overlapB;
 
@@ -15,10 +29,10 @@ SynthDef(\sin_pulsar, { |out=0|
 	f = \freq.kr(440);
 	f_ = f.clip(50, 1500);
 
-	formantA = \formantA.kr(1);
-	formantB = \formantB.kr(1);
-	overlapA = \overlapA.ar(1);
-	overlapB = \overlapB.kr(80);
+	formantA = \formantA.kr(2);
+	formantB = \formantB.kr(6);
+	overlapA = \overlapA.ar(2);
+	overlapB = \overlapB.kr(2);
 
 	e = EnvGen.kr(
 		Env.perc(
@@ -79,16 +93,15 @@ SynthDef(\sin_pulsar, { |out=0|
 
 	c = Mix([
 		c * ( e ).pow(0.7),
-		a * ( \levA.kr(0.5) * e ).pow(f_.linlin( 50, 1500, 1.1, 1.5)) * lev,
-		b * ( \levB.kr(0.5) * e ).pow(f_.linlin( 50, 1500, 1.5, 2.5)) * lev,
+		a * ( \levA.kr(1) * e ).pow(f_.linlin( 50, 1500, 1.1, 1.5)) * lev,
+		b * ( \levB.kr(0.8) * e ).pow(f_.linlin( 50, 1500, 1.5, 2.5)) * lev,
 	]);
 
+	c = FreeVerb.ar(in:c, mix:0.6, room:0.7, damp:1);
 
-	//c = FreeVerb.ar(in:c, mix:0.33, room:0.5, damp:0.5);
+	c = LeakDC.ar(c* 0.05);
 
-	c = LeakDC.ar(c* 0.45);
-	//c = FreeVerb.ar(in:c, mix:0.33, room:0.5, damp:0.5);
-
+	c = Pan2.ar(c, Rand(-1,1));
 
     Out.ar(out, c)
 }).add;
@@ -145,31 +158,23 @@ path: "/noteOff"
 	n0 = note_getter.(0);
 	n1 = note_getter.(1);
 	n2 = note_getter.(2);
-	~seq = [n0,n1,n2].scramble;
-	~seq_dur = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ].scramble;
+	//~seq = [n0,n1,n2].scramble;
+	//~seq_dur = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ].scramble;
 	right = Pbind(
 		\instrument, \sin_pulsar,
-		\midinote, Pseq(~seq ++ ((~seq + 12)!2).flatten),
-		\dur, Pseq(~seq_dur.normalizeSum*2),
-		//\nharms, Pseq([4, 10, 40], inf)
-		/*\lev,0.19,
-		\wet150,0.85,
-		\formantB,0,31,
-		\overlapA,1.82,
-		\overlapB,1.06*/
+		\midinote, Pseq([ n0, n2, n1, n2]),
+		\dur, Pseq([1, 1, 1, 1 ].normalizeSum*2),
 	);
 
+
 	left = Pbind(
-		\instrument, \sin_pulsar,
+		\instrument, \pad,
 		\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
 		\dur, Pseq([2, 2, 2, 2, 2, 2, 2, 2].normalizeSum*2),
-		//\nharms, Pseq([4, 10, 40], inf)
-		/*\lev,0.19,
-		\wet150,0.85,
-		\formantB,0,31,
-		\overlapA,1.82,
-		\overlapB,1.06*/
-		);
+		\formantA,6,
+		\overlapa,8,
+	);
+
 
  if (~player.notNil) { ~player.stop; };
 	~player = Pn(Ppar([right,left])).play;

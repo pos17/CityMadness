@@ -76,10 +76,11 @@ SynthDef(\grain_synth,{
 
 //MouseX.kr(0,BufDur.kr(~buf_l))
 t = Synth("grain_synth");
+Ndef(\lofi_soundscape).fadeTime = 4;
 )
 
 (
-Ndef('lofi_soundscape').set('drywet', 0.6,'lpfscale', 0.1,'slewrate', 500,'hpf',3321.32,'lpfscale',0.1,'shrate',84.57);
+Ndef('lofi_soundscape').xset('drywet', 0.6,'lpfscale', 0.1,'slewrate', 500,'hpf',3321.32,'lpfscale',0.1,'shrate',84.57);
 t.set(\gate,0);
 )
 //t.free;
