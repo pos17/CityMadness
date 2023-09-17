@@ -52,14 +52,14 @@ Ndef(\lofi_soundscape).addSpec(
 	\slewrate, [20,22050, \exp],
 ).gui;
 
-Ndef('lofi_soundscape').set('shrate',1420.75,'drywet', 0.85,'lpfscale', 1.0,'slewrate', 500,'jitter',0.03);
+Ndef('lofi_soundscape').set('shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07);
 //Ndef('lofi_soundscape').set('lpfscale', 0.98372093023256, 'hpf', 4.2498292124156, 'drywet', 0.86046511627907, 'jitterScale', 0.180224551525, 'shrate', 9303.8311061316, 'jitter', 0.43410852713178, 'slewrate', 2512.0911012046);
 
 
 
 
 SynthDef(\grain_synth,{
-	arg outL=0, outR=1, loop = 0, amp = 1,gate=1;
+	arg outL=0, outR=1, loop = 0, amp = 1,gate=1,room=0;
 	var testPos = EnvGen.kr(Env.new(levels:[-1,-1,1,1], times:[5,5,5] ,releaseNode:1), gate:gate);
 	var sigL,sigR, trate, dur, rate;
     trate = MouseY.kr(2,200,1);
@@ -70,8 +70,8 @@ SynthDef(\grain_synth,{
 	sigL = TGrains.ar(1, Impulse.ar(trate), ~buf_l, rate, MouseX.kr(0,BufDur.kr(~buf_l)), dur, Dseq([-1,1,inf]), 0.1, 2);
 	sigR = TGrains.ar(1, Impulse.ar(trate), ~buf_r, rate, MouseX.kr(0,BufDur.kr(~buf_l)), dur, Dseq([-1,1,inf]), 0.1, 2);
 	//sig = PlayBuf.ar(2, ~duomo_buf, rate=1, loop, doneAction: 2);
-	Out.ar(outL,(testPos.linlin(-1,1,1,0)*FreeVerb.ar(in:sigL, mix:testPos.linlin(-1,1,0,1), room:15, damp:0.01)));
-	Out.ar(outR,(testPos.linlin(-1,1,1,0)*FreeVerb.ar(in:sigR, mix:testPos.linlin(-1,1,0,1), room:15, damp:0.01)));
+	Out.ar(outL,(testPos.linlin(-1,1,1,0)*FreeVerb.ar(in:sigL, mix:testPos.linlin(-1,1,0,1), room:0, damp:0.01)));
+	Out.ar(outR,(testPos.linlin(-1,1,1,0)*FreeVerb.ar(in:sigR, mix:testPos.linlin(-1,1,0,1), room:0, damp:0.01)));
 }).add;
 
 //MouseX.kr(0,BufDur.kr(~buf_l))
@@ -80,9 +80,9 @@ Ndef(\lofi_soundscape).fadeTime = 4;
 )
 
 (
-Ndef('lofi_soundscape').xset('drywet', 0.6,'lpfscale', 0.1,'slewrate', 500,'hpf',3321.32,'lpfscale',0.1,'shrate',84.57);
-t.set(\gate,0);
+Ndef('lofi_soundscape').xset('lvl',0.8,'drywet', 0.6,'lpfscale', 0.1,'slewrate', 500,'hpf',3321.32,'lpfscale',0.1,'shrate',84.57);
+t.set(\room, 50,\gate,0);
 )
 //t.free;
 
-
+t.set(\gate,1);
