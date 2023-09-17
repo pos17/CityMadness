@@ -21,6 +21,8 @@ class Map{
   
   boolean pathDone, systemCreated;
   
+  PShape alphaLine;
+  
   PGraphics city, render;
   
   Map(){
@@ -29,6 +31,7 @@ class Map{
     this.systemCreated = false;
     this.renderMap();
     this.render = createGraphics(width, height, P2D);
+    this.alphaLine = createShape(GROUP);
     this.path = new MapPath();
     this.line = new MapLine(this.path);
     for(int i = 0; i < NMAPPARTICLES; i++){
@@ -81,6 +84,12 @@ class Map{
       }
     }
     
+   for(int i = 0; i<alphaLine.getChildCount(); i++){
+     PShape s = alphaLine.getChild(i);
+     this.render.shape(s,0,0);
+   }
+
+    this.render.strokeWeight(3);
     //RENDER RANDOM PATH PARTICLES
     if(this.wanderingParticles.size()>0){
       ListIterator<RandomPathParticle> wanderingParticlesIter = this.wanderingParticles.listIterator();
@@ -92,8 +101,6 @@ class Map{
         this.render.point(p.x,p.y);
       }
     }
-    
-    
     
     // RENDER PATH PARTICLES
     if(this.pathDone){
@@ -151,6 +158,8 @@ class Map{
     this.render.endDraw();
     image(this.render,0,0);
     //image(this.city,0,0);
+    
+    //shape(alphaLine,0,0);
     
   }
   
@@ -265,6 +274,25 @@ class Map{
     this.startPath = this.path.getStartPath();
     this.endPath = this.path.getEndPath();
     this.endPathID = this.path.getEndID();
+    
+    this.alphaLine = createShape(GROUP);
+    ArrayList<MapPoint> pathList = path.getPath();
+    for(int n = 0; n<30; n++){
+      PShape s = createShape();
+      s.setStrokeJoin(ROUND);
+      s.setFill(false);
+      s.strokeJoin(ROUND);
+      s.setStrokeWeight(map(n,0,30,0,120));
+      s.setStroke(color(0,25));
+      s.beginShape();
+      
+      for(int i = 0; i<pathList.size(); i++){
+        PVector p = pathList.get(i).getCoords();
+        s.vertex(p.x,p.y);
+      }
+      s.endShape();
+      alphaLine.addChild(s);
+    }
     
     startup = false; //After second click we exit map startup
   }

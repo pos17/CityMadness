@@ -39,7 +39,7 @@ class RandomPathParticle{
     PVector a = map.getMapPoint(currentID).getCoords();
     PVector b = map.getMapPoint(nextID).getCoords();
       
-    int numSegments = floor(PVector.dist(a,b)*1.5);
+    int numSegments = max(10,floor(PVector.dist(a,b)*1.5));
     for(int j = 0; j<numSegments; j++){
       this.path.add((PVector.lerp(a, b, map(j,0,numSegments,0,1))));
     }
