@@ -1,27 +1,10 @@
 
 void oscEvent(OscMessage msg) {
   
-  if(msg.checkAddrPattern("/ShortPath")==true) {
-    IntList addresses = oscPathParser(msg);
-   // map.addShortPath(addresses);
-    println("Short path parsed");
-  }
-  
-  else if(msg.checkAddrPattern("/MusPath")){
-   IntList addresses = oscPathParser(msg);
-   //map.addMusicPath(addresses);
-   println("Music path parsed");
-  }
-  
-  else if(msg.checkAddrPattern("/RandPath1")){
-    IntList addresses = oscPathParser(msg);
-    map.addRandPath(addresses);
-    println("Random path parsed");
-  }
-  
-  else if(msg.checkAddrPattern("/nextNodes")){
+  if(msg.checkAddrPattern("/nextNodes")){
     IntList addresses = oscPathParser(msg);
     map.setNextPoints(addresses);
+    map.updateCurrentPointConnections(addresses);
     //println("Next Points Set");
   }
   
@@ -45,36 +28,22 @@ void keyPressed() {
 }
 
 void mousePressed(){
-  /*
-  if(!startup){
-    OscMessage myMessage = new OscMessage("/target");
-    int id = map.getClosestPointId(mouseX, mouseY);
-    myMessage.add(id);
-    oscP5.send(myMessage, myRemoteLocation);
-    println("Send Target");
-  }
-  else{
-    OscMessage myMessage = new OscMessage("/start");
-    int id = map.getClosestPointId(mouseX, mouseY);
-    myMessage.add(id);
-    oscP5.send(myMessage, myRemoteLocation);
-    println("Random Start Path Sent");
-    startup = false;
-  }
-  */
-  //if(!startup){
-    OscMessage myMessage = new OscMessage("/currentNode");
-    int id = map.getClosestPointId(mouseX-HALF_WIDTH, mouseY-HALF_HEIGHT);
-    myMessage.add(id);
-    oscP5.send(myMessage, myRemoteLocation);
-    //println("Send Current Node");
+  
+  // UPDATE THE NUMBER OF TIMES THE USER HAS CLICKED
+  time++;
+  
+  OscMessage myMessage = new OscMessage("/currentNode");
+  int id = map.getClosestPointId(mouseX-HALF_WIDTH, mouseY-HALF_HEIGHT);
+  myMessage.add(id);
+  oscP5.send(myMessage, myRemoteLocation);
+  //println("Send Current Node");
+  
+  map.updatePath(id);
+  map.setCurrentPoint(id);
+  
+  println(id);
     
-    map.updatePath(id);
-    map.setCurrentPoint(id);
-    
-    println(id);
-    
-  //}
+  
 }
 
 IntList oscPathParser(OscMessage msg){
@@ -87,6 +56,8 @@ IntList oscPathParser(OscMessage msg){
   
   return addresses;
 }
+
+
 
 void mouseMoved(){
   OscMessage myMessage = new OscMessage("/mousePosition");

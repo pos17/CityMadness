@@ -74,7 +74,7 @@ class MapPath{
     this.path.add(p);
     this.len++;
     
-    if(this.len > 10){
+    if(this.len > PATHMAXLENGTH){
       path.remove(0);
       this.len--;
     }
@@ -86,6 +86,26 @@ class MapPath{
   
   PVector getEndPath(){
     return this.path.get(this.path.size()-1).getCoords(); 
+  }
+  
+  int getEndID(){
+    return this.path.get(this.path.size()-1).getId(); 
+  }
+  
+  ArrayList<PVector> computeParticleBuffer(){
+     ArrayList<PVector> newBuffer = new ArrayList<PVector>();
+     
+     for(int i = 0; i<this.path.size()-1; i++){
+       PVector a = this.path.get(i).getCoords();
+       PVector b = this.path.get(i+1).getCoords();
+      
+       int numSegments = floor(PVector.dist(a,b));
+       for(int j = 0; j<numSegments; j++){
+        newBuffer.add((PVector.lerp(a, b, map(j,0,numSegments,0,1))));
+       }
+     }
+     
+     return newBuffer;
   }
   
 }

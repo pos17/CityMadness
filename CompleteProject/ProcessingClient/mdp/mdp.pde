@@ -2,15 +2,17 @@ import oscP5.*;
 import netP5.*;
 import java.util.*;
 
+int PATHMAXLENGTH = 10;
 int NMAPPARTICLES = 10000;
 int NPATHPARTICLES = 1000;
 int MAPPARTICLEALPHA = 70;
-int TRANSITION_RANGE = 50;
+int TRANSITION_RANGE = 20;
 int RETURN_RANGE = 20;
 float HALF_WIDTH;
 float HALF_HEIGHT;
 float QUARTER_WIDTH;
 float PMASS = 0.1;
+int time = 0;
 
 OscP5 oscP5;
 OscP5 oscP52;
