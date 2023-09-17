@@ -40,6 +40,10 @@ class MapPoint{
     this.connections.shuffle(); // A WAY TO RANDOMIZE WHAT ELEMENT GETS PICKED EACH TIME;
     return this.connections.get(0);
   }
+  
+  IntList getConnections(){
+    return this.connections; 
+  }
 }
 
 class MapPointSorter implements Comparator<MapPoint> {

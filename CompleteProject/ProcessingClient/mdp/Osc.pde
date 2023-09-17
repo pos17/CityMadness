@@ -38,6 +38,7 @@ void mousePressed(){
   oscP5.send(myMessage, myRemoteLocation);
   //println("Send Current Node");
   
+  println(map.getMapPoint(id).getConnections());
   map.updatePath(id);
   map.setCurrentPoint(id);
   

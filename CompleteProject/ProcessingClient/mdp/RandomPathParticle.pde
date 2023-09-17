@@ -21,6 +21,7 @@ class RandomPathParticle{
     
     else{
       this.path.clear();
+      this.currentID = this.nextID;
       this.getNext();
       this.p = this.path.get(0);
       this.path.remove(0);
