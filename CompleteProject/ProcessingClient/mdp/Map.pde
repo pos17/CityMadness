@@ -21,7 +21,7 @@ class Map{
   
   boolean pathDone, systemCreated;
   
-  PShape alphaLine;
+  PGraphics shadow;
   
   PGraphics city, render;
   
@@ -31,7 +31,7 @@ class Map{
     this.systemCreated = false;
     this.renderMap();
     this.render = createGraphics(width, height, P2D);
-    this.alphaLine = createShape(GROUP);
+    this.shadow = createGraphics(width, height, P2D);
     this.path = new MapPath();
     this.line = new MapLine(this.path);
     for(int i = 0; i < NMAPPARTICLES; i++){
@@ -56,6 +56,10 @@ class Map{
     //SHOW CHAOTIC PARTICLES
     this.render.stroke(255,MAPPARTICLEALPHA);
     this.render.strokeWeight(3);
+    
+    if(click){
+       this.renderShadow();
+    }
     
     if(this.pathDone){ // BEHAVIOUR IF WE HAVE A PATH
       
@@ -84,10 +88,14 @@ class Map{
       }
     }
     
+    /*
    for(int i = 0; i<alphaLine.getChildCount(); i++){
      PShape s = alphaLine.getChild(i);
      this.render.shape(s,0,0);
    }
+   */
+   //this.render.image(this.city,-HALF_WIDTH,-HALF_HEIGHT);
+   this.render.image(this.shadow,-HALF_WIDTH,-HALF_HEIGHT);
 
     this.render.strokeWeight(3);
     //RENDER RANDOM PATH PARTICLES
@@ -275,6 +283,7 @@ class Map{
     this.endPath = this.path.getEndPath();
     this.endPathID = this.path.getEndID();
     
+    /*
     this.alphaLine = createShape(GROUP);
     ArrayList<MapPoint> pathList = path.getPath();
     for(int n = 0; n<30; n++){
@@ -293,8 +302,38 @@ class Map{
       s.endShape();
       alphaLine.addChild(s);
     }
+    */
     
     startup = false; //After second click we exit map startup
+  }
+  
+  void renderShadow(){
+    this.shadow.beginDraw();
+    this.shadow.push();
+    this.shadow.translate(HALF_WIDTH, HALF_HEIGHT);
+    this.shadow.stroke(0,10);
+    this.shadow.noFill();
+    this.shadow.strokeJoin(ROUND);
+    
+    IntList addresses = this.currentPoint.getConnections();
+    ArrayList<PVector> to = new ArrayList<PVector>();
+    println(addresses.size());
+    for(int i = 0; i<addresses.size(); i++){
+      to.add(this.getMapPoint(addresses.get(i)).getCoords());
+    }
+    PVector from = this.currentPoint.getCoords();
+    
+    for(int i = 0; i<to.size();i++){
+      PVector t = to.get(i);
+      for(int j = 0; j<20; j++){
+        this.shadow.strokeWeight(map(j,0,20,5,50));
+        this.shadow.line(t.x,t.y,from.x,from.y);
+      }
+    }
+    this.shadow.pop();
+    this.shadow.endDraw();
+    println("SHOADOW");
+    click = false;
   }
   
   void setNextInterestPoint(int p){

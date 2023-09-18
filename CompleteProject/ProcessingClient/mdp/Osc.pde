@@ -1,6 +1,9 @@
 
 void oscEvent(OscMessage msg) {
   
+  click = true;
+
+  
   if(msg.checkAddrPattern("/nextNodes")){
     IntList addresses = oscPathParser(msg);
     map.setNextPoints(addresses);
@@ -38,11 +41,11 @@ void mousePressed(){
   oscP5.send(myMessage, myRemoteLocation);
   //println("Send Current Node");
   
-  println(map.getMapPoint(id).getConnections());
+  //println(map.getMapPoint(id).getConnections());
   map.updatePath(id);
   map.setCurrentPoint(id);
   
-  println(id);
+  //println(id);
     
   
 }

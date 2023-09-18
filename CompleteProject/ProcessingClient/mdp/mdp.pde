@@ -13,6 +13,8 @@ float HALF_HEIGHT;
 float QUARTER_WIDTH;
 float PMASS = 0.1;
 int time = 0;
+boolean click = false;
+
 
 OscP5 oscP5;
 OscP5 oscP52;
@@ -39,7 +41,7 @@ void setup(){
   OscMessage myMessage = new OscMessage("/reset");
   oscP5.send(myMessage, myRemoteLocation);
   
-  strokeJoin(MITER);
+  strokeJoin(ROUND);
   
   font = createFont("Arial", 15);
   textFont(font);
