@@ -3,8 +3,10 @@ from calendar import c
 from email.mime import base
 from platform import node
 from re import T
-
+import sched
+import time
 import string
+#from turtle import position
 #import mdp
 #from mdp import nodes
 import numpy as np
@@ -34,32 +36,44 @@ MinArp      8
 
 scales = [[0,2,4,6,7,9,11],[0,2,4,5,7,9,11],[0,2,4,5,7,9,10],[0,2,3,5,7,9,11],[0,2,3,5,7,8,10],[0,1,3,5,7,8,10],[0,1,3,5,6,8,10],[0,4,7],[0,3,7]]
 
-axiom = 'NWSWSENNNEEEWWNW'
+
 positionsList = []
 dirList = ""
 maxLength = 10
 inport = 5004
 outport2 = 57120  
+SchedStartTime = 0 
 
 
-print("client2 ok")
+#print("client2 ok")
 
 def sendNoteOn(midiValue,client):
     client.send_message("/noteOn",midiValue)
     print("/noteOn",midiValue)
 
 def sendNoteOff(midiValue,client):
+#    print("time: "+str(time.time()-scheduler_started_time))
     client.send_message("/noteOff",midiValue)
     print("/noteOff",midiValue)
 
 def scheduleNotes(midiValues,length,startTime,client,scheduler):
     for i in midiValues:
-        print(i)
+        #print(i)
         scheduleNote(i,length,startTime,client,scheduler)
 
+# eventList: 
+# 0: type of event, 0 noteOn,1 noteOff, 2 schedule
+# 1: event handler
+# 2: relative starttime
+
 def scheduleNote(midiValue,length,startTime,client,scheduler):
-    scheduler.enter(startTime,1,sendNoteOn,argument=(midiValue,client))
-    scheduler.enter(startTime+length,1,sendNoteOff,argument=(midiValue,client))
+    noteOnEvent = scheduler.enter(startTime,1,sendNoteOn,argument=(midiValue,client))
+    noteOffEvent = scheduler.enter(startTime+length,2,sendNoteOff,argument=(midiValue,client))
+
+def sendTotalNoteOff(minVal, maxVal,scheduler,client):
+    for midiValue in range(minVal,maxVal,1):
+        scheduler.enter(0,2,sendNoteOff,argument=(midiValue,client))
+
 
 def lSysGenerate(s, d, order):
     for i in range(order):
@@ -128,11 +142,14 @@ def chordToMidiNotes(scaleIndex, chordIndex,baseNote):
             noteValue=noteValue+1
  """
 
-def parseChords(s, tBase, baseChord,scaleIndex,baseNote,client,scheduler):
+ #notesList [midiNote,length,time]
+
+def parseChords(s, tBase, baseChord,scaleIndex,baseNote,startingTime):
     chordValue = baseChord
     chordLength= tBase
-    startTime = 0
+    startTime = startingTime
     playablechord = False
+    notesList = []
     for c in s:
         if c == "E":
             chordLength = tBase / 2
@@ -143,9 +160,11 @@ def parseChords(s, tBase, baseChord,scaleIndex,baseNote,client,scheduler):
         elif c == 'S':
             if playablechord == True:
                 notes= chordToMidiNotes(scaleIndex, chordValue,baseNote)
-                print(notes)
-                scheduleNotes(notes,chordLength,startTime,client,scheduler)
-                print("note scheduled at time "+str(startTime))
+                #print(notes)
+                #scheduleNotes(notes,chordLength,startTime,client,scheduler,scheduler_started_time)
+                #print("note scheduled at time "+str(startTime) +  ", length "+str(chordLength))
+                notesEvent = [notes,chordLength,startTime]
+                notesList.append(notesEvent)
                 playablechord=False
                 startTime=startTime+chordLength
                 chordLength=tBase
@@ -153,13 +172,19 @@ def parseChords(s, tBase, baseChord,scaleIndex,baseNote,client,scheduler):
         elif c == 'N':
             if playablechord == True:
                 notes= chordToMidiNotes(scaleIndex, chordValue,baseNote)
-                scheduleNotes(notes,chordLength,startTime,client,scheduler)
-                print("note scheduled at time "+str(startTime))
+                #scheduleNotes(notes,chordLength,startTime,client,scheduler,scheduler_started_time)
+                #print("note scheduled at time "+str(startTime) +  ", length "+str(chordLength))
+                notesEvent = [notes,chordLength,startTime]
+                notesList.append(notesEvent)
                 playablechord=False
                 startTime=startTime+chordLength
                 chordLength=tBase
             chordValue=chordValue+1
+    #print("startTime")
+    #print(startTime)
+    return [startTime,notesList]
 
+    
 
 def start_L_system():
     
@@ -171,64 +196,105 @@ def start_L_system():
 
 
 def update_L_system(unused_addr, things, currentNode):
-    print(things)
-    print(len(things))
     nodes = things[0][0]
     client = things[0][1]
     scheduler = things[0][2]
-    l_system_started = things[0][3]
-    print("startCurrentNode")
-    print(currentNode)
-    print("endCurrentNode")
+    endingTime = things[0][3]
+    l_system_started = things[0][4]
+    scheduler_started_time = things[0][5] 
+    axiom = things[0][6] 
     updatePositionsList(nodes, positionsList,currentNode,maxLength)
+    print("positionsList: " + str(positionsList))
     dirList = returnDirList(positionsList)
-    if(l_system_started==False):
-        start_L_system()
+    #print("dirList")
+    #print(dirList)
     iterations = 1
+    char = "N"
+    startingNoteMidi = 69
+    tBase = 2
+    baseChordPos= 0
+    scaleIndex = 1
+    print("dirList: " + dirList + "; char: " + char +"; axiom: " + axiom)
+    lsysString = lSysCompute(axiom,char,dirList)#lSysGenerate(axiom, iterations)
+    print("dirList: " + dirList + "; char: " + char +"; axiom: " + lsysString)
+    [endingTime,notesList] = parseChords(lsysString, tBase,baseChordPos,scaleIndex,startingNoteMidi,endingTime)
+    for event in scheduler.queue:
+        scheduler.cancel(event)
+    print("scheduler empty: " + str(scheduler.empty()))
+    sendTotalNoteOff(0,100,scheduler,client)
+    endingTime = 0
+    for notesEvent in notesList:
+        scheduleNotes(notesEvent[0],notesEvent[1],notesEvent[2],client,scheduler)
+    #print(scheduler.queue[len(scheduler.queue)-1][0])
+    scheduler.enter(endingTime,3,reiterate_l_system,argument=(client,scheduler,dirList,lsysString))
+    print("scheduling event at time " + str(endingTime))
+    # lines for rescheduling events to increase depth of the system 
+    print("l system started: " + str(l_system_started))
+
+    if(l_system_started==False):
+        print("scheduler running")
+        things[0][4] = True
+        things[0][5] = time.time()
+        print("sched")
+        print(things[0][5])
+        print(scheduler.queue)
+        scheduler.run()
+        
+
+def increaseCounter(counter):
+    counter +=1
+
+def reiterate_l_system(client,scheduler,dirList,axiom):
+    #print(scheduler.queue)
+    print("reiterate")
+    startTime = 0
     char = "N"
     startingNoteMidi = 69
     tBase = 4
     baseChordPos= 0
     scaleIndex = 1
-    global axiom
     lsysString = lSysCompute(axiom,char,dirList)#lSysGenerate(axiom, iterations)
-    parseChords(lsysString, tBase,baseChordPos,scaleIndex,startingNoteMidi,client, scheduler)
-    # lines for rescheduling events to increase depth of the system 
-
-
-    if(l_system_started==False):
-        scheduler.run()
-        print("scheduler running")
-        l_system_started = True
-    return l_system_started
+    print("dirList: " + dirList + "; char: " + char +"; axiom: " + axiom)
+    [endingTime,notesList] = parseChords(lsysString, tBase,baseChordPos,scaleIndex,startingNoteMidi,startTime)
+    for notesEvent in notesList:
+        scheduleNotes(notesEvent[0],notesEvent[1],notesEvent[2],client,scheduler)
+        notesList.remove(notesEvent)
+    #endingTime = parseChords(lsysString, tBase,baseChordPos,scaleIndex,startingNoteMidi,client, scheduler,startingTime,scheduler_started_time)
+    schedulingEvent = scheduler.enter(endingTime,3,reiterate_l_system,argument=(client,scheduler,dirList,lsysString))
+    print(endingTime)
+    #eventList.append([2,schedulingEvent,endingTime-1])
+    
 
 def calculateDir(node1x,node1y,node2x,node2y):
     x = node2x - node1x
     y = node2y - node1y
-    theta2PI = np.arctan2(x,y) * 180 / np.pi
+    print("x: " + str(x) + "y: " + str(y))
+    theta2PI = np.arctan2(y,x)
+    print("theta2PI: " +  str(theta2PI))
     if(theta2PI<-(5/6)*np.pi):
-        dir = "EE"
+        dir = "WW"
     elif(theta2PI<-(2/3)*np.pi): 
-        dir = "SE"
+        dir = "SW"
     elif(theta2PI<-(1/3)*np.pi): 
         dir = "SS"
     elif(theta2PI<-(1/6)*np.pi): 
-        dir = "SW"
+        dir = "SE"
     elif(theta2PI<(1/6)*np.pi): 
-        dir = "WW"    
+        dir = "EE"    
     elif(theta2PI<(1/3)*np.pi): 
-        dir = "NW"    
+        dir = "NE"    
     elif(theta2PI<(2/3)*np.pi): 
         dir = "NN"        
     elif(theta2PI<(5/6)*np.pi): 
-        dir = "NE"
+        dir = "NW"
     else:
-        dir = "EE"
+        dir = "WW"
+    print("dir: " + dir)
     return dir
 def updatePositionsList(nodes, positionsList,nextNodeIndex,listLength):
-    print("nodesstart")
-    print(nodes[0])
-    print("nodesend")
+    #print("nodesstart")
+    #print(nodes[0])
+    #print("nodesend")
     nodeX = nodes[nextNodeIndex,1]
     nodeY = nodes[nextNodeIndex,2]
     nodePos = [nodeX,nodeY]
@@ -240,8 +306,8 @@ def updatePositionsList(nodes, positionsList,nextNodeIndex,listLength):
 
 def returnDirList(positionsList):
     dirList = ""
-    print("posList")
-    print(positionsList)
+    #print("posList")
+    #print(positionsList)
     for i in range(len(positionsList)-1):
         dirList = dirList + calculateDir(positionsList[i][0],positionsList[i][1],positionsList[i+1][0],positionsList[i+1][1])
     return dirList

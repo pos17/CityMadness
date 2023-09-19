@@ -19,11 +19,16 @@ inport = 5005
 global nodes
 outport = 1235
 outport2 = 57120
-
+noteOnList =[]
+noteOffList = []
 client = udp_client.SimpleUDPClient("127.0.0.1", outport)
 client2 = udp_client.SimpleUDPClient("127.0.0.1", outport2)
 scheduler = sched.scheduler(time.monotonic, time.sleep)
 l_system_started = False
+scheduler_started_time = 0 
+endingTime = 0
+countSecs = 0
+axiom = 'NWSWSENNNEEEWWNW'
 
 
 def NormalizeMusic(data):
@@ -397,11 +402,12 @@ if __name__ == "__main__":
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
-    dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,l_system_started]) #function for updating l_system
+    frase = "ciao"
+    dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom]) #function for updating l_system
 
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
-    print("These are the nodes")
-    print(nodes)
+    #print("These are the nodes")
+    #print(nodes)
     print("Serving on {}".format(server.server_address))
     server.serve_forever()
     
