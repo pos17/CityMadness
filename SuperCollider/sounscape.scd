@@ -67,7 +67,7 @@ s.waitForBoot({
 		//sigL = Latch.ar(~buf_l,Impulse.ar(200));
 		//sigR = Latch.ar(~buf_r,Impulse.ar(200));
 		//sigL = TGrains.ar(1, Impulse.ar(trate), ~buf_l, rate, MouseX.kr(0,BufDur.kr(~buf_l)), dur, Dseq([-1,1,inf]), 0.1, 2);
-		sigR = TGrains.ar(1, Impulse.ar(trate), ~buf_r, rate, MouseX.kr(0,BufDur.kr(~buf_r)), dur, Dseq([-1,1,inf]), 0.1, 2);
+		sigR = TGrains.ar(1, Impulse.ar(trate), ~buf_r, rate, MouseX.kr(0,BufDur.kr(~buf_r)), dur, Dseq([-1,1,inf]), 0.9, 2);
 		//sig = PlayBuf.ar(2, ~duomo_buf, rate=1, loop, doneAction: 2);
 		//Out.ar(outL,(testPos.linlin(-1,1,1,0)*FreeVerb.ar(in:sigL, mix:testPos.linlin(-1,1,0,1), room:15, damp:0.01)));
 		//Out.ar(outR,(testPos.linlin(-1,1,1,0)*FreeVerb.ar(in:sigR, mix:testPos.linlin(-1,1,0,1), room:15, damp:0.01)));
@@ -270,11 +270,13 @@ s.waitForBoot({
 ~reverbBus.scope;
 ~master.scope;
 (
-~x.free;
+//~x.free;
+~x.set(\drywet,0.2);
 //y.free;
 ~t.free;
 )
-~x.set(\drywet,0.2);
+
+
 ~x.free;
 s.record(duration:20);
 
