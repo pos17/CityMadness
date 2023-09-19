@@ -99,16 +99,14 @@ SynthDef(\sin_pulsar, { |out=0|
 
 	c = FreeVerb.ar(in:c, mix:0.6, room:0.7, damp:1);
 
-	c = LeakDC.ar(c* 0.05);
+	c = LeakDC.ar(c* 0.45);
 
 	c = Pan2.ar(c, Rand(-1,1));
 
-    Out.ar(out, c)
+	Out.ar(out, c*\ampout.ar(0.05))
 }).add;
 
 )
-
-
 
 //Arpeggio, ancora non funziona bene
 
@@ -122,7 +120,6 @@ s.waitForBoot({
  ~note_table = 0!127;
  ~n = nil;
 
-	g = Synth("sin_pulsar");
  OSCdef.new(\noteOn,{
 	arg msg, time, addr, port;
 	var note;
@@ -172,7 +169,7 @@ path: "/noteOff"
 		\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
 		\dur, Pseq([2, 2, 2, 2, 2, 2, 2, 2].normalizeSum*2),
 		\formantA,6,
-		\overlapa,8,
+		\overlapA,8,
 	);
 
 
@@ -181,6 +178,7 @@ path: "/noteOff"
 
 });
 )
+
 
 
 /*
