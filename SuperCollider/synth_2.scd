@@ -1,19 +1,24 @@
 s.boot;
-NetAddr.localAddr;
-(
+
 ~n = NetAddr("127.0.0.1", NetAddr.langPort);
 NetAddr.localAddr;
 
 s.latency = nil;            // for immediate response;
 
-~grainsin_pulsar = ~grainsin_pulsar ? ();
 
-~grainsin_pulsar[\name] = \grainsin_pulsar;
-~grainsin_pulsar[\midiChannel] = 0;
-// ~grainsin_pulsar[\midiSrcID] =  2097152;
+(
 
-Ndef( ~grainsin_pulsar[\name] ).clear;
-Ndef( ~grainsin_pulsar[\name] ).ar(2);
+SynthDef(\pad, { arg freq=261, amp=2, mul=1, out = 0, gate = 1;
+	var snd, env, echo;
+	env = Env(levels: [0, 1, 0.5, 0], times: [1, 1.5, 0.6], curve: [-6,0, 1]);
+	snd = Resonz.ar(SinOsc.ar(BrownNoise.ar(300, 400)) * mul,freq,[0.001, 0.001],amp * EnvGen.kr(env,gate, doneAction: 2));
+	snd = DelayC.ar(snd,0.01,{Rand(0,0.01)}! snd.size);
+	snd = Splay.ar(snd);
+	//snd = Latch.ar(snd,Impulse.ar(Rand(8000,16e3)));
+	snd = Pan2.ar(snd, Rand(-0.5,0.5));
+	Out.ar(out,snd);
+
+}).add;
 
 
 
@@ -92,102 +97,19 @@ SynthDef(\sin_pulsar, { |out=0|
 		b * ( \levB.kr(0.8) * e ).pow(f_.linlin( 50, 1500, 1.5, 2.5)) * lev,
 	]);
 
+	c = FreeVerb.ar(in:c, mix:0.6, room:0.7, damp:1);
 
 	c = LeakDC.ar(c* 0.45);
 
+	c = Pan2.ar(c, Rand(-1,1));
 
-
-    Out.ar(out, c)
+	Out.ar(out, c*\ampout.ar(0.05))
 }).add;
-)
-
-
-
-
-(
-Ndef( ~grainsin_pulsar[\name]).prime( \sin_pulsar );
-
-/// .....prime() is same as
- //Ndef( ~grainsin_pulsar[\name], \sin_pulsar);
-// But without starting the synth
-
-
-//////// reverb
-
-Ndef( ~grainsin_pulsar[\name] ).put( 150, \filter -> { arg in;
-	var d = in;
-	var diffusion = \diffusion.kr(1);
-	var spacesize = \spacesize.kr(0.1);
-	8.do { |i|
-		d = AllpassC.ar(
-			d,
-			delaytime: LFNoise1.kr(0.01!2).range(0.01, spacesize),
-			decaytime: diffusion
-		)
-	};
-
-	d
-
-});
-
-
-
-//////// SPECS
-
-Ndef( ~grainsin_pulsar[\name]).addSpec(
-	\lev, \amp,
-	\freq, \freq,
-	\formantA, [1,7],
-	\formantB, [1,7],
-	\overlapA, [0.01, 20,\exp],
-	\overlapB, [0.01, 20,\exp],
-	\levA, [0.01, 3,\exp],
-	\levB, [0.01, 3,\exp],
-	\gt, \gt,
-	\diffusion, [0.0001, 4],
-	\spacesize, [0.02, 0.2],
-).edit;
-
 
 )
-
-Ndef(~grainsin_pulsar.name).objects
-
-
-(
-OSCdef.new((~grainsin_pulsar[\name] ++ "_On").asSymbol,{
-	arg msg;
-	Ndef(~grainsin_pulsar[\name]).put(
-		msg[1],
-		Ndef(~grainsin_pulsar[\name]).source,
-		0,
-		[\freq, msg[1].midicps, \gt, 1, \lev, 1]
-		);
-	msg[1] = msg[1] - 12;
-	Ndef(~grainsin_pulsar[\name]).put(
-		msg[1],
-		Ndef(~grainsin_pulsar[\name]).source,
-		0,
-		[\freq, msg[1].midicps, \gt, 1, \lev, 1]
-		);
-	postln(msg[1]);
-	},
-path: "/noteOn"
-);
-
-OSCdef.new((~grainsin_pulsar[\name] ++ "_off").asSymbol,{
-	arg msg;
-	Ndef( ~grainsin_pulsar[\name] ).removeAt( msg[1] );
-	//postln("off");
-	},
-path: "/noteOff"
-);
-)
-
-
 
 //Arpeggio, ancora non funziona bene
-/*
+
 (
 s.waitForBoot({
  var right, left;
@@ -233,29 +155,61 @@ path: "/noteOff"
 	n0 = note_getter.(0);
 	n1 = note_getter.(1);
 	n2 = note_getter.(2);
-	~seq = [n0,n1,n2].scramble;
-	~seq_dur = [1, 1, 1, 1, 0.5, 0.5, 2, 0.5, 0.5, 2, 0.5, 0.5 ].scramble;
-		right =
-		Pbind(
-			\instrument, \sin_pulsar,
-			\midinote, Pseq(~seq ++ ((~seq + 12)!2).flatten),
-			\dur, Pseq(~seq_dur.normalizeSum*2)
-		);
+	//~seq = [n0,n1,n2].scramble;
+	//~seq_dur = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ].scramble;
+	right = Pbind(
+		\instrument, \sin_pulsar,
+		\midinote, Pseq([ n0, n2, n1, n2]),
+		\dur, Pseq([1, 1, 1, 1 ].normalizeSum*2),
+	);
 
-		left =
-		Pbind(
-			\instrument,\sin_pulsar,
-			\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
-			\dur, Pseq([1, 1, 1, 1, 1, 1, 1, 1].normalizeSum*2)
-		);
+
+	left = Pbind(
+		\instrument, \pad,
+		\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
+		\dur, Pseq([2, 2, 2, 2, 2, 2, 2, 2].normalizeSum*2),
+		\formantA,6,
+		\overlapA,8,
+	);
+
 
  if (~player.notNil) { ~player.stop; };
-
 	~player = Pn(Ppar([right,left])).play;
 
 });
 )
 
-*/
-Ndef('grainsin_pulsar').set('levA', 0.49765180538124, 'formantA', 6.007874015748, 'levB', 0.31759720095202, 'spacesize', 0.16952380952381, 'overlapB', 1.0651340032941, 'wet150', 0.34391534391534, 'lev', 0.19443238886478, 'formantB', 3.2204724409449, 'diffusion', 1.6931793650794, 'overlapA', 1.8253052748325, 'freq', 69.877455494983);
 
+
+/*
+(
+OSCdef.new((~grainsin_pulsar[\name] ++ "_On").asSymbol,{
+	arg msg;
+	Ndef(~grainsin_pulsar[\name]).put(
+		msg[1],
+		Ndef(~grainsin_pulsar[\name]).source,
+		0,
+		[\freq, msg[1].midicps, \gt, 1, \lev, 1]
+		);
+	msg[1] = msg[1] - 12;
+	Ndef(~grainsin_pulsar[\name]).put(
+		msg[1],
+		Ndef(~grainsin_pulsar[\name]).source,
+		0,
+		[\freq, msg[1].midicps, \gt, 1, \lev, 1]
+		);
+	postln(msg[1]);
+	},
+path: "/noteOn"
+);
+
+OSCdef.new((~grainsin_pulsar[\name] ++ "_off").asSymbol,{
+	arg msg;
+	Ndef( ~grainsin_pulsar[\name] ).removeAt( msg[1] );
+	//postln("off");
+	},
+path: "/noteOff"
+);
+)
+
+*/
