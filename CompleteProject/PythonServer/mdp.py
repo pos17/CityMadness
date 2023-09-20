@@ -1,7 +1,6 @@
 import json
 from multiprocessing.connection import wait
 import numpy as np
-import matplotlib.pyplot as plt
 import mdptoolbox
 import scipy
 import argparse
