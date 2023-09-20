@@ -28,6 +28,7 @@ scheduler_started_time = 0
 endingTime = 0
 countSecs = 0
 axiom = 'NWSWSENNNEEEWWNW'
+snr = 0 #value that specifies the value of noise wrt the value of audio signal
 
 
 def NormalizeMusic(data):
@@ -402,7 +403,7 @@ if __name__ == "__main__":
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
     frase = "ciao"
-    dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom]) #function for updating l_system
+    dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr]) #function for updating l_system
     dispatcher.map("/reset", l_system.sendNoiseOn, client2)
     l_system.sendNoiseOn(client2)
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)

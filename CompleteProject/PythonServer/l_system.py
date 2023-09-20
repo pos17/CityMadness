@@ -60,6 +60,10 @@ def sendNoiseOn(client):
     client.send_message("/noiseOn")
     print("/noiseOn")
 
+def sendSNRRatio(client, value):
+    client.send_message("/snrVal",value)
+    print("/snrVal" + str(value))
+
 def scheduleNotes(midiValues,length,startTime,client,scheduler):
     for i in midiValues:
         #print(i)
@@ -207,6 +211,7 @@ def update_L_system(unused_addr, things, currentNode):
     l_system_started = things[0][4]
     scheduler_started_time = things[0][5] 
     axiom = things[0][6] 
+    snr = things[0][7]
     updatePositionsList(nodes, positionsList,currentNode,maxLength)
     print("positionsList: " + str(positionsList))
     dirList = returnDirList(positionsList)
@@ -234,6 +239,13 @@ def update_L_system(unused_addr, things, currentNode):
     print("scheduling event at time " + str(endingTime))
     # lines for rescheduling events to increase depth of the system 
     print("l system started: " + str(l_system_started))
+
+    # function call to set correctly signal to noise ratio
+    if(snr < 10 ):
+        snr += 1
+        things[0][7] = snr
+        sendSNRRatio(client,snr)
+
 
     if(l_system_started==False):
         print("scheduler running")
