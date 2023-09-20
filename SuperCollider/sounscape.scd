@@ -202,10 +202,19 @@ s.waitForBoot({
 	}).add;
 
 
-	~x = Synth.new(\lofi_soundscape,[\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07]);
-	~t = Synth.new(\grain_synth,[\outBus,~reverbBus.index]);
+	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07]);
+	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index]);
 	~r = Synth.new(\reverb,[\in,~reverbBus,\outBus,~master],s,\addToTail);
 	~m = Synth.new(\master,[\in,~master],s,\addToTail);
+
+
+	OSCdef.new(\noiseOn,{
+	~x.set(\lofi_soundscape,[\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07]);
+	~t.set(\grain_synth,[\outBus,~reverbBus.index]);
+	},
+	path:"/noiseOn"
+	);
+
 
 
 	OSCdef.new(\noteOn,{
@@ -267,12 +276,9 @@ s.waitForBoot({
 
 });
 )
-~reverbBus.scope;
-~master.scope;
+
 (
-//~x.free;
 ~x.set(\drywet,0.2);
-//y.free;
 ~t.free;
 )
 
