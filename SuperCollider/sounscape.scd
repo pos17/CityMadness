@@ -58,7 +58,7 @@ s.waitForBoot({
 		}
 	).add;
 
-	SynthDef(\grain_synth,{|outBus,loop = 0, amp = 1,gate=1|
+	SynthDef(\grain_synth,{|outBus,loop = 0,amp=1,gate=1|
 		//var testPos = EnvGen.kr(Env.new(levels:[-1,-1,1,1], times:[5,5,5] ,releaseNode:1), gate:gate);
 		var sigL,sigR, trate, dur, rate;
 		trate = MouseY.kr(2,200,1);
@@ -92,7 +92,7 @@ s.waitForBoot({
 	}).add;
 
 	SynthDef(\sin_pulsar, {
-		arg outBus;
+		arg outBus,switch;
 		var a,b,c,d,e,f, f_ ,t,lev, formantA, formantB, overlapA, overlapB;
 
 		lev = \lev.kr(0.3);
@@ -203,16 +203,27 @@ s.waitForBoot({
 
 
 	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07]);
-	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index]);
+	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index,]);
+
 	~r = Synth.new(\reverb,[\in,~reverbBus,\outBus,~master],s,\addToTail);
 	~m = Synth.new(\master,[\in,~master],s,\addToTail);
 
 
 	OSCdef.new(\noiseOn,{
-	~x.set(\lofi_soundscape,[\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07]);
-	~t.set(\grain_synth,[\outBus,~reverbBus.index]);
+		arg msg;
+		~x.run;
+		~t.run;
+		postln(msg[1]);
 	},
 	path:"/noiseOn"
+	);
+
+	OSCdef.new(\snrval,{
+		arg msg;
+		msg = msg[1]/10;
+		~x.set('drywet',msg)
+	},
+	path:"/snrval"
 	);
 
 
@@ -282,7 +293,7 @@ s.waitForBoot({
 ~t.free;
 )
 
-
+~x.run;
 ~x.free;
 s.record(duration:20);
 
