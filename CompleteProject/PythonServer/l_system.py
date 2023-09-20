@@ -56,8 +56,8 @@ def sendNoteOff(midiValue,client):
     client.send_message("/noteOff",midiValue)
     print("/noteOff",midiValue)
 
-def sendNoiseOn(client):
-    client.send_message("/noiseOn")
+def sendNoiseOn(unused_addr,client,arg):
+    client.send_message("/noiseOn",0)
     print("/noiseOn")
 
 def sendSNRRatio(client, value):

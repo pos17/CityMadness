@@ -405,7 +405,7 @@ if __name__ == "__main__":
     frase = "ciao"
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr]) #function for updating l_system
     dispatcher.map("/reset", l_system.sendNoiseOn, client2)
-    l_system.sendNoiseOn(client2)
+    #l_system.sendNoiseOn(0,client2,0)
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
     #print("These are the nodes")
     #print(nodes)
