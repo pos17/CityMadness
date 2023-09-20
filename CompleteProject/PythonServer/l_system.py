@@ -56,6 +56,10 @@ def sendNoteOff(midiValue,client):
     client.send_message("/noteOff",midiValue)
     print("/noteOff",midiValue)
 
+def sendNoiseOn(client):
+    client.send_message("/noiseOn")
+    print("/noiseOn")
+
 def scheduleNotes(midiValues,length,startTime,client,scheduler):
     for i in midiValues:
         #print(i)
