@@ -9,6 +9,7 @@ s.waitForBoot({
 	var right, left;
 	var n0, n1, n2;
 	var note_getter;
+	~lvl_synth =0;
 	~n1 = NetAddr.new("127.0.0.1",57120);
 	NetAddr.localAddr;
 	~note_table = 0!127;
@@ -16,6 +17,7 @@ s.waitForBoot({
 
 	~master = Bus.audio(s,2);
 	~reverbBus = Bus.audio(s,2);
+	~lvl = Bus.audio(s,2);
 
 
 	s.latency = nil;
@@ -50,10 +52,10 @@ s.waitForBoot({
 			in * ( 1 - dw.abs ),
 			sig * dw
 			]);*/
-			Out.ar(outBus,Mix([
+			Out.ar(outBus,(Mix([
 				in * ( 1 - dw.abs ),
 				sig * dw
-			]))
+			])))
 
 		}
 	).add;
@@ -92,7 +94,7 @@ s.waitForBoot({
 	}).add;
 
 	SynthDef(\sin_pulsar, {
-		arg outBus,switch;
+		arg outBus;
 		var a,b,c,d,e,f, f_ ,t,lev, formantA, formantB, overlapA, overlapB;
 
 		lev = \lev.kr(0.3);
@@ -176,6 +178,12 @@ s.waitForBoot({
 		Out.ar(outBus, c)
 	}).add;
 
+	SynthDef.new(\synthLvl,{
+		arg in, outBus, amp;
+		var sig;
+		sig = In.ar(in,2);
+		Out.ar(outBus,sig*amp);
+	}).add;
 
 	SynthDef.new(\reverb,{
 		arg in,outBus;
@@ -205,9 +213,22 @@ s.waitForBoot({
 	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07]);
 	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index,]);
 
+	~y = Synth.new(\synthLvl,[\in,~lvl,\outBus,~reverbBus],s,\addToTail);
 	~r = Synth.new(\reverb,[\in,~reverbBus,\outBus,~master],s,\addToTail);
 	~m = Synth.new(\master,[\in,~master],s,\addToTail);
 
+	OSCdef.new(\snrVal,{
+		arg msg;
+		var dw;
+		dw = msg[1]/10;
+		~lvl_synth = 1-(msg[1]/10);
+		postln(~lvl_synth);
+		~x.set('drywet',dw);
+		~y.set(\amp,~lvl_synth);
+		~t.free;
+	},
+	path:"/snrVal"
+	);
 
 	OSCdef.new(\noiseOn,{
 		arg msg;
@@ -218,23 +239,13 @@ s.waitForBoot({
 	path:"/noiseOn"
 	);
 
-	OSCdef.new(\snrval,{
-		arg msg;
-		msg = msg[1]/10;
-		~x.set('drywet',msg)
-	},
-	path:"/snrval"
-	);
-
-
-
 	OSCdef.new(\noteOn,{
 		arg msg, time, addr, port;
 		var note;
 		~note_table[msg[1]] = 1;
 		//~note_table[msg[1]] = Synth.new(\pad, [\freq, msg[1].midicps,\gate,1, \out, 0, \mul, 1]);
 		~n = ~note_table.selectIndices({|item, i| item != 0});
-		postln(msg[1]);
+		//postln(msg[1]);
 	},
 	path: "/noteOn"
 	);
@@ -244,7 +255,7 @@ s.waitForBoot({
 		var note;
 		//~note_table[msg[1]] = Synth.new(\pad, [\freq, msg[1].midicps,\gate, 0,\out, 0, \mul, 1]);
 		~note_table[msg[1]] = 0;
-		postln(msg[1]);
+		//postln(msg[1]);
 	},
 	path: "/noteOff"
 	);
@@ -263,13 +274,15 @@ s.waitForBoot({
 	n0 = note_getter.(0);
 	n1 = note_getter.(1);
 	n2 = note_getter.(2);
+
 	//~seq = [n0,n1,n2].scramble;
 	//~seq_dur = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ].scramble;
 	right = Pbind(
 		\instrument, \sin_pulsar,
 		\midinote, Pseq([ n0, n2, n1, n2]),
 		\dur, Pseq([1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 ].normalizeSum*2),
-		\outBus,~reverbBus,
+		//\lvl,~lvl_synth,
+		\outBus,~lvl,
 	);
 
 
@@ -277,7 +290,8 @@ s.waitForBoot({
 		\instrument, \sin_pulsar,
 		\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
 		\dur, Pseq([2, 2, 2, 2, 2, 2, 2, 2].normalizeSum*2),
-		\outBus,~reverbBus,
+		//\lvl,~lvl_synth,
+		\outBus,~lvl,
 	);
 
 

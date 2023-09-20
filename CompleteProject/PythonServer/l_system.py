@@ -56,7 +56,8 @@ def sendNoteOff(midiValue,client):
     client.send_message("/noteOff",midiValue)
     print("/noteOff",midiValue)
 
-def sendNoiseOn(unused_addr,client,arg):
+def sendNoiseOn(unused_addr,list):
+    client = list[0][0]
     client.send_message("/noiseOn",0)
     print("/noiseOn")
 
@@ -242,9 +243,10 @@ def update_L_system(unused_addr, things, currentNode):
 
     # function call to set correctly signal to noise ratio
     if(snr < 10 ):
+        sendSNRRatio(client,10-snr)
         snr += 1
         things[0][7] = snr
-        sendSNRRatio(client,snr)
+        
 
 
     if(l_system_started==False):
