@@ -25,6 +25,9 @@ class Map{
   
   PGraphics city, render;
   
+  PImage cityGraphics;
+  ArrayList<MapFragment> mapFragments = new ArrayList<MapFragment>();
+  
   Map(){
     this.mapPoints = loadMapPoints();
     this.pathDone = false;
@@ -37,7 +40,9 @@ class Map{
     for(int i = 0; i < NMAPPARTICLES; i++){
       chaoticParticles.add(new ChaoticParticle()); 
     }
-    
+    //this.cityGraphics = new PImage(width, height, 2);
+    this.cityGraphics = loadImage("map.png");
+    this.cityGraphics.resize(width,height);
     this.startPath = new PVector();
     this.endPath = new PVector();
   }
@@ -52,6 +57,15 @@ class Map{
     
     this.render.push();
     this.render.translate(HALF_WIDTH,HALF_HEIGHT);
+    
+    println(this.mapFragments.size());
+    for(int i = 0; i<this.mapFragments.size(); i++){
+      MapFragment f = mapFragments.get(i);
+      
+      float alpha = f.getAlpha();
+      this.render.tint(255,alpha);
+      this.render.image(f.show(),-HALF_WIDTH,-HALF_HEIGHT); 
+    }
     
     //SHOW CHAOTIC PARTICLES
     this.render.stroke(255,MAPPARTICLEALPHA);
@@ -94,8 +108,9 @@ class Map{
      this.render.shape(s,0,0);
    }
    */
-   //this.render.image(this.city,-HALF_WIDTH,-HALF_HEIGHT);
-   this.render.image(this.shadow,-HALF_WIDTH,-HALF_HEIGHT);
+   
+   //this.render.image(this.shadow,-HALF_WIDTH,-HALF_HEIGHT);
+   
 
     this.render.strokeWeight(3);
     //RENDER RANDOM PATH PARTICLES
@@ -168,7 +183,7 @@ class Map{
     //image(this.city,0,0);
     
     //shape(alphaLine,0,0);
-    
+        
   }
   
   void createLine(){
@@ -315,6 +330,16 @@ class Map{
     this.shadow.noFill();
     this.shadow.strokeJoin(ROUND);
     
+    PGraphics mask = createGraphics(width,height, P2D);
+    mask.beginDraw();
+    mask.push();
+    mask.translate(HALF_WIDTH, HALF_HEIGHT);
+    mask.background(0);
+    mask.stroke(255);
+    mask.noFill();
+    mask.strokeJoin(ROUND);
+    mask.strokeWeight(50);
+    
     IntList addresses = this.currentPoint.getConnections();
     ArrayList<PVector> to = new ArrayList<PVector>();
     println(addresses.size());
@@ -329,10 +354,27 @@ class Map{
         this.shadow.strokeWeight(map(j,0,20,5,50));
         this.shadow.line(t.x,t.y,from.x,from.y);
       }
+      
+      mask.line(t.x,t.y,from.x,from.y);
     }
+    mask.pop();
+    mask.endDraw();
+    
+    mask.loadPixels(); // TEST
+    
+    PImage fragment = loadImage("map.png");
+    fragment.resize(width,height);
+    println("Resized: " + fragment.pixelDensity);
+    println("Gen: " + mask.pixelDensity);
+    
+    
+    fragment.mask(mask);
+    
+    this.mapFragments.add(new MapFragment(fragment, this.currentPoint.getId()));
     this.shadow.pop();
     this.shadow.endDraw();
-    println("SHOADOW");
+    
+    
     click = false;
   }
   

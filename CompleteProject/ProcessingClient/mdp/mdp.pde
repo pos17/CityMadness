@@ -29,7 +29,9 @@ PFont font;
 
 void setup(){
   size(900,800,P2D);
-  pixelDensity(displayDensity());
+  //fullScreen(P2D);
+  //pixelDensity(displayDensity());
+  pixelDensity(1);
   HALF_WIDTH = width/2;
   HALF_HEIGHT = height/2;
   QUARTER_WIDTH = width/4;
