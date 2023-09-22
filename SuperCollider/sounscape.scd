@@ -1,8 +1,9 @@
 s.boot;
 (
-~buf_l =Buffer.readChannel(s, "C:/Users/jcalb/Documents/MAE/2nd year/CPAC/PROJECT/CityMadness/SuperCollider/CR_Duomo_Corner.WAV", channels:[0]);
-~buf_r =Buffer.readChannel(s, "C:/Users/jcalb/Documents/MAE/2nd year/CPAC/PROJECT/CityMadness/SuperCollider/CR_Duomo_Corner.WAV", channels:[1]);
-~b =Buffer.read(s, "C:/Users/jcalb/Documents/MAE/2nd year/CPAC/PROJECT/CityMadness/SuperCollider/CR_Duomo_Corner.WAV");
+var samplePath = thisProcess.nowExecutingPath.dirname +/+ "./recordings/CR_Duomo_Corner.WAV";
+~buf_l =Buffer.readChannel(s, samplePath, channels:[0]);
+~buf_r =Buffer.readChannel(s, samplePath, channels:[1]);
+~b =Buffer.read(s, samplePath);
 )
 (
 s.waitForBoot({
@@ -18,7 +19,8 @@ s.waitForBoot({
 	~master = Bus.audio(s,2);
 	~reverbBus = Bus.audio(s,2);
 	~lvl = Bus.audio(s,2);
-
+	~path= thisProcess.nowExecutingPath.dirname;
+	~recPath = (~path +/+ "./images/GRANULATOR.png");
 
 	s.latency = nil;
 
@@ -45,8 +47,6 @@ s.waitForBoot({
 
 			sig = HPF.ar(sig, \hpf.kr(100));
 
-
-
 			dw = \drywet.kr(1);
 			/*Mix([
 			in * ( 1 - dw.abs ),
@@ -67,7 +67,7 @@ s.waitForBoot({
 		dur = 4/trate;
 		rate = Dseq([1, 1, 1, 0.5, 0.5, 0.2, -1], inf);
 		//sigL = Latch.ar(~buf_l,Impulse.ar(200));
-		//sigR = Latch.ar(~buf_r,Impulse.ar(200));
+		//sigR = Latch.ar(~buf_r,Impulse.ar(sr));
 		//sigL = TGrains.ar(1, Impulse.ar(trate), ~buf_l, rate, MouseX.kr(0,BufDur.kr(~buf_l)), dur, Dseq([-1,1,inf]), 0.1, 2);
 		sigR = TGrains.ar(1, Impulse.ar(trate), ~buf_r, rate, MouseX.kr(0,BufDur.kr(~buf_r)), dur, Dseq([-1,1,inf]), 0.9, 2);
 		//sig = PlayBuf.ar(2, ~duomo_buf, rate=1, loop, doneAction: 2);
@@ -76,21 +76,6 @@ s.waitForBoot({
 		//Out.ar(outL,sigL*amp);
 		sigR = Pan2.ar(sigR,LFNoise1.kr(10));
 		Out.ar(outBus,sigR*amp);
-	}).add;
-
-
-
-	SynthDef(\pad, {
-		arg freq, amp=1, mul=1, outBus, gate = 1;
-		var snd, env, echo;
-		env = Env(levels: [0, 1, 0.5, 0], times: [1, 1.5, 0.6], curve: [-6,0, 1]);
-		snd = Resonz.ar(SinOsc.ar(BrownNoise.ar(300, 400)) * mul,freq,[0.001, 0.001],amp * EnvGen.kr(env,gate, doneAction: 2));
-		snd = DelayC.ar(snd,0.01,{Rand(0,0.01)}! snd.size);
-		snd = Splay.ar(snd);
-		//snd = Latch.ar(snd,Impulse.ar(Rand(8000,16e3)));
-		snd = Pan2.ar(snd, Rand(-0.5,0.5));
-		Out.ar(outBus,snd*amp);
-
 	}).add;
 
 	SynthDef(\sin_pulsar, {
@@ -219,13 +204,14 @@ s.waitForBoot({
 
 	OSCdef.new(\snrVal,{
 		arg msg;
-		var dw;
+		var dw,sr;
+		//postln(msg[1]);
 		dw = msg[1]/10;
 		~lvl_synth = 1-(msg[1]/10);
-		postln(~lvl_synth);
-		~x.set('drywet',dw);
+		//postln(~lvl_synth);
+		~x.set('drywet');
 		~y.set(\amp,~lvl_synth);
-		~t.free;
+		~t.stop;
 	},
 	path:"/snrVal"
 	);
@@ -243,9 +229,7 @@ s.waitForBoot({
 		arg msg, time, addr, port;
 		var note;
 		~note_table[msg[1]] = 1;
-		//~note_table[msg[1]] = Synth.new(\pad, [\freq, msg[1].midicps,\gate,1, \out, 0, \mul, 1]);
 		~n = ~note_table.selectIndices({|item, i| item != 0});
-		//postln(msg[1]);
 	},
 	path: "/noteOn"
 	);
@@ -302,13 +286,15 @@ s.waitForBoot({
 });
 )
 
-(
-~x.set(\drywet,0.2);
-~t.free;
-)
 
-~x.run;
-~x.free;
+
+Ndef('grainsin_pulsar').set('levA', 0.30271236992455, 'formantA', 3.5714285714286, 'overlapB', 0.40443672029499, 'levB', 0.28498187848462, 'lev', 0.81859410430839, 'formantB', 4.2698412698413, 'overlapA', 2.1898421014008);
+
+
+
+Ndef('grainsin_pulsar').set('levA', 0.49765180538124, 'formantA', 6.007874015748, 'levB', 0.31759720095202, 'spacesize', 0.16952380952381, 'overlapB', 1.0651340032941, 'wet150', 0.34391534391534, 'lev', 0.19443238886478, 'formantB', 3.2204724409449, 'diffusion', 1.6931793650794, 'overlapA', 1.8253052748325, 'freq', 69.877455494983);
+
+
 s.record(duration:20);
 
 s.freeAll;
