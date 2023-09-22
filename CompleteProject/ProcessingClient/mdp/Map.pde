@@ -335,7 +335,7 @@ class Map{
     mask.push();
     mask.translate(HALF_WIDTH, HALF_HEIGHT);
     mask.background(0);
-    mask.stroke(255);
+    mask.stroke(255,25);
     mask.noFill();
     mask.strokeJoin(ROUND);
     mask.strokeWeight(50);
@@ -353,9 +353,10 @@ class Map{
       for(int j = 0; j<20; j++){
         this.shadow.strokeWeight(map(j,0,20,5,50));
         this.shadow.line(t.x,t.y,from.x,from.y);
+        mask.strokeWeight(map(j,0,20,5,50));
+        mask.line(t.x,t.y,from.x,from.y);
       }
       
-      mask.line(t.x,t.y,from.x,from.y);
     }
     mask.pop();
     mask.endDraw();
