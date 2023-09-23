@@ -1,4 +1,6 @@
 s.boot;
+p=ServerOptions.new;
+p.memSize= 32.768;
 (
 var samplePath = thisProcess.nowExecutingPath.dirname +/+ "./recordings/CR_Duomo_Corner.WAV";
 ~buf_l =Buffer.readChannel(s, samplePath, channels:[0]);
@@ -14,7 +16,7 @@ s.waitForBoot({
 	~n1 = NetAddr.new("127.0.0.1",57120);
 	NetAddr.localAddr;
 	~note_table = 0!127;
-	//~n = nil;
+	~n = nil;
 
 	~master = Bus.audio(s,2);
 	~reverbBus = Bus.audio(s,2);
@@ -75,14 +77,14 @@ s.waitForBoot({
 		Out.ar(outBus,sigR*amp);
 	}).add;
 
-	SynthDef(\sub,{
-		|note, amp=1.2,cutoff=350, decay=1,outBus|
+	/*SynthDef(\sub,{
+		|note, amp=1,cutoff=350, decay=1,outBus|
 		var env, sig;
 		env = EnvGen.kr(Env.new([0,1,0],[0.001,2],[3,-50]),doneAction:2);
 		sig = RLPF.ar(Saw.ar(note.midicps,amp),cutoff)*env;
 		sig = CombC.ar(sig,1,0.125,decay);
 		Out.ar(outBus,sig)
-	}).add;
+	}).add;*/
 
 	SynthDef(\sin_pulsar, {
 		arg outBus;
@@ -179,10 +181,10 @@ s.waitForBoot({
 	SynthDef.new(\reverb,{
 		arg in,outBus;
 		var d = in;
-		var diffusion = \diffusion.kr(50);
-		var spacesize = \spacesize.kr(15);
+		var diffusion = \diffusion.kr(30);
+		var spacesize = \spacesize.kr(10);
 		d = In.ar(d,1);
-		8.do { |i|
+		6.do { |i|
 			d = AllpassC.ar(
 				d,
 				delaytime: LFNoise1.kr(0.01!2).range(0.01, spacesize),
@@ -284,20 +286,17 @@ s.waitForBoot({
 		\outBus,~lvl,
 	);
 
-	bass = Pbind(
-		\instrument, \sub,
-		\note, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
-		\dur, Pseq([2, 2, 2, 2, 2, 2, 2, 2].normalizeSum*2),
-		\amp, 1.4,
-		\cutoff, Pseq([450,300,550,450,300],inf),
-		\decay, Pseq([2,1,0.75,0.75,0.75],inf),
-		//\lvl,~lvl_synth,
-		\outBus,~lvl,
-	);
+	// bass = Pbind(
+	// 	\instrument, \sin_pulsar,
+	// 	\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 24),
+	// 	\dur, Pseq([2, 2, 2, 2, 2, 2, 2, 2].normalizeSum*2),
+	// 	//\lvl,~lvl_synth,
+	// 	\outBus,~lvl,
+	// );
 
 
 	if (~player.notNil) { ~player.stop; };
-	~player = Pn(Ppar([right,left,bass])).play;
+	~player = Pn(Ppar([right,left])).play;
 
 
 });
