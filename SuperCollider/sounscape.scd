@@ -7,21 +7,18 @@ var samplePath = thisProcess.nowExecutingPath.dirname +/+ "./recordings/CR_Duomo
 )
 (
 s.waitForBoot({
-	var right, left;
+	var right, left,bass;
 	var n0, n1, n2;
 	var note_getter;
 	~lvl_synth =0;
 	~n1 = NetAddr.new("127.0.0.1",57120);
 	NetAddr.localAddr;
 	~note_table = 0!127;
-	~n = nil;
+	//~n = nil;
 
 	~master = Bus.audio(s,2);
 	~reverbBus = Bus.audio(s,2);
 	~lvl = Bus.audio(s,2);
-	~path= thisProcess.nowExecutingPath.dirname;
-	~recPath = (~path +/+ "./images/GRANULATOR.png");
-
 	s.latency = nil;
 
 	SynthDef(\lofi_soundscape,
@@ -76,6 +73,15 @@ s.waitForBoot({
 		//Out.ar(outL,sigL*amp);
 		sigR = Pan2.ar(sigR,LFNoise1.kr(10));
 		Out.ar(outBus,sigR*amp);
+	}).add;
+
+	SynthDef(\sub,{
+		|note, amp=1.2,cutoff=350, decay=1,outBus|
+		var env, sig;
+		env = EnvGen.kr(Env.new([0,1,0],[0.001,2],[3,-50]),doneAction:2);
+		sig = RLPF.ar(Saw.ar(note.midicps,amp),cutoff)*env;
+		sig = CombC.ar(sig,1,0.125,decay);
+		Out.ar(outBus,sig)
 	}).add;
 
 	SynthDef(\sin_pulsar, {
@@ -278,9 +284,20 @@ s.waitForBoot({
 		\outBus,~lvl,
 	);
 
+	bass = Pbind(
+		\instrument, \sub,
+		\note, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
+		\dur, Pseq([2, 2, 2, 2, 2, 2, 2, 2].normalizeSum*2),
+		\amp, 1.4,
+		\cutoff, Pseq([450,300,550,450,300],inf),
+		\decay, Pseq([2,1,0.75,0.75,0.75],inf),
+		//\lvl,~lvl_synth,
+		\outBus,~lvl,
+	);
+
 
 	if (~player.notNil) { ~player.stop; };
-	~player = Pn(Ppar([right,left])).play;
+	~player = Pn(Ppar([right,left,bass])).play;
 
 
 });
@@ -298,3 +315,6 @@ Ndef('grainsin_pulsar').set('levA', 0.49765180538124, 'formantA', 6.007874015748
 s.record(duration:20);
 
 s.freeAll;
+
+
+// Olga besedolga
