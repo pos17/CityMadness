@@ -5,7 +5,7 @@ import java.util.*;
 int PATHMAXLENGTH = 10;
 int NMAPPARTICLES = 10000;
 int NPATHPARTICLES = 1000;
-int MAPPARTICLEALPHA = 100;
+int MAPPARTICLEALPHA = 70;
 int TRANSITION_RANGE = 20;
 int RETURN_RANGE = 20;
 float HALF_WIDTH;
@@ -35,8 +35,6 @@ void setup(){
   HALF_WIDTH = width/2;
   HALF_HEIGHT = height/2;
   QUARTER_WIDTH = width/4;
-  
-  //frameRate(1);
   
   oscP5 = new OscP5(this,inport);
   oscP52 = new OscP5(this,inport);
