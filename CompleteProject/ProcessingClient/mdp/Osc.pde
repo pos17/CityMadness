@@ -58,12 +58,3 @@ IntList oscPathParser(OscMessage msg){
   
   return addresses;
 }
-
-
-
-void mouseMoved(){
-  OscMessage myMessage = new OscMessage("/mousePosition");
-  myMessage.add(mouseX/width);
-  myMessage.add(mouseY/height);
-  oscP5.send(myMessage, myRemoteLocation);
-}

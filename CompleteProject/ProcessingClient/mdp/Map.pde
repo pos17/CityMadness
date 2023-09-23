@@ -19,9 +19,11 @@ class Map{
   MapPoint interestPoint;
   MapPoint currentPoint;
   
-  boolean pathDone, systemCreated;
+  
+  boolean pathDone, systemCreated, movingParticles;
   
   PGraphics shadow;
+  PGraphics trash;
   
   PGraphics city, render;
   
@@ -35,16 +37,21 @@ class Map{
     this.renderMap();
     this.render = createGraphics(width, height, P2D);
     this.shadow = createGraphics(width, height, P2D);
+    this.trash = createGraphics(width, height, P2D);
     this.path = new MapPath();
     this.line = new MapLine(this.path);
     for(int i = 0; i < NMAPPARTICLES; i++){
       chaoticParticles.add(new ChaoticParticle()); 
     }
-    //this.cityGraphics = new PImage(width, height, 2);
     this.cityGraphics = loadImage("map.png");
     this.cityGraphics.resize(width,height);
     this.startPath = new PVector();
     this.endPath = new PVector();
+    
+    this.trash.beginDraw();
+    this.trash.circle(200,200,200);
+    this.trash.endDraw();
+    
   }
   
   void show(){
@@ -54,25 +61,15 @@ class Map{
     this.render.noStroke();
     this.render.fill(0,50);
     this.render.rect(0,0,width,height);
+    //this.render.background(0);
     
     this.render.push();
     this.render.translate(HALF_WIDTH,HALF_HEIGHT);
-    
-    for(int i = 0; i<this.mapFragments.size(); i++){
-      MapFragment f = mapFragments.get(i);
-      
-      float alpha = f.getAlpha();
-      this.render.tint(255,alpha);
-      this.render.image(f.show(),-HALF_WIDTH,-HALF_HEIGHT); 
-    }
     
     //SHOW CHAOTIC PARTICLES
     this.render.stroke(255,MAPPARTICLEALPHA);
     this.render.strokeWeight(3);
     
-    if(click){
-       this.renderShadow();
-    }
     
     if(this.pathDone){ // BEHAVIOUR IF WE HAVE A PATH
       
@@ -100,17 +97,29 @@ class Map{
         render.point(p.x,p.y);
       }
     }
+   
+   this.render.image(this.shadow,-HALF_WIDTH,-HALF_HEIGHT);
+   
+    if(this.mapFragments.size()>0){
+      this.trash.beginDraw();
+      ListIterator<MapFragment> mapFragmentsIter = this.mapFragments.listIterator();
+      while(mapFragmentsIter.hasNext()){
+        MapFragment f = mapFragmentsIter.next();
+        f.update();
+        if(f.t>1){
+          this.render.image(f.show(),-HALF_WIDTH,-HALF_HEIGHT); 
+        }
+        else
+          this.trash.image(f.show(),0,0); // FIX ORRIBILE, NON TOCCARE
+      }
+      this.trash.endDraw();
+    }
     
-    /*
-   for(int i = 0; i<alphaLine.getChildCount(); i++){
-     PShape s = alphaLine.getChild(i);
-     this.render.shape(s,0,0);
-   }
-   */
+    
+    if(click){
+       this.renderShadow();
+    }
    
-   //this.render.image(this.shadow,-HALF_WIDTH,-HALF_HEIGHT);
-   
-
     this.render.strokeWeight(3);
     //RENDER RANDOM PATH PARTICLES
     if(this.wanderingParticles.size()>0){
@@ -138,6 +147,7 @@ class Map{
     
     
     if(!startup){
+      /*
       //println("RENDERING NEXT POINTS");
       this.render.stroke(0,0,255, 255*sin(5*radians(frameCount)));
       this.render.strokeWeight(8);
@@ -146,25 +156,34 @@ class Map{
         PVector p = nextPointIter.next().getCoords();
         this.render.point(p.x, p.y);
       }
+      */
       
       // CURRENT POINT
-      this.render.stroke(255,0,0);
-      PVector p = currentPoint.getCoords();
-      this.render.point(p.x,p.y);
       
+      PVector p = currentPoint.getCoords();
+      for(int j = 0; j<30; j++){
+          float fade = sq(sq(float(j)/30));
+          this.render.stroke(lerpColor(color(255,255,0),color(255,0,0), float(j)/30), 20*sin(5*radians(frameCount)));
+          this.render.strokeWeight(map(fade,0,1,2,30));
+          this.render.point(p.x, p.y);
+        }  
+      
+      /*
       // PATH TO INTEREST POINT
       this.render.stroke(0,255,255, 255*sin(5*radians(frameCount)));
       p = toInterestPoint.getCoords();
       this.render.point(p.x,p.y);
       
       // TEMP, CURRENT INTEREST POINT
-      /*
+      
       this.render.strokeWeight(12);
       p = interestPoint.getCoords();
       this.render.point(p.x,p.y);
       */
     }
     
+    
+    /*
     if(this.line.exists()){
       ArrayList<PVector> lineList = line.show();
       ListIterator<PVector> linetIter = lineList.listIterator();
@@ -175,13 +194,11 @@ class Map{
         this.render.point(p.x, p.y);
       }
     }
+    */
     
     this.render.pop();
     this.render.endDraw();
     image(this.render,0,0);
-    //image(this.city,0,0);
-    
-    //shape(alphaLine,0,0);
         
   }
   
@@ -326,56 +343,38 @@ class Map{
       if(mapFragments.get(i).id == currentPoint.id){
         return; 
       }
-    }    
-    this.shadow.beginDraw();
-    this.shadow.push();
-    this.shadow.translate(HALF_WIDTH, HALF_HEIGHT);
-    this.shadow.stroke(0,10);
-    this.shadow.noFill();
-    this.shadow.strokeJoin(ROUND);
-    
-    PGraphics mask = createGraphics(width,height, P2D);
-    mask.beginDraw();
-    mask.push();
-    mask.translate(HALF_WIDTH, HALF_HEIGHT);
-    mask.background(0);
-    mask.stroke(255,25);
-    mask.noFill();
-    mask.strokeJoin(ROUND);
-    mask.strokeWeight(50);
+    }
+    PImage img = loadImage("map.png");
+    img.resize(width,height);
     
     IntList addresses = this.currentPoint.getConnections();
     ArrayList<PVector> to = new ArrayList<PVector>();
-    println(addresses.size());
     for(int i = 0; i<addresses.size(); i++){
       to.add(this.getMapPoint(addresses.get(i)).getCoords());
     }
+    mapFragments.add(new MapFragment(this.currentPoint.getCoords(), to, this.currentPoint.getId(), img));
+    
+    
+    
+    this.shadow.beginDraw();
+    this.shadow.push();
+    this.shadow.translate(HALF_WIDTH, HALF_HEIGHT);
+    this.shadow.stroke(0,25);
+    this.shadow.noFill();
+    this.shadow.strokeJoin(ROUND);
+    
+  
     PVector from = this.currentPoint.getCoords();
     
     for(int i = 0; i<to.size();i++){
       PVector t = to.get(i);
       for(int j = 0; j<20; j++){
-        this.shadow.strokeWeight(map(j,0,20,5,50));
+        this.shadow.strokeWeight(map(j,0,20,5,65));
         this.shadow.line(t.x,t.y,from.x,from.y);
-        mask.strokeWeight(map(j,0,20,5,50));
-        mask.line(t.x,t.y,from.x,from.y);
       }
-      
     }
-    mask.pop();
-    mask.endDraw();
-    
-    mask.loadPixels(); // TEST
-    
-    PImage fragment = loadImage("map.png");
-    fragment.resize(width,height);
-    fragment.mask(mask);
-    
-    this.mapFragments.add(new MapFragment(fragment, this.currentPoint.getId()));
     this.shadow.pop();
     this.shadow.endDraw();
-    
-    
     click = false;
   }
   
@@ -419,5 +418,6 @@ class Map{
     this.pathParticles.remove(p);
   }
   
+
   
 }
