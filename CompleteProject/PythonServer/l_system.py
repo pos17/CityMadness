@@ -14,6 +14,7 @@ from tracemalloc import start
 
 
 
+
 #import turtle
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
@@ -213,6 +214,13 @@ def update_L_system(unused_addr, things, currentNode):
     scheduler_started_time = things[0][5] 
     axiom = things[0][6] 
     snr = things[0][7]
+    imageMap = things[0][8]
+    nodeX = nodes[currentNode,1]
+    nodeY = nodes[currentNode,2]
+    map_coordinates_to_query = (nodeX,nodeY)  # Corresponding map coordinates
+    rgb_value = imageMap.get_rgb_at_map_coordinates(map_coordinates_to_query)
+    print("RGB Value:", rgb_value)
+    imageMap.RGBValuesOSCMessage( map_coordinates_to_query,client)
     updatePositionsList(nodes, positionsList,currentNode,maxLength)
     print("positionsList: " + str(positionsList))
     dirList = returnDirList(positionsList)

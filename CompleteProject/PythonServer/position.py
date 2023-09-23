@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from colormath.color_objects import LabColor
-from colormath.color_conversions import convert_color
+#from colormath.color_objects import LabColor
+#from colormath.color_conversions import convert_color
 
 class ImageToMap:
     def __init__(self, image_path, map_reference_points):
@@ -68,11 +68,12 @@ class ImageToMap:
         plt.title("Image with Reference Points")
         plt.show()
 
+    def RGBValuesOSCMessage(self,mapCoordinates,client):
+        rgb_value = self.get_rgb_at_map_coordinates(mapCoordinates)
+        client.send_message("/RGBValues",rgb_value[0],rgb_value[1],rgb_value[2])
 
-def RGBValuesOSCMessage(imToMap, mapCoordinates,client):
-    rgb_value = imToMap.get_rgb_at_map_coordinates(mapCoordinates)
-    client.send_message("/RGBValues",rgb_value[0],rgb_value[1],rgb_value[2])
 
+"""
 # Example usage
 image_path = 'assets/COLORMAPTEST.png'
 map_reference_points = [(10.060950707625352,
@@ -89,3 +90,5 @@ image_to_map.plot_image_with_reference_points()
 map_coordinates_to_query = (10.01111,45.131111)  # Corresponding map coordinates
 rgb_value = image_to_map.get_rgb_at_map_coordinates(map_coordinates_to_query)
 print("RGB Value:", rgb_value)
+
+"""
