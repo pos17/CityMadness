@@ -9,6 +9,8 @@ void oscEvent(OscMessage msg) {
     map.setNextPoints(addresses);
     map.updateCurrentPointConnections(addresses);
     //println("Next Points Set");
+    
+    //println("Next addresses: " + addresses);
   }
   
   else if(msg.checkAddrPattern("/interestPath")){
@@ -26,10 +28,6 @@ void oscEvent(OscMessage msg) {
   }
 }
 
-
-void keyPressed() {
-}
-
 void mousePressed(){
   
   // UPDATE THE NUMBER OF TIMES THE USER HAS CLICKED
@@ -45,7 +43,7 @@ void mousePressed(){
   map.updatePath(id);
   map.setCurrentPoint(id);
   
-  //println(id);
+  //println("Current id: " + id);
     
   
 }

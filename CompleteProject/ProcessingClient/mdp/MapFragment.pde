@@ -24,4 +24,8 @@ class MapFragment{
     
     return 255;
   }
+  
+  int getId(){
+    return this.id; 
+  }
 }

@@ -58,7 +58,6 @@ class Map{
     this.render.push();
     this.render.translate(HALF_WIDTH,HALF_HEIGHT);
     
-    println(this.mapFragments.size());
     for(int i = 0; i<this.mapFragments.size(); i++){
       MapFragment f = mapFragments.get(i);
       
@@ -260,7 +259,7 @@ class Map{
     PVector p = new PVector(x,y);
     ArrayList<MapPoint> distSorted;
     // If an element has alredy been clicked only check in the next points
-    if(!pathDone){
+    if(startup){
       distSorted = new ArrayList<MapPoint>(this.mapPoints);
     }
     else{
@@ -323,6 +322,11 @@ class Map{
   }
   
   void renderShadow(){
+    for(int i = 0; i<mapFragments.size(); i++){
+      if(mapFragments.get(i).id == currentPoint.id){
+        return; 
+      }
+    }    
     this.shadow.beginDraw();
     this.shadow.push();
     this.shadow.translate(HALF_WIDTH, HALF_HEIGHT);
@@ -365,10 +369,6 @@ class Map{
     
     PImage fragment = loadImage("map.png");
     fragment.resize(width,height);
-    println("Resized: " + fragment.pixelDensity);
-    println("Gen: " + mask.pixelDensity);
-    
-    
     fragment.mask(mask);
     
     this.mapFragments.add(new MapFragment(fragment, this.currentPoint.getId()));
