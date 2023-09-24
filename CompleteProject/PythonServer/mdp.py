@@ -364,7 +364,7 @@ def interestPathHandler(unused_addr, currentNode):
             msg = msg.build()
             client.send(msg)
 
-def interestZonePathsHandler(unused_addr):
+def interestZonePaths():
     global interestNodes
     print(interestNodes)
     startNodes = [[],[],[]]
@@ -377,13 +377,18 @@ def interestZonePathsHandler(unused_addr):
     #print(startNodes)
     #print("end of start nodes")
 
-    steps = []
+    steps = [[] for _ in range(len(startNodes))]
 
+    #print(steps)
     for i in range(len(startNodes)):
         for j in range(len(startNodes[i])):
             path = getPath(startNodes[i][j], interestNodes[i], interest_pol[i])
             if path is not None:
-                steps.append(path)
+                path.reverse()
+                steps[i].append(path)
+
+    # for i in range(3):
+    #     print(steps[1][i])
 
     #print(len(startNodes[0])+len(startNodes[1])+len(startNodes[2]))  
     #print(len(steps))
@@ -411,7 +416,7 @@ def interestZonePathsHandler(unused_addr):
     #     #print(nodes[currentNode][3][i])
     # msg = msg.build()
     # client.send(msg)
-    
+    return steps
 
 def resetHandler(unused_addr):
     global interestNodes
@@ -447,7 +452,9 @@ if __name__ == "__main__":
     interestNodes = [55, 275, 239]
     global interest_pol
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
-    
+    global steps
+    steps = interestZonePaths()
+
     dispatcher = dispatcher.Dispatcher()
 
     imageMap = ImageToMap("assets/COLORMAPTEST.png",[(10.060950707625352,
@@ -463,12 +470,12 @@ if __name__ == "__main__":
     # dispatcher.map("/target",targetHandler)
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/reset", interestZonePathsHandler)
-    dispatcher.map("/currentNode", pathHandler)
-    dispatcher.map("/currentNode", interestPathHandler)
+    #dispatcher.map("/currentNode", pathHandler)
+    #dispatcher.map("/currentNode", interestPathHandler)
     frase = "ciao"
-    dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
-    dispatcher.map("/reset", l_system.sendNoiseOn, [client2])
-    l_system.sendNoiseOn(0,client2,0)
+    #dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
+    #dispatcher.map("/reset", l_system.sendNoiseOn, [client2])
+    #l_system.sendNoiseOn(0,client2,0)
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
     #print("These are the nodes")
     #print(nodes)
