@@ -32,7 +32,7 @@ s.waitForBoot({
 	~lvl = Bus.audio(s,2);
 	s.latency = nil;
 
-/*	SynthDef.new(\buffer_play,{
+	SynthDef.new(\buffer_play,{
 		arg inA,inB,inC,inD, outBus, ampA, ampB, ampC, ampD;
 		var sigA, sigB, sigC, sigD;
 
@@ -42,7 +42,8 @@ s.waitForBoot({
 		sigD = PlayBuf.ar(2, ~d.bufnum, BufRateScale.kr(~d.bufnum), loop:1);
 
 		Out.ar(outBus,Mix.ar([sigA*ampA,sigB*ampB,sigC*ampC,sigD*ampD]));
-	});*/
+	});
+
 	SynthDef.new(\reverb,{
 		arg in;
 		var d = in;
@@ -62,12 +63,12 @@ s.waitForBoot({
 
 	SynthDef(\lofi_soundscape,
 		{
-			arg outBus;
+			arg outBus,in;
 			var nfilters = 6;
 			var sig;
 			var shrate = \shrate.kr(22050).lag(1);
-			var in = PlayBuf.ar(2, ~b.bufnum, BufRateScale.kr(~b.bufnum), loop:1);
-			//var in = WhiteNoise.ar(0.1);  /// for lowpass examples
+			//var in = PlayBuf.ar(2, ~b.bufnum, BufRateScale.kr(~b.bufnum), loop:1);
+			//var in = WhiteNoise.ar(0.1);  //
 			var dw;
 			var trigFreq = LFDNoise3.ar(shrate * \jitterScale.kr(1) !2).range(shrate * ( 1 - \jitter.kr(0.1)), shrate);
 			var trig = Impulse.ar(trigFreq);
@@ -211,8 +212,8 @@ s.waitForBoot({
 		Out.ar(out,sig);
 	}).add;*/
 
-
-	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07]);
+	~z = Synth.new(\buffer_play,[\outBus,~scBus],s,\addToHead);
+	~x = Synth.newPaused(\lofi_soundscape,[\in,~scBus,\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07]);
 	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index,]);
 
 	~y = Synth.new(\synthLvl,[\in,~lvl,\outBus,~reverbBus],s,\addToTail);
@@ -230,6 +231,15 @@ s.waitForBoot({
 		~t.stop;
 	},
 	path:"/snrVal"
+	);
+
+	OSCdef.new(\scMix,{
+		arg msg;
+
+		~z.set(\ampA,,\ampB,,\ampC,,\ampD);
+
+	},
+	path:"/scMix"
 	);
 
 	OSCdef.new(\noiseOn,{
