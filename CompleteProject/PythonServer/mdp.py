@@ -1,7 +1,7 @@
 import json
 from multiprocessing.connection import wait
 import numpy as np
-from CompleteProject.PythonServer.position import scheduleOSCPathsToInterestNode
+from position import scheduleOSCPathsToInterestNode
 from position import ImageToMap
 import mdptoolbox
 import scipy
@@ -414,12 +414,14 @@ def goalHandler(unused_addr, list, currentNode):
             scheduleOSCPathsToInterestNode(paths,client)
 """
 def goalHandler(unused_addr, things, currentNode):
-    interestNodes = things[0][1]
+    myinterestNodes = things[0][1]
     list = things[0][0]
     client = things[0][2]
     scheduler2 = things[0][3]
-    for i in range(len(list[1])):
-        if currentNode == interestNodes[i]:
+    print("my interest nodes")
+    print(myinterestNodes)
+    for i in range(len(myinterestNodes)):
+        if currentNode == myinterestNodes[i]:
             paths = list[i]
             print(paths)
             ### ADD FUNCTION HERE

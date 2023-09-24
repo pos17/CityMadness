@@ -48,6 +48,14 @@ void mousePressed(){
   
 }
 
+void keyPressed(){
+  OscMessage myMessage = new OscMessage("/currentNode");
+  myMessage.add(55);
+  oscP5.send(myMessage, myRemoteLocation);
+  
+ ;
+}
+
 IntList oscPathParser(OscMessage msg){
   // First element is the length, all other elements are the IDs
   int len = msg.get(0).intValue();
