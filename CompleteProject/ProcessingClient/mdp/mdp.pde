@@ -30,8 +30,8 @@ int outport = 5005;
 PFont font;
 
 void setup(){
-  //size(900,800,P2D);
-  fullScreen(P2D);
+  size(900,800,P2D);
+  //fullScreen(P2D);
   //pixelDensity(displayDensity());
   pixelDensity(1);
   frameRate(30);

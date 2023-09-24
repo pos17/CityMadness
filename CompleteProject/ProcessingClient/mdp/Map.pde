@@ -15,7 +15,7 @@ class Map{
   ArrayList<PVector> pathParticlePosBuffer = new ArrayList<PVector>();
   
   ArrayList<MapPoint> nextPoints = new ArrayList<MapPoint>();
-  MapPoint toInterestPoint;
+  ArrayList<PVector> toInterestPoint = new ArrayList<PVector>();
   MapPoint interestPoint;
   MapPoint currentPoint;  
   
@@ -151,28 +151,42 @@ class Map{
       }
     }
     
+    if(!startup){
+      ListIterator<PVector> toInterestPointIter = this.toInterestPoint.listIterator();
+      this.render.strokeWeight(2);
+      this.render.noFill();
+      this.render.stroke(173,216,230, 30);
+      this.render.beginShape();
+      while(toInterestPointIter.hasNext()){
+        PVector p = toInterestPointIter.next();
+        this.render.vertex(p.x,p.y);
+      }
+      this.render.endShape();
+    }
+    
     
     if(!startup){
-      /*
-      //println("RENDERING NEXT POINTS");
-      this.render.stroke(0,0,255, 255*sin(5*radians(frameCount)));
-      this.render.strokeWeight(8);
-      ListIterator<MapPoint> nextPointIter = nextPoints.listIterator();
-      while(nextPointIter.hasNext()){
-        PVector p = nextPointIter.next().getCoords();
-        this.render.point(p.x, p.y);
-      }
-      */
-      
-      // CURRENT POINT
       if(timeFromClick > 60){
         PVector p = currentPoint.getCoords();
         for(int j = 0; j<30; j++){
             float fade = sq(sq(float(j)/30));
-            this.render.stroke(lerpColor(color(255,255,0),color(255,0,0), float(j)/30), 40*sin(10*radians(frameCount)));
+            this.render.stroke(lerpColor(color(255,255,0),color(255,0,0), float(j)/30), 40*sin(10*radians(timeFromClick)));
             this.render.strokeWeight(map(fade,0,1,2,30));
             this.render.point(p.x, p.y);
           }  
+      }
+      
+      
+      if(time>0){
+        PVector p = interestPoint.getCoords();
+        this.render.stroke(255,255,0, 2.0*sin(radians(constrain(timeFromClick,0,180))));
+
+        for(int j = 0; j<50; j++){
+            float fade = float(j)/50;
+            this.render.strokeWeight(map(fade,0,1,1,100));
+            this.render.point(p.x, p.y);
+          }  
+        
       }
       /*
       // PATH TO INTEREST POINT
@@ -376,8 +390,11 @@ class Map{
     //println(p);
   }
   
-  void updatePathToInterestPoint(int p){
-    this.toInterestPoint = this.getMapPoint(p);
+  void updatePathToInterestPoint(IntList addresses){
+    this.toInterestPoint.clear();
+    for(int i = 0; i<addresses.size(); i++){
+      this.toInterestPoint.add(this.getMapPoint(addresses.get(i)).getCoords());
+    }
   }
   
   void setCurrentPoint(int p){
