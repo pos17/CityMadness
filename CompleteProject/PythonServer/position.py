@@ -95,9 +95,8 @@ def scheduleOSCPathsToInterestNode(pathsList,client,myscheduler):
     
 
 def sendPath(path,client):
-    
     client.send_message("/mapDiscoveredPath",path)
-    print("path sent")
+    #print("path sent")
 """
 # Example usage
 image_path = 'assets/COLORMAPTEST.png'
