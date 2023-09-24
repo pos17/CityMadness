@@ -1,14 +1,21 @@
 
-class Particle{
+class ChaoticParticle{
   PVector p, v, a;
   
-  Particle(){
+  ChaoticParticle(){
     this.p = new PVector(random(-width/2,width/2),random(-height/2,height/2));
     this.v = new PVector(0,0);
     this.a = new PVector(0,0);
+    
   }
-  Particle(PVector p){
+  ChaoticParticle(PVector p){
     this.p = p;
+    this.v = new PVector(0,0);
+    this.a = new PVector(0,0);
+  }
+  
+  ChaoticParticle(float x, float y){
+    this.p = new PVector(x,y);
     this.v = new PVector(0,0);
     this.a = new PVector(0,0);
   }
@@ -17,13 +24,6 @@ class Particle{
     return this.p; 
   }
   
-  float getX(){
-    return this.p.x;
-  }
-  
-  float getY(){
-    return this.p.y; 
-  }
   
   void move(){
     (this.v.add(this.a)).setMag(1);
@@ -65,4 +65,5 @@ class Particle{
   void setV(PVector v){
     this.v = v; 
   }
+  
 }

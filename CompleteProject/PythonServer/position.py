@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from colormath.color_objects import LabColor
-from colormath.color_conversions import convert_color
+#from colormath.color_objects import LabColor
+#from colormath.color_conversions import convert_color
 
 class ImageToMap:
     def __init__(self, image_path, map_reference_points):
@@ -55,7 +55,7 @@ class ImageToMap:
         mapped_x, mapped_y = self.get_image_coordinates(map_coordinates)
         if 0 <= mapped_x < self.image.shape[1] and 0 <= mapped_y < self.image.shape[0]:
             b, g, r = self.image[mapped_y, mapped_x]
-            return r, g, b
+            return int(r), int(g), int(b)
         else:
             return (0, 0, 0)  # Default value for points outside the image
 
@@ -68,11 +68,36 @@ class ImageToMap:
         plt.title("Image with Reference Points")
         plt.show()
 
+    def RGBValuesOSCMessage(self,mapCoordinates,client):
+        rgb_value = self.get_rgb_at_map_coordinates(mapCoordinates)
+        print("RGB VALUES")
+        print(rgb_value[0])
+        client.send_message("/RGBValues",[rgb_value[0],rgb_value[1],rgb_value[2]])
 
-def RGBValuesOSCMessage(imToMap, mapCoordinates,client):
-    rgb_value = imToMap.get_rgb_at_map_coordinates(mapCoordinates)
-    client.send_message("/RGBValues",rgb_value[0],rgb_value[1],rgb_value[2])
+#pos =[x,y]
 
+def userDistanceFromInterestPoint(userPos, nodePos): 
+    # calculating Euclidean distance
+    # using linalg.norm()
+    dist = np.linalg.norm(userPos-nodePos)
+    # printing Euclidean distance
+    print(dist)
+
+def userDistanceSendOSC(dists,client):
+    client.send_message("/UserDistanceFromInterestPoints",dists)
+
+def scheduleOSCPathsToInterestNode(pathsList,client,myscheduler):
+    delay = 0
+    for path in pathsList: 
+        myscheduler.enter(delay,1,sendPath,argument=(path,client))
+        delay += 0.5
+    myscheduler.run()
+    
+
+def sendPath(path,client):
+    client.send_message("/mapDiscoveredPath",path)
+    #print("path sent")
+"""
 # Example usage
 image_path = 'assets/COLORMAPTEST.png'
 map_reference_points = [(10.060950707625352,
@@ -89,3 +114,5 @@ image_to_map.plot_image_with_reference_points()
 map_coordinates_to_query = (10.01111,45.131111)  # Corresponding map coordinates
 rgb_value = image_to_map.get_rgb_at_map_coordinates(map_coordinates_to_query)
 print("RGB Value:", rgb_value)
+
+"""

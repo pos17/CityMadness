@@ -14,6 +14,7 @@ from tracemalloc import start
 
 
 
+
 #import turtle
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
@@ -49,21 +50,21 @@ SchedStartTime = 0
 
 def sendNoteOn(midiValue,client):
     client.send_message("/noteOn",midiValue)
-    print("/noteOn",midiValue)
+    #print("/noteOn",midiValue)
 
 def sendNoteOff(midiValue,client):
 #    print("time: "+str(time.time()-scheduler_started_time))
     client.send_message("/noteOff",midiValue)
-    print("/noteOff",midiValue)
+    #print("/noteOff",midiValue)
 
 def sendNoiseOn(unused_addr,list):
     client = list[0][0]
     client.send_message("/noiseOn",0)
-    print("/noiseOn")
+    #print("/noiseOn")
 
 def sendSNRRatio(client, value):
     client.send_message("/snrVal",value)
-    print("/snrVal" + str(value))
+    #print("/snrVal" + str(value))
 
 def scheduleNotes(midiValues,length,startTime,client,scheduler):
     for i in midiValues:
@@ -195,11 +196,9 @@ def parseChords(s, tBase, baseChord,scaleIndex,baseNote,startingTime):
 
     
 
-def start_L_system():
+#def start_L_system():
     
-   
-    
-    print("scheduler2 created ")
+    #[print("scheduler2 created ")
    
    
 
@@ -213,8 +212,15 @@ def update_L_system(unused_addr, things, currentNode):
     scheduler_started_time = things[0][5] 
     axiom = things[0][6] 
     snr = things[0][7]
+    imageMap = things[0][8]
+    nodeX = nodes[currentNode,1]
+    nodeY = nodes[currentNode,2]
+    map_coordinates_to_query = (nodeX,nodeY)  # Corresponding map coordinates
+    rgb_value = imageMap.get_rgb_at_map_coordinates(map_coordinates_to_query)
+    #print("RGB Value:", rgb_value)
+    imageMap.RGBValuesOSCMessage( map_coordinates_to_query,client)
     updatePositionsList(nodes, positionsList,currentNode,maxLength)
-    print("positionsList: " + str(positionsList))
+    #print("positionsList: " + str(positionsList))
     dirList = returnDirList(positionsList)
     #print("dirList")
     #print(dirList)
@@ -224,22 +230,22 @@ def update_L_system(unused_addr, things, currentNode):
     tBase = 2
     baseChordPos= 0
     scaleIndex = 1
-    print("dirList: " + dirList + "; char: " + char +"; axiom: " + axiom)
+    #print("dirList: " + dirList + "; char: " + char +"; axiom: " + axiom)
     lsysString = lSysCompute(axiom,char,dirList)#lSysGenerate(axiom, iterations)
-    print("dirList: " + dirList + "; char: " + char +"; axiom: " + lsysString)
+    #print("dirList: " + dirList + "; char: " + char +"; axiom: " + lsysString)
     [endingTime,notesList] = parseChords(lsysString, tBase,baseChordPos,scaleIndex,startingNoteMidi,endingTime)
     for event in scheduler.queue:
         scheduler.cancel(event)
-    print("scheduler empty: " + str(scheduler.empty()))
+    #print("scheduler empty: " + str(scheduler.empty()))
     sendTotalNoteOff(0,100,scheduler,client)
     endingTime = 0
     for notesEvent in notesList:
         scheduleNotes(notesEvent[0],notesEvent[1],notesEvent[2],client,scheduler)
     #print(scheduler.queue[len(scheduler.queue)-1][0])
     scheduler.enter(endingTime,3,reiterate_l_system,argument=(client,scheduler,dirList,lsysString))
-    print("scheduling event at time " + str(endingTime))
+    #print("scheduling event at time " + str(endingTime))
     # lines for rescheduling events to increase depth of the system 
-    print("l system started: " + str(l_system_started))
+    #print("l system started: " + str(l_system_started))
 
     # function call to set correctly signal to noise ratio
     if(snr < 10 ):
@@ -250,12 +256,12 @@ def update_L_system(unused_addr, things, currentNode):
 
 
     if(l_system_started==False):
-        print("scheduler running")
+        #print("scheduler running")
         things[0][4] = True
         things[0][5] = time.time()
-        print("sched")
-        print(things[0][5])
-        print(scheduler.queue)
+        #print("sched")
+        #print(things[0][5])
+        #print(scheduler.queue)
         scheduler.run()
         
 
@@ -264,7 +270,7 @@ def increaseCounter(counter):
 
 def reiterate_l_system(client,scheduler,dirList,axiom):
     #print(scheduler.queue)
-    print("reiterate")
+    #print("reiterate")
     startTime = 0
     char = "N"
     startingNoteMidi = 69
@@ -272,23 +278,23 @@ def reiterate_l_system(client,scheduler,dirList,axiom):
     baseChordPos= 0
     scaleIndex = 1
     lsysString = lSysCompute(axiom,char,dirList)#lSysGenerate(axiom, iterations)
-    print("dirList: " + dirList + "; char: " + char +"; axiom: " + axiom)
+    #print("dirList: " + dirList + "; char: " + char +"; axiom: " + axiom)
     [endingTime,notesList] = parseChords(lsysString, tBase,baseChordPos,scaleIndex,startingNoteMidi,startTime)
     for notesEvent in notesList:
         scheduleNotes(notesEvent[0],notesEvent[1],notesEvent[2],client,scheduler)
         notesList.remove(notesEvent)
     #endingTime = parseChords(lsysString, tBase,baseChordPos,scaleIndex,startingNoteMidi,client, scheduler,startingTime,scheduler_started_time)
     schedulingEvent = scheduler.enter(endingTime,3,reiterate_l_system,argument=(client,scheduler,dirList,lsysString))
-    print(endingTime)
+    #print(endingTime)
     #eventList.append([2,schedulingEvent,endingTime-1])
     
 
 def calculateDir(node1x,node1y,node2x,node2y):
     x = node2x - node1x
     y = node2y - node1y
-    print("x: " + str(x) + "y: " + str(y))
+    #print("x: " + str(x) + "y: " + str(y))
     theta2PI = np.arctan2(y,x)
-    print("theta2PI: " +  str(theta2PI))
+    #print("theta2PI: " +  str(theta2PI))
     if(theta2PI<-(5/6)*np.pi):
         dir = "WW"
     elif(theta2PI<-(2/3)*np.pi): 
@@ -307,7 +313,7 @@ def calculateDir(node1x,node1y,node2x,node2y):
         dir = "NW"
     else:
         dir = "WW"
-    print("dir: " + dir)
+    #print("dir: " + dir)
     return dir
 def updatePositionsList(nodes, positionsList,nextNodeIndex,listLength):
     #print("nodesstart")

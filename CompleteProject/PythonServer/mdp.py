@@ -1,6 +1,8 @@
 import json
 from multiprocessing.connection import wait
 import numpy as np
+from position import scheduleOSCPathsToInterestNode
+from position import ImageToMap
 import mdptoolbox
 import scipy
 import argparse
@@ -8,6 +10,7 @@ import random
 import time
 import l_system
 import sched
+import position
 
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
@@ -22,13 +25,17 @@ noteOnList =[]
 noteOffList = []
 client = udp_client.SimpleUDPClient("127.0.0.1", outport)
 client2 = udp_client.SimpleUDPClient("127.0.0.1", outport2)
+#scheduler for midi OSC notes
 scheduler = sched.scheduler(time.monotonic, time.sleep)
+#scheduler for interestPaths update
+scheduler2 = sched.scheduler(time.monotonic, time.sleep)
 l_system_started = False
 scheduler_started_time = 0 
 endingTime = 0
 countSecs = 0
 axiom = 'NWSWSENNNEEEWWNW'
 snr = 0 #value that specifies the value of noise wrt the value of audio signal
+imageMap = None
 
 
 def NormalizeMusic(data):
@@ -116,6 +123,7 @@ def loadNodes(features):
             print(str(source) + ", " + str(target))
             nodes[source][3].append(target)
             nodes[target][3].append(source)
+            print(target)
     nodes = np.array(nodes, dtype=object)
     nodes.shape
 
@@ -130,7 +138,7 @@ def getPath(start, target, policy):
         counter += 1
         if counter > 500:
             print("path not possible")
-            break
+            return None
     return steps
 
 def getMaxC():
@@ -355,17 +363,95 @@ def interestPathHandler(unused_addr, currentNode):
             interest_path = getPath(currentNode, interestNodes[closer_interest], interest_pol[closer_interest])
             msg = osc_message_builder.OscMessageBuilder(address = '/interestPath')
             msg.add_arg(interestNodes[closer_interest], arg_type='i')
-            msg.add_arg(interest_path[1], arg_type='i')
-            print(interest_path[1])
+            msg.add_arg(len(interest_path),arg_type='i')
+            for node in interest_path:
+                msg.add_arg(node, arg_type='i')
+            print(interest_path)
+            print(interest_path)
             msg = msg.build()
             client.send(msg)
+
+
+def interestNodeDistance(unused_addr, things, currentNode):
+    interest_point_list = things[0][0]
+    client = things[0][1]
+    max_dist = 0.205
+    
+    to_send = [0,0,0,0,0]
+    in_circle = False
+    for i in range(len(interest_point_list)):
+        if(dm[currentNode,interest_point_list[i]] < max_dist):
+            percDist = dm[currentNode,interest_point_list[i]]/max_dist
+            to_send[i] = 1-percDist
+            in_circle = True
+    if(~in_circle):
+        to_send[4] = 1
+    send_interest_node_distance(to_send,client)
+
+def send_interest_node_distance(to_send,client):
+    print("to_send")
+    print(to_send)
+    client.send_message("/scMix",to_send)
+
+def interestZonePaths():
+    global interestNodes
+    print(interestNodes)
+    #startNodes = [[],[],[]]
+    startNodes = [[] for _ in range(len(interestNodes))]
+    for i in range(len(interestNodes)):
+        for j in range(len(nodes)):
+            if dm[i,j] < 0.205 and dm[i,j] > 0.2:
+                startNodes[i].append(j)
+
+    #print("printing start nodes")
+    #print(startNodes)
+    #print("end of start nodes")
+
+    steps = [[] for _ in range(len(startNodes))]
+
+    #print(steps)
+    for i in range(len(startNodes)):
+        for j in range(len(startNodes[i])):
+            path = getPath(startNodes[i][j], interestNodes[i], interest_pol[i])
+            if path is not None:
+                path.reverse()
+                steps[i].append(path)
+
+  
+    return steps
+    
 
 def resetHandler(unused_addr):
     global interestNodes
     global interest_pol
-    interestNodes = [55, 275, 239]
+    interestNodes = [1013, 340, 1428, 1594]
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     print(interestNodes)
+
+"""
+def goalHandler(unused_addr, list, currentNode):
+    for i in range(len(list[1])):
+        if currentNode == list[1][i]:
+            paths = list[0][i]
+            print(paths)
+            ### ADD FUNCTION HERE
+            scheduleOSCPathsToInterestNode(paths,client)
+"""
+def goalHandler(unused_addr, things, currentNode):
+    myinterestNodes = things[0][1]
+    
+    list = things[0][0]
+    client = things[0][2]
+    print("my interest nodes")
+    print(myinterestNodes)
+    for i in range(len(myinterestNodes)):
+        if currentNode == myinterestNodes[i]:
+            print("found correct node!!!")
+            paths = list[i]
+            print(paths)
+            ### ADD FUNCTION HERE
+            scheduleOSCPathsToInterestNode(paths,client,things[0][3])
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -375,7 +461,7 @@ if __name__ == "__main__":
         help="The port the OSC server is listening on")
     args = parser.parse_args()
 
-    f = open("graphCremona.json")
+    f = open("graphCremonaLarge.json")
     graph = json.load(f)
     features = graph["features"]
     loadNodes(features)
@@ -391,21 +477,36 @@ if __name__ == "__main__":
     for i in range(len(tm)):
         tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
     global interestNodes
-    interestNodes = [55, 275, 239]
+    interestNodes = [1013, 340, 1428, 1594]
+    global interestNodes2
+    interestNodes2 = [1013, 340, 1428, 1594]
     global interest_pol
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
+    global steps
+    steps = interestZonePaths()
     
     dispatcher = dispatcher.Dispatcher()
 
+    imageMap = ImageToMap("assets/COLORMAPTEST.png",[(10.060950707625352,
+          45.154113135481765),(9.994003334686766,
+          45.12628845363338)])
+    imageMap.find_black_pixels()
+    print(imageMap.image_reference_points) 
+    scheduler2.run()
+    #imageMap.plot_image_with_reference_points() 
+    #map_coordinates_to_query = (10.01111,45.131111)  # Corresponding map coordinates
+    #rgb_value = imageMap.get_rgb_at_map_coordinates(map_coordinates_to_query)
+    #print("RGB Value:", rgb_value)
     # dispatcher.map("/start",randPathsHandler)
     # dispatcher.map("/target",targetHandler)
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
+    dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client])
+    dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
     frase = "ciao"
-    dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr]) #function for updating l_system
+    dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
     dispatcher.map("/reset", l_system.sendNoiseOn, [client2])
-    #l_system.sendNoiseOn(0,client2,0)
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
     #print("These are the nodes")
     #print(nodes)

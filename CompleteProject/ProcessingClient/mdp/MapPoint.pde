@@ -2,10 +2,12 @@
 class MapPoint{
  PVector coordinates;
  int id;
+ IntList connections;
  ArrayList<MapPoint> line; 
  
   MapPoint(int id, float x, float y){
     this.coordinates = new PVector(x, y);
+    this.connections = new IntList();
     this.id = id;
   }
   
@@ -15,6 +17,32 @@ class MapPoint{
   
   int getId(){
     return this.id;
+  }
+  
+  void addToConnections(IntList addresses){
+    for(int i = 0; i<addresses.size(); i++){
+      int add = addresses.get(i);
+      if(!this.connections.hasValue(add)){
+        this.connections.append(add);
+        
+        map.getMapPoint(add).addConnection(this.id);
+      }
+    }
+  }
+  
+  void addConnection(int id){
+    if(!this.connections.hasValue(id)){
+        this.connections.append(id); 
+      }
+  }
+  
+  int getRandomConnection(){
+    this.connections.shuffle(); // A WAY TO RANDOMIZE WHAT ELEMENT GETS PICKED EACH TIME;
+    return this.connections.get(0);
+  }
+  
+  IntList getConnections(){
+    return this.connections; 
   }
 }
 
@@ -29,6 +57,8 @@ class MapPointSorter implements Comparator<MapPoint> {
             return -1;
     }
 }
+
+
 
 class MapPointDistanceSorter implements Comparator<MapPoint>{
   PVector p;

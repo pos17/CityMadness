@@ -3,9 +3,14 @@
 ##Recordings
 *.wav
 
+# wav 
+*.wav
 ### Java ###
 # Compiled class file
 *.class
+
+#wav 
+*.wav
 
 # Log file
 *.log
