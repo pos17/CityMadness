@@ -403,26 +403,28 @@ def resetHandler(unused_addr):
     interestNodes = [55, 275, 239]
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     print(interestNodes)
-"""
-def interestNodesHandle(unused_addr, args,interestNode):
-    schedule
-    if interestNode == 0:
-        scheduleOSCPathsToInterestNode(pathsList,client,scheduler)
-    elif interestNode == 1: 
-        scheduleOSCPathsToInterestNode(pathsList,client,scheduler)
-    elif interestNode == 2: 
-        scheduleOSCPathsToInterestNode(pathsList,client,scheduler)
-    elif interestNode == 3
-        scheduleOSCPathsToInterestNode(pathsList,client,scheduler)
-"""
 
-
+"""
 def goalHandler(unused_addr, list, currentNode):
     for i in range(len(list[1])):
         if currentNode == list[1][i]:
             paths = list[0][i]
             print(paths)
             ### ADD FUNCTION HERE
+            scheduleOSCPathsToInterestNode(paths,client)
+"""
+def goalHandler(unused_addr, things, currentNode):
+    interestNodes = things[0][1]
+    list = things[0][0]
+    client = things[0][2]
+    scheduler2 = things[0][3]
+    for i in range(len(list[1])):
+        if currentNode == interestNodes[i]:
+            paths = list[i]
+            print(paths)
+            ### ADD FUNCTION HERE
+            scheduleOSCPathsToInterestNode(paths,client,scheduler2)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -463,6 +465,7 @@ if __name__ == "__main__":
           45.12628845363338)])
     imageMap.find_black_pixels()
     print(imageMap.image_reference_points) 
+    scheduler2.run()
     #imageMap.plot_image_with_reference_points() 
     #map_coordinates_to_query = (10.01111,45.131111)  # Corresponding map coordinates
     #rgb_value = imageMap.get_rgb_at_map_coordinates(map_coordinates_to_query)
@@ -472,7 +475,7 @@ if __name__ == "__main__":
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
-    dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2])
+    dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
     frase = "ciao"
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
     dispatcher.map("/reset", l_system.sendNoiseOn, [client2])
