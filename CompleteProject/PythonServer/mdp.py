@@ -1,6 +1,7 @@
 import json
 from multiprocessing.connection import wait
 import numpy as np
+from position import scheduleOSCPathsToInterestNode
 from position import ImageToMap
 import mdptoolbox
 import scipy
@@ -24,7 +25,10 @@ noteOnList =[]
 noteOffList = []
 client = udp_client.SimpleUDPClient("127.0.0.1", outport)
 client2 = udp_client.SimpleUDPClient("127.0.0.1", outport2)
+#scheduler for midi OSC notes
 scheduler = sched.scheduler(time.monotonic, time.sleep)
+#scheduler for interestPaths update
+scheduler2 = sched.scheduler(time.monotonic, time.sleep)
 l_system_started = False
 scheduler_started_time = 0 
 endingTime = 0
@@ -134,7 +138,7 @@ def getPath(start, target, policy):
         counter += 1
         if counter > 500:
             print("path not possible")
-            break
+            return None
     return steps
 
 def getMaxC():
@@ -364,12 +368,65 @@ def interestPathHandler(unused_addr, currentNode):
             msg = msg.build()
             client.send(msg)
 
+
+
+def interestZonePaths():
+    global interestNodes
+    print(interestNodes)
+    startNodes = [[],[],[]]
+    for i in range(len(interestNodes)):
+        for j in range(len(nodes)):
+            if dm[i,j] < 0.205 and dm[i,j] > 0.2:
+                startNodes[i].append(j)
+
+    #print("printing start nodes")
+    #print(startNodes)
+    #print("end of start nodes")
+
+    steps = [[] for _ in range(len(startNodes))]
+
+    #print(steps)
+    for i in range(len(startNodes)):
+        for j in range(len(startNodes[i])):
+            path = getPath(startNodes[i][j], interestNodes[i], interest_pol[i])
+            if path is not None:
+                path.reverse()
+                steps[i].append(path)
+
+  
+    return steps
+    
+
 def resetHandler(unused_addr):
     global interestNodes
     global interest_pol
     interestNodes = [55, 275, 239]
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     print(interestNodes)
+
+"""
+def goalHandler(unused_addr, list, currentNode):
+    for i in range(len(list[1])):
+        if currentNode == list[1][i]:
+            paths = list[0][i]
+            print(paths)
+            ### ADD FUNCTION HERE
+            scheduleOSCPathsToInterestNode(paths,client)
+"""
+def goalHandler(unused_addr, things, currentNode):
+    myinterestNodes = things[0][1]
+    list = things[0][0]
+    client = things[0][2]
+    scheduler2 = things[0][3]
+    print("my interest nodes")
+    print(myinterestNodes)
+    for i in range(len(myinterestNodes)):
+        if currentNode == myinterestNodes[i]:
+            paths = list[i]
+            print(paths)
+            ### ADD FUNCTION HERE
+            scheduleOSCPathsToInterestNode(paths,client,scheduler2)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -396,8 +453,12 @@ if __name__ == "__main__":
         tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
     global interestNodes
     interestNodes = [55, 275, 239]
+    global interestNodes2
+    interestNodes2 = [55, 275, 239]
     global interest_pol
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
+    global steps
+    steps = interestZonePaths()
     
     dispatcher = dispatcher.Dispatcher()
 
@@ -406,6 +467,7 @@ if __name__ == "__main__":
           45.12628845363338)])
     imageMap.find_black_pixels()
     print(imageMap.image_reference_points) 
+    scheduler2.run()
     #imageMap.plot_image_with_reference_points() 
     #map_coordinates_to_query = (10.01111,45.131111)  # Corresponding map coordinates
     #rgb_value = imageMap.get_rgb_at_map_coordinates(map_coordinates_to_query)
@@ -415,10 +477,10 @@ if __name__ == "__main__":
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
+    dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
     frase = "ciao"
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
     dispatcher.map("/reset", l_system.sendNoiseOn, [client2])
-    #l_system.sendNoiseOn(0,client2,0)
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
     #print("These are the nodes")
     #print(nodes)
