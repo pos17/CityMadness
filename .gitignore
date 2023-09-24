@@ -1,6 +1,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/openframeworks,openframeworks+visualstudio,processing,java,node,macos,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=openframeworks,openframeworks+visualstudio,processing,java,node,macos,windows
 
+# wav 
+*.wav
 ### Java ###
 # Compiled class file
 *.class
