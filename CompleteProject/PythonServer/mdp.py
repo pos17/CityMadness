@@ -134,7 +134,7 @@ def getPath(start, target, policy):
         counter += 1
         if counter > 500:
             print("path not possible")
-            break
+            return None
     return steps
 
 def getMaxC():
@@ -364,6 +364,55 @@ def interestPathHandler(unused_addr, currentNode):
             msg = msg.build()
             client.send(msg)
 
+def interestZonePathsHandler(unused_addr):
+    global interestNodes
+    print(interestNodes)
+    startNodes = [[],[],[]]
+    for i in range(len(interestNodes)):
+        for j in range(len(nodes)):
+            if dm[i,j] < 0.205 and dm[i,j] > 0.2:
+                startNodes[i].append(j)
+
+    #print("printing start nodes")
+    #print(startNodes)
+    #print("end of start nodes")
+
+    steps = []
+
+    for i in range(len(startNodes)):
+        for j in range(len(startNodes[i])):
+            path = getPath(startNodes[i][j], interestNodes[i], interest_pol[i])
+            if path is not None:
+                steps.append(path)
+
+    #print(len(startNodes[0])+len(startNodes[1])+len(startNodes[2]))  
+    #print(len(steps))
+
+    # msg = osc_message_builder.OscMessageBuilder(address = '/interestPath1')
+    # msg.add_arg(len(steps[0]), arg_type='i')
+    # for i in range(len(steps[0])):
+    #     msg.add_arg(steps[0][i], arg_type='i')
+    #     #print(nodes[currentNode][3][i])
+    # msg = msg.build()
+    # client.send(msg)
+
+    # msg = osc_message_builder.OscMessageBuilder(address = '/interestPath2')
+    # msg.add_arg(len(steps[1]), arg_type='i')
+    # for i in range(len(steps[1])):
+    #     msg.add_arg(steps[1][i], arg_type='i')
+    #     #print(nodes[currentNode][3][i])
+    # msg = msg.build()
+    # client.send(msg)
+
+    # msg = osc_message_builder.OscMessageBuilder(address = '/interestPath3')
+    # msg.add_arg(len(steps[2]), arg_type='i')
+    # for i in range(len(steps[2])):
+    #     msg.add_arg(steps[2][i], arg_type='i')
+    #     #print(nodes[currentNode][3][i])
+    # msg = msg.build()
+    # client.send(msg)
+    
+
 def resetHandler(unused_addr):
     global interestNodes
     global interest_pol
@@ -413,12 +462,13 @@ if __name__ == "__main__":
     # dispatcher.map("/start",randPathsHandler)
     # dispatcher.map("/target",targetHandler)
     dispatcher.map("/reset", resetHandler)
+    dispatcher.map("/reset", interestZonePathsHandler)
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
     frase = "ciao"
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
     dispatcher.map("/reset", l_system.sendNoiseOn, [client2])
-    #l_system.sendNoiseOn(0,client2,0)
+    l_system.sendNoiseOn(0,client2,0)
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
     #print("These are the nodes")
     #print(nodes)
