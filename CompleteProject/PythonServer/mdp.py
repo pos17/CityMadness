@@ -398,6 +398,13 @@ def resetHandler(unused_addr):
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     print(interestNodes)
 
+def goalHandler(unused_addr, list, currentNode):
+    for i in range(len(list[1])):
+        if currentNode == list[1][i]:
+            paths = list[0][i]
+            print(paths)
+            ### ADD FUNCTION HERE
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", default="127.0.0.1",
@@ -423,6 +430,8 @@ if __name__ == "__main__":
         tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
     global interestNodes
     interestNodes = [55, 275, 239]
+    global interestNodes2
+    interestNodes2 = [55, 275, 239]
     global interest_pol
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     global steps
@@ -444,6 +453,7 @@ if __name__ == "__main__":
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
+    dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2])
     frase = "ciao"
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
     dispatcher.map("/reset", l_system.sendNoiseOn, [client2])
