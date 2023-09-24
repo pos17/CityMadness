@@ -42,9 +42,9 @@ class MapFragment{
       for(int i = 0; i<to.size(); i++){
         PVector l = PVector.lerp(this.from, to.get(i), float(this.t)/30);
         
-        for(int j = 0; j<40; j++){
-          float fade = sq(sq(float(j)/40));
-          mask.strokeWeight(map(fade,0,1,5,60));
+        for(int j = 0; j<30; j++){
+          float fade = sq(sq(float(j)/30));
+          mask.strokeWeight(map(fade,0,1,2,20));
           mask.line(l.x,l.y,from.x,from.y);
         }  
       }

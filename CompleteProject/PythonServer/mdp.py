@@ -422,7 +422,7 @@ def interestZonePaths():
 def resetHandler(unused_addr):
     global interestNodes
     global interest_pol
-    interestNodes = [55, 275, 239]
+    interestNodes = [1013, 340, 1428, 1594]
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     print(interestNodes)
 
@@ -475,9 +475,9 @@ if __name__ == "__main__":
     for i in range(len(tm)):
         tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
     global interestNodes
-    interestNodes = [55, 275, 239,1310]
+    interestNodes = [1013, 340, 1428, 1594]
     global interestNodes2
-    interestNodes2 = [55, 275, 239,1310]
+    interestNodes2 = [1013, 340, 1428, 1594]
     global interest_pol
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     global steps
