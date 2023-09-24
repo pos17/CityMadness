@@ -74,17 +74,50 @@ class MapPath{
     this.path.add(p);
     this.len++;
     
-    if(this.len > 10){
+    if(this.len > PATHMAXLENGTH){
       path.remove(0);
       this.len--;
     }
   }
   
-  boolean isNear(PVector p){
-    println("WOW");
-    if(PVector.dist(p,this.path.get(0).getCoords()) < 100)
-      return true;
-    else
-      return false;
+  PVector getStartPath(){
+    return this.path.get(0).getCoords(); 
   }
+  
+  PVector getEndPath(){
+    return this.path.get(this.path.size()-1).getCoords(); 
+  }
+  
+  int getEndID(){
+    return this.path.get(this.path.size()-1).getId(); 
+  }
+  
+  ArrayList<PVector> computeParticleBuffer(){
+     ArrayList<PVector> newBuffer = new ArrayList<PVector>();
+     ArrayList<PVector> updateToBuffer = new ArrayList<PVector>();
+     
+     for(int i = 0; i<this.path.size()-1; i++){
+       PVector a = this.path.get(i).getCoords();
+       PVector b = this.path.get(i+1).getCoords();
+      
+       int numSegments = floor(PVector.dist(a,b));
+       if( i < this.path.size()-2){
+         for(int j = 0; j<numSegments; j++){
+          newBuffer.add((PVector.lerp(a, b, map(j,0,numSegments,0,1))));
+         }
+       }
+       else{
+         for(int j = 0; j<numSegments; j++){
+           PVector l = PVector.lerp(a, b, map(j,0,numSegments,0,1));
+           newBuffer.add(l);
+           updateToBuffer.add(l);
+         }
+       }
+     }
+     
+     map.updatePathParticles(updateToBuffer, this.getEndID());
+     
+     return newBuffer;
+  }
+  
 }
