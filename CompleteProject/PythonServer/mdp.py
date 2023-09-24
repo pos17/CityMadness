@@ -384,8 +384,14 @@ def interestNodeDistance(unused_addr, things, currentNode):
             percDist = dm[currentNode,interest_point_list[i]]/max_dist
             to_send[i] = 1-percDist
             in_circle = True
-    if(~in_circle):
+    if(in_circle==False):
         to_send[4] = 1
+    max_toSend = max(to_send)
+    for i in range(len(to_send)):
+        if to_send[i] < max_toSend:
+            to_send[i] = 0
+        
+    
     send_interest_node_distance(to_send,client)
 
 def send_interest_node_distance(to_send,client):
@@ -502,7 +508,7 @@ if __name__ == "__main__":
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
-    dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client])
+    dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client2])
     dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
     frase = "ciao"
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
