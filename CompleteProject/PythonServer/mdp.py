@@ -440,15 +440,15 @@ def goalHandler(unused_addr, things, currentNode):
     
     list = things[0][0]
     client = things[0][2]
-    scheduler2 = things[0][3]
     print("my interest nodes")
     print(myinterestNodes)
     for i in range(len(myinterestNodes)):
         if currentNode == myinterestNodes[i]:
+            print("found correct node!!!")
             paths = list[i]
             print(paths)
             ### ADD FUNCTION HERE
-            scheduleOSCPathsToInterestNode(paths,client,scheduler2)
+            scheduleOSCPathsToInterestNode(paths,client,things[0][3])
 
 
 if __name__ == "__main__":

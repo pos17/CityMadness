@@ -86,16 +86,18 @@ def userDistanceFromInterestPoint(userPos, nodePos):
 def userDistanceSendOSC(dists,client):
     client.send_message("/UserDistanceFromInterestPoints",dists)
 
-def scheduleOSCPathsToInterestNode(pathsList,client,scheduler):
+def scheduleOSCPathsToInterestNode(pathsList,client,myscheduler):
     delay = 0
     for path in pathsList: 
-        scheduler.enter(delay,4,sendPath,argument=(path,client))
+        myscheduler.enter(delay,1,sendPath,argument=(path,client))
         delay += 0.5
+    myscheduler.run()
     
 
 def sendPath(path,client):
-     client.send_message("/mapDiscoveredPath",path)
-
+    
+    client.send_message("/mapDiscoveredPath",path)
+    print("path sent")
 """
 # Example usage
 image_path = 'assets/COLORMAPTEST.png'
