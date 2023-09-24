@@ -2,7 +2,7 @@ import oscP5.*;
 import netP5.*;
 import java.util.*;
 
-int PATHMAXLENGTH = 10;
+int PATHMAXLENGTH = 60;
 int NMAPPARTICLES = 10000;
 int NPATHPARTICLES = 1000;
 int MAPPARTICLEALPHA = 70;

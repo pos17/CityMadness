@@ -228,7 +228,7 @@ class Map{
     JSONObject mapJson;
     JSONArray features = new JSONArray();
     
-    mapJson = loadJSONObject("graphCremona.json");
+    mapJson = loadJSONObject("graphCremonaLarge.json");
     features = mapJson.getJSONArray("features");
     
     // map.add(new MapPoint(0,0,0)); // Offset to get that Id of the MapPoint = index in the ArrayList
@@ -249,8 +249,17 @@ class Map{
         */
         
         // CREMONA
+        /*
         x = ((x - 10.012826061753287) * width) / (10.031731839461685 - 10.012826061753287) - HALF_WIDTH;
         y = ((y - 45.138503171087336)* height)/ (45.13185662179308 - 45.138503171087336) - HALF_HEIGHT;
+        */
+         // CREMONA LARGE
+        float boundLBx = 9.989161251126518;
+        float boundLBy = 45.12098025283069;
+        float boundRTx = 10.066522275498357;
+        float boundRTy = 45.15613689432058;
+        x = ((x - boundLBx) * width) / (boundRTx - boundLBx) - HALF_WIDTH;
+        y = ((y -  boundLBy)* height)/ ( boundRTy -  boundLBy) - HALF_HEIGHT;
         
         map.add(new MapPoint(id,x,y));
       }

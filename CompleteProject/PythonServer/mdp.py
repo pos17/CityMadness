@@ -119,6 +119,7 @@ def loadNodes(features):
             print(str(source) + ", " + str(target))
             nodes[source][3].append(target)
             nodes[target][3].append(source)
+            print(target)
     nodes = np.array(nodes, dtype=object)
     nodes.shape
 
@@ -378,7 +379,7 @@ if __name__ == "__main__":
         help="The port the OSC server is listening on")
     args = parser.parse_args()
 
-    f = open("graphCremona.json")
+    f = open("graphCremonaLarge.json")
     graph = json.load(f)
     features = graph["features"]
     loadNodes(features)
