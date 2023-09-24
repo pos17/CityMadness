@@ -1,4 +1,5 @@
 s.boot;
+Server.killAll;
 p=ServerOptions.new;
 p.memSize= 32.768;
 (
@@ -13,12 +14,12 @@ s.waitForBoot({
 	var n0, n1, n2;
 	var note_getter;
 	~lvl_synth =0;
-	~n1 = NetAddr.new("127.0.0.1",57120);
+	~n1 = NetAddr.new("127.0.0.1",57121);
 	NetAddr.localAddr;
 	~note_table = 0!127;
 	~n = nil;
 
-	~master = Bus.audio(s,2);
+	//~master = Bus.audio(s,2);
 	~reverbBus = Bus.audio(s,2);
 	~lvl = Bus.audio(s,2);
 	s.latency = nil;
@@ -77,14 +78,14 @@ s.waitForBoot({
 		Out.ar(outBus,sigR*amp);
 	}).add;
 
-	/*SynthDef(\sub,{
+	/SynthDef(\sub,{
 		|note, amp=1,cutoff=350, decay=1,outBus|
 		var env, sig;
 		env = EnvGen.kr(Env.new([0,1,0],[0.001,2],[3,-50]),doneAction:2);
 		sig = RLPF.ar(Saw.ar(note.midicps,amp),cutoff)*env;
 		sig = CombC.ar(sig,1,0.125,decay);
 		Out.ar(outBus,sig)
-	}).add;*/
+	}).add;
 
 	SynthDef(\sin_pulsar, {
 		arg outBus;
@@ -169,7 +170,7 @@ s.waitForBoot({
 		c = Pan2.ar(c, Rand(-1,1));
 
 		Out.ar(outBus, c)
-	}).add;
+	}).store;
 
 	SynthDef.new(\synthLvl,{
 		arg in, outBus, amp;
@@ -179,12 +180,12 @@ s.waitForBoot({
 	}).add;
 
 	SynthDef.new(\reverb,{
-		arg in,outBus;
+		arg in;
 		var d = in;
-		var diffusion = \diffusion.kr(30);
-		var spacesize = \spacesize.kr(10);
+		var diffusion = \diffusion.kr(50);
+		var spacesize = \spacesize.kr(30);
 		d = In.ar(d,1);
-		6.do { |i|
+		8.do { |i|
 			d = AllpassC.ar(
 				d,
 				delaytime: LFNoise1.kr(0.01!2).range(0.01, spacesize),
@@ -192,23 +193,23 @@ s.waitForBoot({
 			)
 		};
 
-		Out.ar(outBus,d);
+		Out.ar([0,1],d);
 	}).add;
 
-	SynthDef.new(\master,{
+/*	SynthDef.new(\master,{
 		arg in, out=0;
 		var sig;
 		sig = In.ar(in,2);
 		Out.ar(out,sig);
-	}).add;
+	}).add;*/
 
 
 	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07]);
 	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index,]);
 
 	~y = Synth.new(\synthLvl,[\in,~lvl,\outBus,~reverbBus],s,\addToTail);
-	~r = Synth.new(\reverb,[\in,~reverbBus,\outBus,~master],s,\addToTail);
-	~m = Synth.new(\master,[\in,~master],s,\addToTail);
+	~r = Synth.new(\reverb,[\in,~reverbBus],s,\addToTail);
+	//~m = Synth.new(\master,[\in,~master],s,\addToTail);
 
 	OSCdef.new(\snrVal,{
 		arg msg;
@@ -235,7 +236,6 @@ s.waitForBoot({
 
 	OSCdef.new(\noteOn,{
 		arg msg, time, addr, port;
-		var note;
 		~note_table[msg[1]] = 1;
 		~n = ~note_table.selectIndices({|item, i| item != 0});
 	},
@@ -244,10 +244,11 @@ s.waitForBoot({
 
 	OSCdef.new(\noteOff,{
 		arg msg, time, addr, port;
-		var note;
-		//~note_table[msg[1]] = Synth.new(\pad, [\freq, msg[1].midicps,\gate, 0,\out, 0, \mul, 1]);
+
 		~note_table[msg[1]] = 0;
-		//postln(msg[1]);
+		/*~n = ~note_table.selectIndices({|item, i| item != 0});
+		if (~n == []) { ~n = nil; };*/
+
 	},
 	path: "/noteOff"
 	);
@@ -271,28 +272,30 @@ s.waitForBoot({
 	//~seq_dur = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ].scramble;
 	right = Pbind(
 		\instrument, \sin_pulsar,
-		\midinote, Pseq([ n0, n2, n1, n2]),
+		\midinote, Pseq([ n0, n2, n1, n2] ++ (([ n0, n2, n1, n2] + 12)!2).flatten),
 		\dur, Pseq([1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 ].normalizeSum*2),
 		//\lvl,~lvl_synth,
 		\outBus,~lvl,
+		\delta,2,
 	);
 
 
 	left = Pbind(
 		\instrument, \sin_pulsar,
 		\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
-		\dur, Pseq([2, 2, 2, 2, 2, 2, 2, 2].normalizeSum*2),
+		\dur, Pseq([1, 1, 1, 1, 1, 1, 1, 1].normalizeSum*2),
 		//\lvl,~lvl_synth,
 		\outBus,~lvl,
+		\delta, 2,
 	);
 
-	// bass = Pbind(
+	/*// bass = Pbind(
 	// 	\instrument, \sin_pulsar,
 	// 	\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 24),
 	// 	\dur, Pseq([2, 2, 2, 2, 2, 2, 2, 2].normalizeSum*2),
 	// 	//\lvl,~lvl_synth,
 	// 	\outBus,~lvl,
-	// );
+	// );*/
 
 
 	if (~player.notNil) { ~player.stop; };
@@ -314,6 +317,3 @@ Ndef('grainsin_pulsar').set('levA', 0.49765180538124, 'formantA', 6.007874015748
 s.record(duration:20);
 
 s.freeAll;
-
-
-// Olga besedolga
