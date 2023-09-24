@@ -368,6 +368,8 @@ def interestPathHandler(unused_addr, currentNode):
             msg = msg.build()
             client.send(msg)
 
+
+
 def interestZonePaths():
     global interestNodes
     print(interestNodes)
