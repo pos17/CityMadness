@@ -372,11 +372,30 @@ def interestPathHandler(unused_addr, currentNode):
             client.send(msg)
 
 
+def interestPointDistance(unused_addr, things, currentNode):
+    max_dist = 0.205
+    interest_point_list = things[0][0]
+    to_send = [0,0,0,0,0]
+    in_circle = False
+    for i in range(len(interest_point_list)):
+        if(dm[currentNode,interest_point_list[i]] < max_dist):
+            percDist = dm[currentNode,interest_point_list[i]]/max_dist
+            to_send[i] = 1-percDist
+            in_circle = True
+    if(~in_circle):
+        to_send[4] = 1
+    send_interest_node_distance(to_send,client)
+
+def send_interest_node_distance(to_send,client):
+    print("to_send")
+    print(to_send)
+    client.send_message("/interest_node_distance",to_send)
 
 def interestZonePaths():
     global interestNodes
     print(interestNodes)
-    startNodes = [[],[],[]]
+    #startNodes = [[],[],[]]
+    startNodes = [[] for _ in range(len(interestNodes))]
     for i in range(len(interestNodes)):
         for j in range(len(nodes)):
             if dm[i,j] < 0.205 and dm[i,j] > 0.2:
@@ -418,6 +437,7 @@ def goalHandler(unused_addr, list, currentNode):
 """
 def goalHandler(unused_addr, things, currentNode):
     myinterestNodes = things[0][1]
+    
     list = things[0][0]
     client = things[0][2]
     scheduler2 = things[0][3]
@@ -455,9 +475,9 @@ if __name__ == "__main__":
     for i in range(len(tm)):
         tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
     global interestNodes
-    interestNodes = [55, 275, 239]
+    interestNodes = [55, 275, 239,1310]
     global interestNodes2
-    interestNodes2 = [55, 275, 239]
+    interestNodes2 = [55, 275, 239,1310]
     global interest_pol
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     global steps
