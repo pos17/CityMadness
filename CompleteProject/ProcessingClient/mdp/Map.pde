@@ -19,7 +19,7 @@ class Map{
   MapPoint interestPoint;
   MapPoint currentPoint;  
   
-  boolean pathDone, systemCreated, movingParticles;
+  boolean pathDone, systemCreated, moving;
   
   PGraphics shadow;
   PGraphics trash;
@@ -54,6 +54,7 @@ class Map{
   }
   
   void show(){
+    timeFromClick++;
     this.render.beginDraw();
     //this.render.clear();
     
@@ -164,15 +165,15 @@ class Map{
       */
       
       // CURRENT POINT
-      
-      PVector p = currentPoint.getCoords();
-      for(int j = 0; j<30; j++){
-          float fade = sq(sq(float(j)/30));
-          this.render.stroke(lerpColor(color(255,255,0),color(255,0,0), float(j)/30), 40*sin(5*radians(frameCount)));
-          this.render.strokeWeight(map(fade,0,1,2,30));
-          this.render.point(p.x, p.y);
-        }  
-      
+      if(timeFromClick > 60){
+        PVector p = currentPoint.getCoords();
+        for(int j = 0; j<30; j++){
+            float fade = sq(sq(float(j)/30));
+            this.render.stroke(lerpColor(color(255,255,0),color(255,0,0), float(j)/30), 40*sin(10*radians(frameCount)));
+            this.render.strokeWeight(map(fade,0,1,2,30));
+            this.render.point(p.x, p.y);
+          }  
+      }
       /*
       // PATH TO INTEREST POINT
       this.render.stroke(0,255,255, 255*sin(5*radians(frameCount)));
@@ -309,6 +310,10 @@ class Map{
   }
   
   void updatePath(int id){
+    if(!startup){
+      this.moving = true;
+    }
+    
     this.path.updatePath(this.getMapPoint(id));
     this.pathParticlePosBuffer = this.path.computeParticleBuffer();
     
@@ -347,7 +352,7 @@ class Map{
     this.shadow.beginDraw();
     this.shadow.push();
     this.shadow.translate(HALF_WIDTH, HALF_HEIGHT);
-    this.shadow.stroke(0,20);
+    this.shadow.stroke(0,5);
     this.shadow.noFill();
     this.shadow.strokeJoin(ROUND);
     
@@ -356,8 +361,8 @@ class Map{
     
     for(int i = 0; i<to.size();i++){
       PVector t = to.get(i);
-      for(int j = 0; j<20; j++){
-        this.shadow.strokeWeight(map(j,0,20,5,65));
+      for(int j = 0; j<10; j++){
+        this.shadow.strokeWeight(map(j,0,20,5,25));
         this.shadow.line(t.x,t.y,from.x,from.y);
       }
     }
@@ -400,10 +405,10 @@ class Map{
   } 
   
   void removePathParticle(MapPathParticle p){
-    
     this.wanderingParticles.add(new RandomPathParticle(p.getID()));
-    
     this.pathParticles.remove(p);
+    
+    this.moving = false;
   }
   
   
@@ -415,5 +420,7 @@ class Map{
       }
   }
 
-  
+  boolean isMoving(){
+    return this.moving; 
+  }
 }
