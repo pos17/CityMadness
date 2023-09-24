@@ -372,9 +372,11 @@ def interestPathHandler(unused_addr, currentNode):
             client.send(msg)
 
 
-def interestPointDistance(unused_addr, things, currentNode):
-    max_dist = 0.205
+def interestNodeDistance(unused_addr, things, currentNode):
     interest_point_list = things[0][0]
+    client = things[0][1]
+    max_dist = 0.205
+    
     to_send = [0,0,0,0,0]
     in_circle = False
     for i in range(len(interest_point_list)):
@@ -389,7 +391,7 @@ def interestPointDistance(unused_addr, things, currentNode):
 def send_interest_node_distance(to_send,client):
     print("to_send")
     print(to_send)
-    client.send_message("/interest_node_distance",to_send)
+    client.send_message("/scMix",to_send)
 
 def interestZonePaths():
     global interestNodes
@@ -500,6 +502,7 @@ if __name__ == "__main__":
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
+    dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client])
     dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
     frase = "ciao"
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
