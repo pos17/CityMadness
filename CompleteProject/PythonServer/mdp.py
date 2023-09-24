@@ -1,6 +1,7 @@
 import json
 from multiprocessing.connection import wait
 import numpy as np
+from CompleteProject.PythonServer.position import scheduleOSCPathsToInterestNode
 from position import ImageToMap
 import mdptoolbox
 import scipy
@@ -24,7 +25,10 @@ noteOnList =[]
 noteOffList = []
 client = udp_client.SimpleUDPClient("127.0.0.1", outport)
 client2 = udp_client.SimpleUDPClient("127.0.0.1", outport2)
+#scheduler for midi OSC notes
 scheduler = sched.scheduler(time.monotonic, time.sleep)
+#scheduler for interestPaths update
+scheduler2 = sched.scheduler(time.monotonic, time.sleep)
 l_system_started = False
 scheduler_started_time = 0 
 endingTime = 0
@@ -419,6 +423,19 @@ def resetHandler(unused_addr):
     interestNodes = [55, 275, 239]
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     print(interestNodes)
+"""
+def interestNodesHandle(unused_addr, args,interestNode):
+    schedule
+    if interestNode == 0:
+        scheduleOSCPathsToInterestNode(pathsList,client,scheduler)
+    elif interestNode == 1: 
+        scheduleOSCPathsToInterestNode(pathsList,client,scheduler)
+    elif interestNode == 2: 
+        scheduleOSCPathsToInterestNode(pathsList,client,scheduler)
+    elif interestNode == 3
+        scheduleOSCPathsToInterestNode(pathsList,client,scheduler)
+"""
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -465,9 +482,11 @@ if __name__ == "__main__":
     dispatcher.map("/reset", interestZonePathsHandler)
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
+
     frase = "ciao"
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
     dispatcher.map("/reset", l_system.sendNoiseOn, [client2])
+
     l_system.sendNoiseOn(0,client2,0)
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
     #print("These are the nodes")
