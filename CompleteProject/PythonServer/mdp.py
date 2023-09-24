@@ -363,8 +363,11 @@ def interestPathHandler(unused_addr, currentNode):
             interest_path = getPath(currentNode, interestNodes[closer_interest], interest_pol[closer_interest])
             msg = osc_message_builder.OscMessageBuilder(address = '/interestPath')
             msg.add_arg(interestNodes[closer_interest], arg_type='i')
-            msg.add_arg(interest_path[1], arg_type='i')
-            print(interest_path[1])
+            msg.add_arg(len(interest_path),arg_type='i')
+            for node in interest_path:
+                msg.add_arg(node, arg_type='i')
+            print(interest_path)
+            print(interest_path)
             msg = msg.build()
             client.send(msg)
 
