@@ -75,3 +75,22 @@ class MapFragment{
     return this.id; 
   }
 }
+
+
+class Fragment{
+  ArrayList<PVector> to;
+  PVector from;
+  int id;
+  int t;
+  boolean young;
+  
+  Fragment(PVector f, ArrayList<PVector> t, int id){
+    this.to = t;
+    this.from = f;
+    this.id = id;
+    this.t = 0;
+    this.young = true;
+  }
+  
+  
+}

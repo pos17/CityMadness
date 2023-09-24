@@ -6,7 +6,7 @@ int PATHMAXLENGTH = 10;
 int NMAPPARTICLES = 10000;
 int NPATHPARTICLES = 1000;
 int MAPPARTICLEALPHA = 70;
-int TRANSITION_RANGE = 20;
+int TRANSITION_RANGE = 30;
 int RETURN_RANGE = 20;
 float HALF_WIDTH;
 float HALF_HEIGHT;
@@ -28,8 +28,8 @@ int outport = 5004;
 PFont font;
 
 void setup(){
-  size(900,800,P2D);
-  //fullScreen(P2D);
+  //size(900,800,P2D);
+  fullScreen(P2D);
   //pixelDensity(displayDensity());
   pixelDensity(1);
   HALF_WIDTH = width/2;

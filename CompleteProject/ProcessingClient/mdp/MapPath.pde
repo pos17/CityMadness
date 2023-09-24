@@ -94,16 +94,28 @@ class MapPath{
   
   ArrayList<PVector> computeParticleBuffer(){
      ArrayList<PVector> newBuffer = new ArrayList<PVector>();
+     ArrayList<PVector> updateToBuffer = new ArrayList<PVector>();
      
      for(int i = 0; i<this.path.size()-1; i++){
        PVector a = this.path.get(i).getCoords();
        PVector b = this.path.get(i+1).getCoords();
       
        int numSegments = floor(PVector.dist(a,b));
-       for(int j = 0; j<numSegments; j++){
-        newBuffer.add((PVector.lerp(a, b, map(j,0,numSegments,0,1))));
+       if( i < this.path.size()-2){
+         for(int j = 0; j<numSegments; j++){
+          newBuffer.add((PVector.lerp(a, b, map(j,0,numSegments,0,1))));
+         }
+       }
+       else{
+         for(int j = 0; j<numSegments; j++){
+           PVector l = PVector.lerp(a, b, map(j,0,numSegments,0,1));
+           newBuffer.add(l);
+           updateToBuffer.add(l);
+         }
        }
      }
+     
+     map.updatePathParticles(updateToBuffer, this.getEndID());
      
      return newBuffer;
   }

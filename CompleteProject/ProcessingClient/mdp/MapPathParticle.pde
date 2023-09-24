@@ -31,4 +31,9 @@ class MapPathParticle{
   int getID(){
     return this.endingID; 
   }
+  
+  void addToPath(ArrayList<PVector> extention, int id){
+    this.path.addAll(extention);
+    this.endingID = id;
+  }
 }

@@ -17,8 +17,7 @@ class Map{
   ArrayList<MapPoint> nextPoints = new ArrayList<MapPoint>();
   MapPoint toInterestPoint;
   MapPoint interestPoint;
-  MapPoint currentPoint;
-  
+  MapPoint currentPoint;  
   
   boolean pathDone, systemCreated, movingParticles;
   
@@ -47,7 +46,7 @@ class Map{
     this.cityGraphics.resize(width,height);
     this.startPath = new PVector();
     this.endPath = new PVector();
-    
+        
     this.trash.beginDraw();
     this.trash.circle(200,200,200);
     this.trash.endDraw();
@@ -73,19 +72,25 @@ class Map{
     
     if(this.pathDone){ // BEHAVIOUR IF WE HAVE A PATH
       
+      if(frameCount%2 == 0){
+        pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
+        chaoticParticles.remove(0);
+      }
+      
       ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
       while(chaoticParticlesIter.hasNext()){
         ChaoticParticle m = chaoticParticlesIter.next();
         m.moveNoise();
         PVector p = m.getPos();
-        
+        /*
         if(particleIsNearStartPath(p)){
           pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
           chaoticParticlesIter.remove();
         }
         else{
+          */
           render.point(p.x,p.y);
-        }
+        //}
       }
     }
     else{ // BEHAVIOUR IF WE DON'T HAVE A PATH
@@ -124,7 +129,7 @@ class Map{
     //RENDER RANDOM PATH PARTICLES
     if(this.wanderingParticles.size()>0){
       ListIterator<RandomPathParticle> wanderingParticlesIter = this.wanderingParticles.listIterator();
-      this.render.stroke(255,200,0);
+      this.render.stroke(50,50,255);
       while(wanderingParticlesIter.hasNext()){
         RandomPathParticle m = wanderingParticlesIter.next();
         m.move();
@@ -135,7 +140,7 @@ class Map{
     
     // RENDER PATH PARTICLES
     if(this.pathDone){
-      this.render.stroke(50,50,255);
+      this.render.stroke(255,200,0);
       
       for(int i = 0; i<pathParticles.size(); i++){
         MapPathParticle m = pathParticles.get(i);
@@ -163,7 +168,7 @@ class Map{
       PVector p = currentPoint.getCoords();
       for(int j = 0; j<30; j++){
           float fade = sq(sq(float(j)/30));
-          this.render.stroke(lerpColor(color(255,255,0),color(255,0,0), float(j)/30), 20*sin(5*radians(frameCount)));
+          this.render.stroke(lerpColor(color(255,255,0),color(255,0,0), float(j)/30), 40*sin(5*radians(frameCount)));
           this.render.strokeWeight(map(fade,0,1,2,30));
           this.render.point(p.x, p.y);
         }  
@@ -283,9 +288,6 @@ class Map{
       distSorted = new ArrayList<MapPoint>(this.nextPoints);
     }
     distSorted.sort(new MapPointDistanceSorter(p));
-    strokeWeight(9);
-    stroke(25,200,100);
-    point(distSorted.get(0).getCoords().x,distSorted.get(0).getCoords().y);
     return distSorted.get(0).getId();
   }
   
@@ -302,8 +304,6 @@ class Map{
     this.pathParticlePosBuffer = this.path.computeParticleBuffer();
     
     if(time>1){
-      //this.system.generateAttractors(this.path);
-      //println("UPDATE PATH");
       
       this.line.updatePath(this.path);
       this.pathDone = true;
@@ -313,27 +313,6 @@ class Map{
     this.startPath = this.path.getStartPath();
     this.endPath = this.path.getEndPath();
     this.endPathID = this.path.getEndID();
-    
-    /*
-    this.alphaLine = createShape(GROUP);
-    ArrayList<MapPoint> pathList = path.getPath();
-    for(int n = 0; n<30; n++){
-      PShape s = createShape();
-      s.setStrokeJoin(ROUND);
-      s.setFill(false);
-      s.strokeJoin(ROUND);
-      s.setStrokeWeight(map(n,0,30,0,120));
-      s.setStroke(color(0,25));
-      s.beginShape();
-      
-      for(int i = 0; i<pathList.size(); i++){
-        PVector p = pathList.get(i).getCoords();
-        s.vertex(p.x,p.y);
-      }
-      s.endShape();
-      alphaLine.addChild(s);
-    }
-    */
     
     startup = false; //After second click we exit map startup
   }
@@ -359,7 +338,7 @@ class Map{
     this.shadow.beginDraw();
     this.shadow.push();
     this.shadow.translate(HALF_WIDTH, HALF_HEIGHT);
-    this.shadow.stroke(0,25);
+    this.shadow.stroke(0,20);
     this.shadow.noFill();
     this.shadow.strokeJoin(ROUND);
     
@@ -418,6 +397,14 @@ class Map{
     this.pathParticles.remove(p);
   }
   
+  
+  void updatePathParticles(ArrayList<PVector> buffer, int id){
+      ListIterator<MapPathParticle> iter = this.pathParticles.listIterator();
+      while(iter.hasNext()){
+        MapPathParticle p = iter.next();
+        p.addToPath(buffer, id);
+      }
+  }
 
   
 }
