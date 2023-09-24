@@ -1,24 +1,37 @@
 import json
 from multiprocessing.connection import wait
 import numpy as np
-import matplotlib.pyplot as plt
+from position import ImageToMap
 import mdptoolbox
 import scipy
 import argparse
 import random
 import time
+import l_system
+import sched
+import position
 
 from pythonosc import osc_message_builder
 from pythonosc import udp_client
 from pythonosc import osc_server
 from pythonosc import dispatcher
 np.random.seed(0)
-inport = 5004
-
-outport = 1234
-
+inport = 5005
+global nodes
+outport = 1235
+outport2 = 57120
+noteOnList =[]
+noteOffList = []
 client = udp_client.SimpleUDPClient("127.0.0.1", outport)
-
+client2 = udp_client.SimpleUDPClient("127.0.0.1", outport2)
+scheduler = sched.scheduler(time.monotonic, time.sleep)
+l_system_started = False
+scheduler_started_time = 0 
+endingTime = 0
+countSecs = 0
+axiom = 'NWSWSENNNEEEWWNW'
+snr = 0 #value that specifies the value of noise wrt the value of audio signal
+imageMap = None
 
 
 def NormalizeMusic(data):
@@ -387,16 +400,30 @@ if __name__ == "__main__":
     
     dispatcher = dispatcher.Dispatcher()
 
+    imageMap = ImageToMap("assets/COLORMAPTEST.png",[(10.060950707625352,
+          45.154113135481765),(9.994003334686766,
+          45.12628845363338)])
+    imageMap.find_black_pixels()
+    print(imageMap.image_reference_points) 
+    #imageMap.plot_image_with_reference_points() 
+    #map_coordinates_to_query = (10.01111,45.131111)  # Corresponding map coordinates
+    #rgb_value = imageMap.get_rgb_at_map_coordinates(map_coordinates_to_query)
+    #print("RGB Value:", rgb_value)
     # dispatcher.map("/start",randPathsHandler)
     # dispatcher.map("/target",targetHandler)
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNode", interestPathHandler)
-    
+    frase = "ciao"
+    dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
+    dispatcher.map("/reset", l_system.sendNoiseOn, [client2])
+    #l_system.sendNoiseOn(0,client2,0)
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
-
+    #print("These are the nodes")
+    #print(nodes)
     print("Serving on {}".format(server.server_address))
     server.serve_forever()
+    
     
 
     

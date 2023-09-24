@@ -7,6 +7,9 @@
 # Compiled class file
 *.class
 
+#wav 
+*.wav
+
 # Log file
 *.log
 
@@ -108,6 +111,8 @@ jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
+
+Samples/
 
 # TypeScript cache
 *.tsbuildinfo
