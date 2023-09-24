@@ -3,26 +3,62 @@ Server.killAll;
 p=ServerOptions.new;
 p.memSize= 32.768;
 (
-var samplePath = thisProcess.nowExecutingPath.dirname +/+ "./recordings/CR_Duomo_Corner.WAV";
-~buf_l =Buffer.readChannel(s, samplePath, channels:[0]);
-~buf_r =Buffer.readChannel(s, samplePath, channels:[1]);
-~b =Buffer.read(s, samplePath);
+var samplePath = thisProcess.nowExecutingPath.dirname +/+ "/recordings";
+~buf_r =Buffer.readChannel(s, samplePath +/+ "./CR_Duomo_Corner.WAV", channels:[1]);
+
+~a =Buffer.read(s, samplePath +/+ "/CR_PRoma2.WAV");
+~b =Buffer.read(s, samplePath +/+ "/CR_Duomo_Corner.WAV");
+~c =Buffer.read(s, samplePath +/+ "/CR_MarketWalk.WAV");
+~d =Buffer.read(s, samplePath +/+ "/CR_PStradivari_Corner.WAV");
 )
 (
 s.waitForBoot({
 	var right, left,bass;
 	var n0, n1, n2;
 	var note_getter;
+	~jk=1;
 	~lvl_synth =0;
+	~left=0;
+	~right=0;
+	~bass=0;
 	~n1 = NetAddr.new("127.0.0.1",57121);
 	NetAddr.localAddr;
 	~note_table = 0!127;
 	~n = nil;
 
 	//~master = Bus.audio(s,2);
+	~scBus = Bus.audio(s,2);
 	~reverbBus = Bus.audio(s,2);
 	~lvl = Bus.audio(s,2);
 	s.latency = nil;
+
+/*	SynthDef.new(\buffer_play,{
+		arg inA,inB,inC,inD, outBus, ampA, ampB, ampC, ampD;
+		var sigA, sigB, sigC, sigD;
+
+		sigA = PlayBuf.ar(2, ~a.bufnum, BufRateScale.kr(~a.bufnum), loop:1);
+		sigB = PlayBuf.ar(2, ~b.bufnum, BufRateScale.kr(~b.bufnum), loop:1);
+		sigC = PlayBuf.ar(2, ~c.bufnum, BufRateScale.kr(~c.bufnum), loop:1);
+		sigD = PlayBuf.ar(2, ~d.bufnum, BufRateScale.kr(~d.bufnum), loop:1);
+
+		Out.ar(outBus,Mix.ar([sigA*ampA,sigB*ampB,sigC*ampC,sigD*ampD]));
+	});*/
+	SynthDef.new(\reverb,{
+		arg in;
+		var d = in;
+		var diffusion = \diffusion.kr(50);
+		var spacesize = \spacesize.kr(30);
+		d = In.ar(d,1);
+		8.do { |i|
+			d = AllpassC.ar(
+				d,
+				delaytime: LFNoise1.kr(0.01!2).range(0.01, spacesize),
+				decaytime: diffusion
+			)
+		};
+
+		Out.ar([0,1],d);
+	}).add;
 
 	SynthDef(\lofi_soundscape,
 		{
@@ -61,44 +97,33 @@ s.waitForBoot({
 	).add;
 
 	SynthDef(\grain_synth,{|outBus,loop = 0,amp=1,gate=1|
-		//var testPos = EnvGen.kr(Env.new(levels:[-1,-1,1,1], times:[5,5,5] ,releaseNode:1), gate:gate);
 		var sigL,sigR, trate, dur, rate;
 		trate = MouseY.kr(2,200,1);
 		dur = 4/trate;
 		rate = Dseq([1, 1, 1, 0.5, 0.5, 0.2, -1], inf);
-		//sigL = Latch.ar(~buf_l,Impulse.ar(200));
-		//sigR = Latch.ar(~buf_r,Impulse.ar(sr));
-		//sigL = TGrains.ar(1, Impulse.ar(trate), ~buf_l, rate, MouseX.kr(0,BufDur.kr(~buf_l)), dur, Dseq([-1,1,inf]), 0.1, 2);
 		sigR = TGrains.ar(1, Impulse.ar(trate), ~buf_r, rate, MouseX.kr(0,BufDur.kr(~buf_r)), dur, Dseq([-1,1,inf]), 0.9, 2);
-		//sig = PlayBuf.ar(2, ~duomo_buf, rate=1, loop, doneAction: 2);
-		//Out.ar(outL,(testPos.linlin(-1,1,1,0)*FreeVerb.ar(in:sigL, mix:testPos.linlin(-1,1,0,1), room:15, damp:0.01)));
-		//Out.ar(outR,(testPos.linlin(-1,1,1,0)*FreeVerb.ar(in:sigR, mix:testPos.linlin(-1,1,0,1), room:15, damp:0.01)));
-		//Out.ar(outL,sigL*amp);
 		sigR = Pan2.ar(sigR,LFNoise1.kr(10));
 		Out.ar(outBus,sigR*amp);
 	}).add;
 
-	/SynthDef(\sub,{
-		|note, amp=1,cutoff=350, decay=1,outBus|
-		var env, sig;
-		env = EnvGen.kr(Env.new([0,1,0],[0.001,2],[3,-50]),doneAction:2);
-		sig = RLPF.ar(Saw.ar(note.midicps,amp),cutoff)*env;
+	SynthDef(\sub,{
+		arg midinote,cutoff=350, decay=1,outBus;
+		var env, sig, ampSynth=0.4;
+		env = EnvGen.kr(Env.new([0,1,0.8,0],[0.5,1,2],[0.5,-50]),doneAction:2);
+		sig = RLPF.ar(Saw.ar(midinote.midicps,ampSynth),cutoff)*env;
 		sig = CombC.ar(sig,1,0.125,decay);
-		Out.ar(outBus,sig)
+		Out.ar(outBus,sig);
 	}).add;
 
 	SynthDef(\sin_pulsar, {
-		arg outBus;
-		var a,b,c,d,e,f, f_ ,t,lev, formantA, formantB, overlapA, overlapB;
+		arg outBus,lev, formantA, formantB, overlapA, overlapB,levA, levB;
+		var a,b,c,d,e,f, f_ ,t;
 
-		lev = \lev.kr(0.3);
+		//lev = \lev.kr(0.3);
 		f = \freq.kr(440);
 		f_ = f.clip(50, 1500);
 
-		formantA = \formantA.kr(2);
-		formantB = \formantB.kr(6);
-		overlapA = \overlapA.ar(2);
-		overlapB = \overlapB.kr(2);
+
 
 		e = EnvGen.kr(
 			Env.perc(
@@ -159,11 +184,11 @@ s.waitForBoot({
 
 		c = Mix([
 			c * ( e ).pow(0.7),
-			a * ( \levA.kr(1) * e ).pow(f_.linlin( 50, 1500, 1.1, 1.5)) * lev,
-			b * ( \levB.kr(0.8) * e ).pow(f_.linlin( 50, 1500, 1.5, 2.5)) * lev,
+			a * ( levA * e ).pow(f_.linlin( 50, 1500, 1.1, 1.5)) * lev,
+			b * ( levB * e ).pow(f_.linlin( 50, 1500, 1.5, 2.5)) * lev,
 		]);
 
-		c = FreeVerb.ar(in:c, mix:0.6, room:0.7, damp:1);
+		//c = FreeVerb.ar(in:c, mix:0.6, room:0.7, damp:1);
 
 		c = LeakDC.ar(c* 0.45);
 
@@ -177,23 +202,6 @@ s.waitForBoot({
 		var sig;
 		sig = In.ar(in,2);
 		Out.ar(outBus,sig*amp);
-	}).add;
-
-	SynthDef.new(\reverb,{
-		arg in;
-		var d = in;
-		var diffusion = \diffusion.kr(50);
-		var spacesize = \spacesize.kr(30);
-		d = In.ar(d,1);
-		8.do { |i|
-			d = AllpassC.ar(
-				d,
-				delaytime: LFNoise1.kr(0.01!2).range(0.01, spacesize),
-				decaytime: diffusion
-			)
-		};
-
-		Out.ar([0,1],d);
 	}).add;
 
 /*	SynthDef.new(\master,{
@@ -213,12 +221,11 @@ s.waitForBoot({
 
 	OSCdef.new(\snrVal,{
 		arg msg;
-		var dw,sr;
-		//postln(msg[1]);
+		var dw;
+
 		dw = msg[1]/10;
 		~lvl_synth = 1-(msg[1]/10);
-		//postln(~lvl_synth);
-		~x.set('drywet');
+		~x.set('drywet',dw);
 		~y.set(\amp,~lvl_synth);
 		~t.stop;
 	},
@@ -268,6 +275,8 @@ s.waitForBoot({
 	n1 = note_getter.(1);
 	n2 = note_getter.(2);
 
+	Pdefn(\ampSynth,1);
+
 	//~seq = [n0,n1,n2].scramble;
 	//~seq_dur = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ].scramble;
 	right = Pbind(
@@ -277,6 +286,14 @@ s.waitForBoot({
 		//\lvl,~lvl_synth,
 		\outBus,~lvl,
 		\delta,2,
+		//
+		\levA,Pdefn(\levA,1),
+		\formantA,Pdefn(\formantA,2),
+		\overlapB,Pdefn(\overlapB,2),
+		\levB,Pdefn(\levB,0.8),
+		\lev,Pdefn(\lev,0.3),
+		\formantB,Pdefn(\formantB,2),
+		\overlapA,Pdefn(\overlapA,2),
 	);
 
 
@@ -284,22 +301,42 @@ s.waitForBoot({
 		\instrument, \sin_pulsar,
 		\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
 		\dur, Pseq([1, 1, 1, 1, 1, 1, 1, 1].normalizeSum*2),
-		//\lvl,~lvl_synth,
 		\outBus,~lvl,
 		\delta, 2,
+		//
+		\levA,Pdefn(\levA,1),
+		\formantA,Pdefn(\formantA,2),
+		\overlapB,Pdefn(\overlapB,2),
+		\levB,Pdefn(\levB,0.8),
+		\lev,Pdefn(\lev,0.3),
+		\formantB,Pdefn(\formantB,2),
+		\overlapA,Pdefn(\overlapA,2),
 	);
 
-	/*// bass = Pbind(
-	// 	\instrument, \sin_pulsar,
-	// 	\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 24),
-	// 	\dur, Pseq([2, 2, 2, 2, 2, 2, 2, 2].normalizeSum*2),
-	// 	//\lvl,~lvl_synth,
-	// 	\outBus,~lvl,
-	// );*/
+	bass = Pbind(
+	 	\instrument, \sub,
+	 	\midinote, Pseq([ n0, n0, n0, n0, n0, n0, n0, n0] - 24),
+		\dur, Pseq([1, 1, 1, 1, 1, 1, 1, 1].normalizeSum*2),
+		\delta,2,
+		\ampSynth,Pdefn(\ampSynth),
+		\cutoff,450,
+		\decay,4,
+		\outBus,~lvl,
+		\delta,2,
+		//
+		\levA,Pdefn(\levA,1),
+		\formantA,Pdefn(\formantA,2),
+		\overlapB,Pdefn(\overlapB,2),
+		\levB,Pdefn(\levB,0.8),
+		\lev,Pdefn(\lev,0.3),
+		\formantB,Pdefn(\formantB,2),
+		\overlapA,Pdefn(\overlapA,2),
+
+	 );
 
 
 	if (~player.notNil) { ~player.stop; };
-	~player = Pn(Ppar([right,left])).play;
+	~player = Pn(Ppar([right,left,bass])).play;
 
 
 });
@@ -307,9 +344,39 @@ s.waitForBoot({
 
 
 
+(
+Pdefn(\levA,1);
+Pdefn(\formantA,2);
+Pdefn(\overlapB,2);
+Pdefn(\levB,0.8);
+Pdefn(\lev,0.3);
+Pdefn(\formantB,2);
+Pdefn(\overlapA,2);
+)
+
+
+(
+Pdefn(\levA,0.303);
+Pdefn(\formantA,3.6);
+Pdefn(\overlapB,0.4);
+Pdefn(\levB,0.3);
+Pdefn(\lev,0.82);
+Pdefn(\formantB,4.27);
+Pdefn(\overlapA,2.2);
+)
+
+(
+Pdefn(\levA,0.2);
+Pdefn(\formantA,7.0);
+Pdefn(\overlapB,3.6);
+Pdefn(\levB,0.23);
+Pdefn(\lev,0.92);
+Pdefn(\formantB,8.2);
+Pdefn(\overlapA,6.2);
+)
+
+
 Ndef('grainsin_pulsar').set('levA', 0.30271236992455, 'formantA', 3.5714285714286, 'overlapB', 0.40443672029499, 'levB', 0.28498187848462, 'lev', 0.81859410430839, 'formantB', 4.2698412698413, 'overlapA', 2.1898421014008);
-
-
 
 Ndef('grainsin_pulsar').set('levA', 0.49765180538124, 'formantA', 6.007874015748, 'levB', 0.31759720095202, 'spacesize', 0.16952380952381, 'overlapB', 1.0651340032941, 'wet150', 0.34391534391534, 'lev', 0.19443238886478, 'formantB', 3.2204724409449, 'diffusion', 1.6931793650794, 'overlapA', 1.8253052748325, 'freq', 69.877455494983);
 
@@ -317,3 +384,5 @@ Ndef('grainsin_pulsar').set('levA', 0.49765180538124, 'formantA', 6.007874015748
 s.record(duration:20);
 
 s.freeAll;
+
+p.stop;

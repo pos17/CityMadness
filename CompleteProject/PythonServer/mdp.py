@@ -17,7 +17,7 @@ np.random.seed(0)
 inport = 5005
 global nodes
 outport = 1235
-outport2 = 57121
+outport2 = 57120
 noteOnList =[]
 noteOffList = []
 client = udp_client.SimpleUDPClient("127.0.0.1", outport)
