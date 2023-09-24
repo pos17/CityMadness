@@ -55,7 +55,7 @@ class ImageToMap:
         mapped_x, mapped_y = self.get_image_coordinates(map_coordinates)
         if 0 <= mapped_x < self.image.shape[1] and 0 <= mapped_y < self.image.shape[0]:
             b, g, r = self.image[mapped_y, mapped_x]
-            return r, g, b
+            return int(r), int(g), int(b)
         else:
             return (0, 0, 0)  # Default value for points outside the image
 
@@ -70,7 +70,23 @@ class ImageToMap:
 
     def RGBValuesOSCMessage(self,mapCoordinates,client):
         rgb_value = self.get_rgb_at_map_coordinates(mapCoordinates)
-        client.send_message("/RGBValues",rgb_value[0],rgb_value[1],rgb_value[2])
+        print("RGB VALUES")
+        print(rgb_value[0])
+        client.send_message("/RGBValues",[rgb_value[0],rgb_value[1],rgb_value[2]])
+
+#pos =[x,y]
+
+def userDistanceFromInterestPoint(userPos, nodePos): 
+    # calculating Euclidean distance
+    # using linalg.norm()
+    dist = np.linalg.norm(userPos-nodePos)
+    # printing Euclidean distance
+    print(dist)
+
+def userDistanceSendOSC(dists,client):
+    client.send_message("/UserDistanceFromInterestPoints",dists)
+
+
 
 
 """
