@@ -88,9 +88,9 @@ def userDistanceSendOSC(dists,client):
 def scheduleOSCPathsToInterestNode(pathsList,client,myscheduler):
     delay = 0
     for path in pathsList: 
-        myscheduler.enter(delay,1,sendPath,argument=(path,client))
+        myscheduler.enter(delay,4,sendPath,argument=(path,client))
         delay += 0.5
-    myscheduler.run()
+        print(delay)
     
 
 def sendPath(path,client):
