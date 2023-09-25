@@ -42,7 +42,7 @@ s.waitForBoot({
 		sigD = PlayBuf.ar(2, ~d.bufnum, BufRateScale.kr(~d.bufnum), loop:1);
 
 		Out.ar(outBus,Mix.ar([sigA*ampA,sigB*ampB,sigC*ampC,sigD*ampD]));
-	});
+	}).add;
 
 	SynthDef.new(\reverb,{
 		arg in;
@@ -212,7 +212,7 @@ s.waitForBoot({
 		Out.ar(out,sig);
 	}).add;*/
 
-	~z = Synth.new(\buffer_play,[\outBus,~scBus],s,\addToHead);
+	//~z = Synth.new(\buffer_play,[\outBus,~scBus],s,\addToHead);
 	~x = Synth.newPaused(\lofi_soundscape,[\in,~scBus,\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07]);
 	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index,]);
 
@@ -235,8 +235,8 @@ s.waitForBoot({
 
 	OSCdef.new(\scMix,{
 		arg msg;
-
-		~z.set(\ampA,,\ampB,,\ampC,,\ampD);
+		postln(msg);
+		~z.set(\ampA,msg[1],\ampB,msg[2],\ampC,msg[3],\ampD,msg[4]);
 
 	},
 	path:"/scMix"

@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 #from colormath.color_objects import LabColor
 #from colormath.color_conversions import convert_color
 
