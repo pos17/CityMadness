@@ -30,9 +30,17 @@ void oscEvent(OscMessage msg) {
   }
   
   else if(msg.checkAddrPattern("/mapDiscoveredPath")){
-    println(msg.arguments());
-    println("WOW");
+    Object[] arg = msg.arguments();
+    IntList addresses = new IntList();
+    ArrayList<PVector> p = new ArrayList<PVector>();
+    for(int i = 0; i<arg.length; i++){
+      addresses.append((int)arg[i]);
+      p.add(map.getMapPoint((int)arg[i]).getCoords());
+    }
     
+    map.explosionsPaths.addAll(p);
+    
+    map.setNextPointsExplode(addresses);
   }
   
   else {

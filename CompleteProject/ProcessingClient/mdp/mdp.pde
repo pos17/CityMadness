@@ -17,6 +17,8 @@ int timeFromClick = 0;
 
 boolean click = false;
 
+boolean creatingExplosions = false;
+
 
 OscP5 oscP5;
 OscP5 oscP52;
@@ -62,4 +64,10 @@ void draw(){
   
   map.show();
   
+}
+
+
+void updateExplosions(){
+  creatingExplosions = true;
+  map.updateExplosions();
 }
