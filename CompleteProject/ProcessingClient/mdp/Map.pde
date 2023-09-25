@@ -8,6 +8,8 @@ class Map{
   PVector endPath;
   int endPathID;
   
+  ArrayList<PVector> explosionsPaths = new ArrayList<PVector>();
+  
   ArrayList<ChaoticParticle> chaoticParticles = new ArrayList<ChaoticParticle>();
   ArrayList<MapPathParticle> pathParticles = new ArrayList<MapPathParticle>();
   ArrayList<RandomPathParticle> wanderingParticles = new ArrayList<RandomPathParticle>();
@@ -28,6 +30,9 @@ class Map{
   
   PImage cityGraphics;
   ArrayList<MapFragment> mapFragments = new ArrayList<MapFragment>();
+  
+  
+  ArrayList<IntList> explosions = new ArrayList<IntList>();
   
   Map(){
     this.mapPoints = loadMapPoints();
@@ -106,11 +111,11 @@ class Map{
    
    this.render.image(this.shadow,-HALF_WIDTH,-HALF_HEIGHT);
    
-    if(this.mapFragments.size()>0){
+    if(this.mapFragments.size()>0 && !creatingExplosions){
       this.trash.beginDraw();
-      ListIterator<MapFragment> mapFragmentsIter = this.mapFragments.listIterator();
-      while(mapFragmentsIter.hasNext()){
-        MapFragment f = mapFragmentsIter.next();
+      //ListIterator<MapFragment> mapFragmentsIter = this.mapFragments.listIterator();
+      for(int i = 0; i< mapFragments.size(); i++){
+        MapFragment f = mapFragments.get(i);
         f.update();
         if(f.t>1){
           this.render.image(f.show(),-HALF_WIDTH,-HALF_HEIGHT); 
@@ -188,37 +193,19 @@ class Map{
           }  
         
       }
-      /*
-      // PATH TO INTEREST POINT
-      this.render.stroke(0,255,255, 255*sin(5*radians(frameCount)));
-      p = toInterestPoint.getCoords();
-      this.render.point(p.x,p.y);
-      
-      // TEMP, CURRENT INTEREST POINT
-      
-      this.render.strokeWeight(12);
-      p = interestPoint.getCoords();
-      this.render.point(p.x,p.y);
-      */
     }
     
-    
-    /*
-    if(this.line.exists()){
-      ArrayList<PVector> lineList = line.show();
-      ListIterator<PVector> linetIter = lineList.listIterator();
-      
-      while(linetIter.hasNext()){
-        PVector p = linetIter.next();
-        this.render.stroke(255, map(linetIter.nextIndex(),0,lineList.size(),0,70));
-        this.render.point(p.x, p.y);
-      }
-    }
-    */
     
     this.render.pop();
     this.render.endDraw();
     image(this.render,0,0);
+    
+    stroke(255,0,0);
+    strokeWeight(5);
+    for(int i = 0; i<explosionsPaths.size(); i++){
+      PVector p = explosionsPaths.get(i);
+      point(p.x+HALF_WIDTH,p.y+HALF_HEIGHT);
+    }
         
   }
   
@@ -321,6 +308,56 @@ class Map{
       this.nextPoints.add(this.getMapPoint(addr.get(i))); 
     }
     
+  }
+  
+  void setNextPointsExplode(IntList addr){
+    for(int i = 0; i<addr.size(); i++){
+      IntList t = new IntList();
+      if(i == 0){
+        t.append(addr.get(1));
+      }
+      else if(i == addr.size()-1){
+        t.append(addr.get(addr.size()-2));
+      }
+      else{
+        t.append(addr.get(i-1));
+        t.append(addr.get(i+1));
+      }
+      MapPoint p = this.getMapPoint(addr.get(i));
+      p.addToConnections(t);
+    }
+    
+    this.explosions.add(addr);
+    
+    if(!creatingExplosions && this.explosions.size()>0){
+      thread("updateExplosions"); 
+    }
+  }
+  
+  void updateExplosions(){
+    
+    println("WOW");
+    creatingExplosions = true;
+    for(int i = 0; i<explosions.size(); i++){
+      IntList l = explosions.get(i);
+      
+      if(l.size() > 2){
+        PVector from = this.getMapPoint(l.get(1)).getCoords();
+        ArrayList<PVector> to = new ArrayList<PVector>();
+        to.add(this.getMapPoint(l.get(0)).getCoords());
+        to.add(this.getMapPoint(l.get(2)).getCoords());
+        
+        this.mapFragments.add(new MapFragment(from, to, l.get(1), this.cityGraphics));
+        
+        l.remove(0);
+      }
+      else{
+        explosions.remove(i);
+      }
+    }
+    
+    delay(300);
+    creatingExplosions = false;
   }
   
   void updatePath(int id){
