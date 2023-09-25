@@ -42,7 +42,7 @@ positionsList = []
 dirList = ""
 maxLength = 10
 inport = 5004
-outport2 = 57120  
+outport2 = 57121  
 SchedStartTime = 0 
 
 

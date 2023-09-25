@@ -11,16 +11,12 @@ var samplePath = thisProcess.nowExecutingPath.dirname +/+ "/recordings";
 ~c =Buffer.read(s, samplePath +/+ "/CR_MarketWalk.WAV");
 ~d =Buffer.read(s, samplePath +/+ "/CR_PStradivari_Corner.WAV");
 )
+
 (
 s.waitForBoot({
 	var right, left,bass;
 	var n0, n1, n2;
 	var note_getter;
-	~jk=1;
-	~lvl_synth =0;
-	~left=0;
-	~right=0;
-	~bass=0;
 	~n1 = NetAddr.new("127.0.0.1",57121);
 	NetAddr.localAddr;
 	~note_table = 0!127;
@@ -31,9 +27,9 @@ s.waitForBoot({
 	~reverbBus = Bus.audio(s,2);
 	~lvl = Bus.audio(s,2);
 	s.latency = nil;
-
+/*
 	SynthDef.new(\buffer_play,{
-		arg inA,inB,inC,inD, outBus, ampA, ampB, ampC, ampD;
+		arg outBus, ampA, ampB, ampC, ampD;
 		var sigA, sigB, sigC, sigD;
 
 		sigA = PlayBuf.ar(2, ~a.bufnum, BufRateScale.kr(~a.bufnum), loop:1);
@@ -41,8 +37,11 @@ s.waitForBoot({
 		sigC = PlayBuf.ar(2, ~c.bufnum, BufRateScale.kr(~c.bufnum), loop:1);
 		sigD = PlayBuf.ar(2, ~d.bufnum, BufRateScale.kr(~d.bufnum), loop:1);
 
-		Out.ar(outBus,Mix.ar([sigA*ampA,sigB*ampB,sigC*ampC,sigD*ampD]));
-	}).add;
+		Out.ar(outBus,sigA*ampA);
+		Out.ar(outBus,sigB*ampB);
+		Out.ar(outBus,sigC*ampC);
+		Out.ar(outBus,sigD*ampD);
+	}).add;*/
 
 	SynthDef.new(\reverb,{
 		arg in;
@@ -63,11 +62,17 @@ s.waitForBoot({
 
 	SynthDef(\lofi_soundscape,
 		{
-			arg outBus,in;
+			arg outBus, ampA, ampB, ampC, ampD;
 			var nfilters = 6;
 			var sig;
 			var shrate = \shrate.kr(22050).lag(1);
 			//var in = PlayBuf.ar(2, ~b.bufnum, BufRateScale.kr(~b.bufnum), loop:1);
+			var sigA = PlayBuf.ar(2, ~a.bufnum, BufRateScale.kr(~a.bufnum), loop:1);
+			var sigB = PlayBuf.ar(2, ~b.bufnum, BufRateScale.kr(~b.bufnum), loop:1);
+			var sigC = PlayBuf.ar(2, ~c.bufnum, BufRateScale.kr(~c.bufnum), loop:1);
+			var sigD = PlayBuf.ar(2, ~d.bufnum, BufRateScale.kr(~d.bufnum), loop:1);
+
+			var in = Mix.ar([sigA*ampA,sigC*ampC,sigC*ampC,sigD*ampD]);
 			//var in = WhiteNoise.ar(0.1);  //
 			var dw;
 			var trigFreq = LFDNoise3.ar(shrate * \jitterScale.kr(1) !2).range(shrate * ( 1 - \jitter.kr(0.1)), shrate);
@@ -212,10 +217,9 @@ s.waitForBoot({
 		Out.ar(out,sig);
 	}).add;*/
 
-	//~z = Synth.new(\buffer_play,[\outBus,~scBus],s,\addToHead);
-	~x = Synth.newPaused(\lofi_soundscape,[\in,~scBus,\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07]);
-	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index,]);
-
+	//~z = Synth.new(\buffer_play,[\outBus,~scBus.index]);
+	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
+	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index]);
 	~y = Synth.new(\synthLvl,[\in,~lvl,\outBus,~reverbBus],s,\addToTail);
 	~r = Synth.new(\reverb,[\in,~reverbBus],s,\addToTail);
 	//~m = Synth.new(\master,[\in,~master],s,\addToTail);
@@ -233,22 +237,22 @@ s.waitForBoot({
 	path:"/snrVal"
 	);
 
-	OSCdef.new(\scMix,{
-		arg msg;
-		postln(msg);
-		~z.set(\ampA,msg[1],\ampB,msg[2],\ampC,msg[3],\ampD,msg[4]);
-
-	},
-	path:"/scMix"
-	);
-
 	OSCdef.new(\noiseOn,{
 		arg msg;
+
 		~x.run;
 		~t.run;
 		postln(msg[1]);
 	},
 	path:"/noiseOn"
+	);
+
+	OSCdef.new(\scMix,{
+		arg msg;
+		postln(msg);
+		~x.set('ampA',msg[1],'ampB',msg[2],'ampC',msg[3],'ampD',msg[4]);
+	},
+	path:"/scMix"
 	);
 
 	OSCdef.new(\noteOn,{
