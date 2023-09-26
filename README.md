@@ -1,7 +1,7 @@
 # **CITY MADNESS**
 
 ## INTRODUCTION
-Project developed for the course "Advance Coding Tools and Methodologies", held in the Master degree of [Music and Acoustic Engineering](https://suono.polimi.it/), based in [Politecnico di Milano](https://www.polimi.it/). 
+Project developed for the course "Creative Programming and Computing", held in the Master degree of [Music and Acoustic Engineering](https://suono.polimi.it/), based in [Politecnico di Milano](https://www.polimi.it/). 
   The project aims at the production of generative music through the combination of different melodic and rythmic music styles, different instruments. Every component is represented by a simple and friendly visual component, combining the various components the user can build a visual and musical environment.
 
 ### Introduction Video
