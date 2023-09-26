@@ -43,6 +43,14 @@ void oscEvent(OscMessage msg) {
     map.setNextPointsExplode(addresses);
   }
   
+  else if(msg.checkAddrPattern("/chaoticParticleAlpha")){
+    MAPPARTICLEALPHA = msg.get(0).intValue();
+  }
+  
+  else if(msg.checkAddrPattern("/pathToInterestPath")){
+     showPathToInterestPoint = msg.get(0).booleanValue();
+  }
+  
   else {
   println("something else");
   println(msg);
@@ -63,10 +71,6 @@ void mousePressed(){
     map.updatePath(id);
     map.setCurrentPoint(id);
   }
-  
-  //println("Current id: " + id);
-    
-  
 }
 
 void keyPressed(){
@@ -74,7 +78,30 @@ void keyPressed(){
   myMessage.add(55);
   oscP5.send(myMessage, myRemoteLocation);
   
- ;
+  if(key == LEFT){
+    if(explosionPaths)
+      explosionPaths = false;
+    else
+      showInterestPoint = true;
+  }
+  else if(keyCode == UP){
+   if(showPathToInterestPoint)
+     showPathToInterestPoint = false;
+   else
+     showPathToInterestPoint = true;
+  }
+  else if(keyCode == RIGHT){
+   if(showUser)
+     showUser = false;
+   else
+     showUser = true;
+  }
+  else if(keyCode == DOWN){
+   if(showInterestPoint)
+     showInterestPoint = false;
+   else
+     showInterestPoint = true;
+  }
 }
 
 IntList oscPathParser(OscMessage msg){

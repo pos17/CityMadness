@@ -2,22 +2,24 @@ import oscP5.*;
 import netP5.*;
 import java.util.*;
 
-int PATHMAXLENGTH = 60;
+int PATHMAXLENGTH = 30; // lunghezza massima path ovvero ultimi nodi esplorati
 int NMAPPARTICLES = 10000;
-int NPATHPARTICLES = 1000;
-int MAPPARTICLEALPHA = 15;
-int TRANSITION_RANGE = 30;
-int RETURN_RANGE = 20;
+int MAPPARTICLEALPHA = 30; //valore iniziale
 float HALF_WIDTH;
 float HALF_HEIGHT;
 float QUARTER_WIDTH;
 float PMASS = 0.1;
-int time = 0;
+int time = 0; // n° di click
 int timeFromClick = 0;
 
 boolean click = false;
 
 boolean creatingExplosions = false;
+
+boolean explosionPaths = false;
+boolean showPathToInterestPoint = false;
+boolean showUser = true;
+boolean showInterestPoint = true;
 
 
 OscP5 oscP5;

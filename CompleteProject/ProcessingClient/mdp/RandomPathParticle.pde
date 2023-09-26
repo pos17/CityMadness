@@ -1,5 +1,5 @@
 
-class RandomPathParticle{
+class RandomPathParticle{ // PARTICELLE CHE GIRANO A CASO PER I NODI VISTI
   ArrayList<PVector> path;
   PVector p;
   int currentID, nextID;

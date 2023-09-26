@@ -1,5 +1,5 @@
 
-class MapPoint{
+class MapPoint{ //CLASSE DEL MAP POINT
  PVector coordinates;
  int id;
  IntList connections;
@@ -58,8 +58,7 @@ class MapPointSorter implements Comparator<MapPoint> {
     }
 }
 
-
-
+// SORTER PER VEDERE CHE NODO E' PIU' VICINO AL CLICK
 class MapPointDistanceSorter implements Comparator<MapPoint>{
   PVector p;
   
