@@ -91,7 +91,7 @@ def scheduleOSCPathsToInterestNode(pathsList,client,myscheduler):
         myscheduler.enter(delay,4,sendPath,argument=(path,client))
         delay += 0.5
         print(delay)
-    
+    myscheduler.run()
 
 def sendPath(path,client):
     client.send_message("/mapDiscoveredPath",path)

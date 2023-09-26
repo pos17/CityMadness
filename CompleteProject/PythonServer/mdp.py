@@ -375,7 +375,7 @@ def interestPathHandler(unused_addr, currentNode):
 def interestNodeDistance(unused_addr, things, currentNode):
     interest_point_list = things[0][0]
     client = things[0][1]
-    max_dist = 0.205
+    max_dist = 0.02
     
     to_send = [0,0,0,0,0]
     in_circle = False
@@ -406,7 +406,7 @@ def interestZonePaths():
     startNodes = [[] for _ in range(len(interestNodes))]
     for i in range(len(interestNodes)):
         for j in range(len(nodes)):
-            if dm[i,j] < 0.205 and dm[i,j] > 0.2:
+            if dm[i,j] < 0.02: #and dm[i,j] > 0.2:
                 startNodes[i].append(j)
 
     #print("printing start nodes")
@@ -456,7 +456,7 @@ def goalHandler(unused_addr, things, currentNode):
             paths = list[i]
             print(paths)
             ### ADD FUNCTION HERE
-            scheduleOSCPathsToInterestNode(paths,client,things[0][3])
+            scheduleOSCPathsToInterestNode(paths,client,scheduler2)
 
 
 if __name__ == "__main__":
