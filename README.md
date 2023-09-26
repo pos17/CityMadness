@@ -23,5 +23,3 @@ The audio generation is performed using supercollider
 - Juan Camilo Albarracin Sanchez  (JuanCamilo.Albarracin@mail.polimi.it)
 - Marco Bernasconi  (Marco.Bernasconi7@mail.polimi.it)
 - Paolo Ostan (paolo.ostan@mail.polimi.it)
-- 
-- 
