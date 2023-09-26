@@ -1,5 +1,5 @@
 
-class MapFragment{
+class MapFragment{ // SFONDO MAPPA
   PImage img;
   int id;
   int t;
