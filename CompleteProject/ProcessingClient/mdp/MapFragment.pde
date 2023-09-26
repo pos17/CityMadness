@@ -41,15 +41,18 @@ class MapFragment{
       mask.translate(HALF_WIDTH, HALF_HEIGHT);
       mask.stroke(255,5);
       mask.strokeJoin(ROUND);
-      for(int i = 0; i<to.size(); i++){
-        PVector l = PVector.lerp(this.from, to.get(i), float(this.t)/30);
+      //for(int i = 0; i<to.size(); i++){
+      //  PVector l = PVector.lerp(this.from, to.get(i), float(this.t)/30);
         
-        for(int j = 0; j<30; j++){
-          float fade = sq(sq(float(j)/30));
-          mask.strokeWeight(map(fade,0,1,2,20));
-          mask.line(l.x,l.y,from.x,from.y);
-        }  
-      }
+      //  for(int j = 0; j<30; j++){
+      //    float fade = sq(sq(float(j)/30));
+      //    mask.strokeWeight(map(fade,0,1,2,20));
+      //    mask.line(l.x,l.y,from.x,from.y);
+      //  }  
+      //}
+      //mask.circle()
+      mask.background(0);
+      mask.ellipse(50, 50, 75, 75);
       mask.pop();
       mask.endDraw();
       

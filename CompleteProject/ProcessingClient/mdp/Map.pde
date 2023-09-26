@@ -329,9 +329,9 @@ class Map{
     
     this.explosions.add(addr);
     
-    if(!creatingExplosions && this.explosions.size()>0){
-      thread("updateExplosions"); 
-    }
+    //if(!creatingExplosions && this.explosions.size()>0){
+    //  thread("updateExplosions"); 
+    //}
   }
   
   void updateExplosions(){
