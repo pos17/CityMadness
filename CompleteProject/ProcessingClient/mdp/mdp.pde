@@ -14,6 +14,7 @@ int time = 0; // n° di click
 int timeFromClick = 0;
 
 boolean click = false;
+boolean explosions = false;
 
 boolean creatingExplosions = false;
 
@@ -69,10 +70,4 @@ void draw(){
   
   map.show();
   
-}
-
-
-void updateExplosions(){
-  creatingExplosions = true;
-  map.updateExplosions();
 }
