@@ -44,8 +44,10 @@ class Map{
     this.trash = createGraphics(width, height, P2D);
     this.path = new MapPath();
     this.line = new MapLine(this.path);
+    chaosVel = 0; 
+    chaosAcc = 1;
     for(int i = 0; i < NMAPPARTICLES; i++){
-      chaoticParticles.add(new ChaoticParticle()); 
+      chaoticParticles.add(new ChaoticParticle(chaosVel, chaosAcc)); 
     }
     this.cityGraphics = loadImage("map.png");
     this.cityGraphics.resize(width,height);

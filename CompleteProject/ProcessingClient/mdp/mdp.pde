@@ -21,7 +21,7 @@ boolean explosionPaths = false;
 boolean showPathToInterestPoint = false;
 boolean showUser = true;
 boolean showInterestPoint = true;
-
+int particle_alpha_count = 10;
 
 OscP5 oscP5;
 OscP5 oscP52;
@@ -36,9 +36,9 @@ PFont font;
 
 void setup(){
   size(900,800,P2D);
-  //fullScreen(P2D);
-  //pixelDensity(displayDensity());
-  pixelDensity(1);
+  fullScreen(P2D);
+  pixelDensity(displayDensity());
+  //pixelDensity(1);
   frameRate(30);
   HALF_WIDTH = width/2;
   HALF_HEIGHT = height/2;

@@ -70,6 +70,11 @@ void mousePressed(){
     oscP5.send(myMessage, myRemoteLocation);
     map.updatePath(id);
     map.setCurrentPoint(id);
+    //if(particle_alpha_count>=0) {
+    //  particle_alpha_count -= 1;
+    //  MAPPARTICLEALPHA = particle_alpha_count;
+      
+    //}
   }
 }
 
