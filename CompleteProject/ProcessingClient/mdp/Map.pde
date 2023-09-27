@@ -76,7 +76,7 @@ class Map{
     this.render.stroke(255,MAPPARTICLEALPHA);
     this.render.strokeWeight(3);
     
-    if(this.pathDone){ // BEHAVIOUR IF WE HAVE A PATH
+    if(this.pathDone && showChaoticParticles){ // BEHAVIOUR IF WE HAVE A PATH
       if(frameCount%2 == 0){
         pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
         chaoticParticles.remove(0);
@@ -112,20 +112,24 @@ class Map{
    this.render.image(this.shadow,-HALF_WIDTH,-HALF_HEIGHT);
    
    // RENDER MAP FRAGMENTS
-    if(this.mapFragments.size()>0 && !creatingExplosions && explosionPaths){
+    if(this.mapFragments.size()>0 && !creatingExplosions){
       this.trash.beginDraw();
       //ListIterator<MapFragment> mapFragmentsIter = this.mapFragments.listIterator();
       for(int i = 0; i< mapFragments.size(); i++){
         MapFragment f = mapFragments.get(i);
-        f.update();
-        if(f.t>1){
+        float alpha = f.update();
+        this.render.tint(255,alpha);
+        //if(f.t>3){
           this.render.image(f.show(),-HALF_WIDTH,-HALF_HEIGHT); 
-        }
-        else
-          this.trash.image(f.show(),0,0); // FIX ORRIBILE, NON TOCCARE
+       // }
+        //else{
+         // println("WOW");
+         // this.trash.image(f.show(),0,0); // FIX ORRIBILE, NON TOCCARE
+       // }
       }
       this.trash.endDraw();
     }
+    this.render.tint(255);
     
     // GENERA LE OMBRE
     if(click){
@@ -203,13 +207,15 @@ class Map{
     image(this.render,0,0);
     
     // TEST: PATH GENERATI INTORNO AL'INTEREST POINT
-    stroke(255,0,0);
-    strokeWeight(5);
-    for(int i = 0; i<explosionsPaths.size(); i++){
-      PVector p = explosionsPaths.get(i);
-      point(p.x+HALF_WIDTH,p.y+HALF_HEIGHT);
-    }
+    if(explosionPaths){
+      stroke(255,0,0);
+      strokeWeight(5);
+      for(int i = 0; i<explosionsPaths.size(); i++){
+        PVector p = explosionsPaths.get(i);
+        point(p.x+HALF_WIDTH,p.y+HALF_HEIGHT);
+      }
         
+    }
   }
   
   // INUTILIZZATO MA MEGLIO LASCIARLO
@@ -347,7 +353,7 @@ class Map{
   
   void updateExplosions(){
     
-    println("WOW");
+    
     creatingExplosions = true;
     for(int i = 0; i<explosions.size(); i++){
       IntList l = explosions.get(i);
@@ -367,7 +373,6 @@ class Map{
       }
     }
     
-    delay(300);
     creatingExplosions = false;
   }
   
@@ -407,7 +412,7 @@ class Map{
     IntList addresses = this.currentPoint.getConnections();
     ArrayList<PVector> to = new ArrayList<PVector>();
     for(int i = 0; i<addresses.size(); i++){
-      to.add(this.getMapPoint(addresses.get(i)).getCoords());
+        to.add(this.getMapPoint(addresses.get(i)).getCoords());
     }
     mapFragments.add(new MapFragment(this.currentPoint.getCoords(), to, this.currentPoint.getId(), img));
     

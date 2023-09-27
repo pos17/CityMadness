@@ -17,10 +17,12 @@ boolean click = false;
 
 boolean creatingExplosions = false;
 
-boolean explosionPaths = false;
-boolean showPathToInterestPoint = false;
+boolean explosionPaths = true;
+boolean showPathToInterestPoint = true;
 boolean showUser = true;
 boolean showInterestPoint = true;
+
+boolean showChaoticParticles = true;
 
 
 OscP5 oscP5;

@@ -45,6 +45,11 @@ void oscEvent(OscMessage msg) {
   
   else if(msg.checkAddrPattern("/chaoticParticleAlpha")){
     MAPPARTICLEALPHA = msg.get(0).intValue();
+    
+    if(MAPPARTICLEALPHA <=0){
+      showChaoticParticles = false;
+      map.chaoticParticles.clear();
+    }
   }
   
   else if(msg.checkAddrPattern("/pathToInterestPath")){
