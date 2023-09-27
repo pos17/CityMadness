@@ -25,6 +25,28 @@ class MapFragment{ // SFONDO MAPPA
      this.img = img;
      this.t = 0;
      this.mask = createGraphics(width, height, P2D);
+     
+     this.fragment = this.img;
+     this.mask.beginDraw(); 
+     this.mask.push();
+     this.mask.translate(HALF_WIDTH, HALF_HEIGHT);
+     this.mask.stroke(255,10);
+     this.mask.noFill();
+     this.mask.strokeJoin(ROUND);
+     
+     for(int i = 0; i<to.size();i++){
+       PVector t = to.get(i);
+       for(int j = 0; j<20; j++){
+         float fade = sq(sq(float(j)/20));
+         this.mask.strokeWeight(map(fade,0,1,5,15));
+         this.mask.line(t.x,t.y,from.x,from.y);
+       }
+     }
+     this.mask.pop();
+     this.mask.endDraw();
+      
+     this.fragment.mask(mask);
+     //this.fragment.save("AAA.png");
   }
   
   PImage show(){
@@ -32,37 +54,12 @@ class MapFragment{ // SFONDO MAPPA
   }
   
   
-  void update(){
-    if(this.t<30){
-      this.fragment = this.img;
-      mask.beginDraw();
-      mask.clear();
-      mask.push();
-      mask.translate(HALF_WIDTH, HALF_HEIGHT);
-      mask.stroke(255,5);
-      mask.strokeJoin(ROUND);
-      //for(int i = 0; i<to.size(); i++){
-      //  PVector l = PVector.lerp(this.from, to.get(i), float(this.t)/30);
-        
-      //  for(int j = 0; j<30; j++){
-      //    float fade = sq(sq(float(j)/30));
-      //    mask.strokeWeight(map(fade,0,1,2,20));
-      //    mask.line(l.x,l.y,from.x,from.y);
-      //  }  
-      //}
-      //mask.circle()
-      mask.background(0);
-      mask.ellipse(50, 50, 75, 75);
-      mask.pop();
-      mask.endDraw();
-      
-      
-      this.fragment.mask(mask);
-      
-    }
-
+  float update(){
     this.t++;
-
+    if(this.t<30)
+      return this.t*255/30;
+    
+    return 255;
   }
   
   int getT(){
