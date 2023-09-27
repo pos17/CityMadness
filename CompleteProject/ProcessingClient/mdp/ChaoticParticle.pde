@@ -17,7 +17,7 @@ class ChaoticParticle{ // Particelle caotiche
     this.acc = acc;
     this.maxspeed = 2;
     this.maxforce = 30;
-    this.mass = 0.5;
+    this.mass = 1;
   }
   ChaoticParticle(PVector p,PVector velocity, PVector acc){
     this.state = false;
