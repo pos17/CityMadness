@@ -77,21 +77,13 @@ class Map{
     //SHOW CHAOTIC PARTICLES
     this.render.stroke(255,MAPPARTICLEALPHA);
     this.render.strokeWeight(3);
-    // FIRST CLICK PERFORMED
-    if(startup) {
-      //print("startup");
-      if(this.pathDone && showChaoticParticles){ // BEHAVIOUR IF WE HAVE A PATH
-        println("PATH DONE");
-        if(frameCount%2 == 0){
-          pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
-          chaoticParticles.remove(0);
-        }
+    
         
-        ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
-        while(chaoticParticlesIter.hasNext()){
-          ChaoticParticle m = chaoticParticlesIter.next();
-          m.moveNoise();
-          PVector p = m.getPos();
+        //ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
+        //while(chaoticParticlesIter.hasNext()){
+        //  ChaoticParticle m = chaoticParticlesIter.next();
+        //  m.moveNoise();
+        //  PVector p = m.getPos();
           /*
           if(particleIsNearStartPath(p)){
             pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
@@ -99,19 +91,29 @@ class Map{
           }
           else{
             */
-            render.point(p.x,p.y);
+            //render.point(p.x,p.y);
           //}
-        }
-      } else{ // BEHAVIOUR IF WE DON'T HAVE A PATH
-         ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
-        while(chaoticParticlesIter.hasNext()){
-          ChaoticParticle m = chaoticParticlesIter.next();
-          m.moveNoise();
-          PVector p = m.getPos();
-          render.point(p.x,p.y);
-        }
-      }
+        //}
+      //} else{ // BEHAVIOUR IF WE DON'T HAVE A PATH
+         //ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
+         //while(chaoticParticlesIter.hasNext()){
+         // ChaoticParticle m = chaoticParticlesIter.next();
+         // m.moveNoise();
+         // PVector p = m.getPos();
+         // render.point(p.x,p.y);
+        //}
+      //}
+      
+    // CHAOTIIC PARTICLES GENERATION
     //FIRST CLICK NOT PERFORMED
+    if(startup) {
+      ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
+      while(chaoticParticlesIter.hasNext()){
+        ChaoticParticle m = chaoticParticlesIter.next();
+        m.moveNoise();
+        PVector p = m.getPos();
+        render.point(p.x,p.y);
+      }
     } else {
       //println("not startup");
       PVector userPos = currentPoint.getCoords();
@@ -170,6 +172,14 @@ class Map{
         this.render.point(p.x,p.y);
       }
     }
+    
+    // GENERATION OF PATH PARTICLES
+    if(this.pathDone ){
+        if(frameCount%2 == 0){
+          pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
+        }
+    }
+      
     
     // RENDER PATH PARTICLES
     if(this.pathDone){

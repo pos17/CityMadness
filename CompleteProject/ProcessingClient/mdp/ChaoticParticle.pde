@@ -7,14 +7,16 @@ class ChaoticParticle{ // Particelle caotiche
   float maxspeed;
   float maxforce;
   float mass;
+  int behaviourFade = 0;
+  int behaviourFadeMax = 100;
   
   ChaoticParticle(PVector velocity, PVector acc){
     this.state = false;
     this.p = new PVector(random(-width/2,width/2),random(-height/2,height/2)); 
     this.velocity = velocity;
     this.acc = acc;
-    this.maxspeed = 5;
-    this.maxforce = 40;
+    this.maxspeed = 2;
+    this.maxforce = 30;
     this.mass = 1;
   }
   ChaoticParticle(PVector p,PVector velocity, PVector acc){
@@ -32,7 +34,7 @@ class ChaoticParticle{ // Particelle caotiche
     this.p = new PVector(x,y);
     this.velocity = velocity;
     this.acc = acc;
-    this.maxspeed = 5;
+    this.maxspeed = 3;
     this.maxforce = 40;
     this.mass = 1;
   }
@@ -64,7 +66,8 @@ class ChaoticParticle{ // Particelle caotiche
     if(this.state == false)
       this.p.add((this.p.cross(PVector.fromAngle((noise(this.p.x/100, this.p.y/100, float(frameCount)/100)-0.5)*TWO_PI))).setMag(2));
     else{
-      this.p.add((this.p.cross(PVector.fromAngle((noise(this.p.x/100, this.p.y/100, float(frameCount)/100)-0.5)*TWO_PI))).setMag(3));
+      
+      this.p.add((this.p.cross(PVector.fromAngle((noise(this.p.x/100, this.p.y/100, float(frameCount)/100)-0.5)*TWO_PI))).setMag(1));
       // Update velocity
       this.velocity.add(acc);
       // Limit speed
