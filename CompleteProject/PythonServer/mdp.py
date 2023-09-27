@@ -477,7 +477,7 @@ def nNearestNodesHandler(unused_addr, things  ,currentNode):
     #print(nodes.__len__())
     for i in range(len(mynodes)):
         if currentNode == myinterestNodes[i]:
-            nearestNodes = mynodes[3]
+            nearestNodes = mynodes[i]
             # print("printing nearest nodes")
             # print(nearestNodes)
             conections = [[] for _ in range(len(nearestNodes))]
@@ -488,8 +488,8 @@ def nNearestNodesHandler(unused_addr, things  ,currentNode):
                 for j in range(len(nodes[nearestNodes[i]][3])):
                     conections[i].append(nodes[nearestNodes[i]][3][j])
             scheduleOSCPathsToInterestNode(conections,client,scheduler2)
-            # print("printing conecctions")
-            # print(conections)
+            print("printing conecctions")
+            print(conections)
 
 
 if __name__ == "__main__":
