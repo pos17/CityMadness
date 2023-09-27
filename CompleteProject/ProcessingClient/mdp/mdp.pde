@@ -27,6 +27,7 @@ boolean showChaoticParticles = true;
 
 OscP5 oscP5;
 OscP5 oscP52;
+
 NetAddress myRemoteLocation;
 boolean startup = true;
 
@@ -41,7 +42,7 @@ void setup(){
   fullScreen(P2D);
   pixelDensity(displayDensity());
   //pixelDensity(1);
-  frameRate(30);
+  frameRate(60);
   HALF_WIDTH = width/2;
   HALF_HEIGHT = height/2;
   QUARTER_WIDTH = width/4;

@@ -45,7 +45,7 @@ class MapFragment{ // SFONDO MAPPA
      this.mask.pop();
      this.mask.endDraw();
       
-     this.fragment.mask(mask);
+     //this.fragment.mask(mask);
      //this.fragment.save("AAA.png");
   }
   

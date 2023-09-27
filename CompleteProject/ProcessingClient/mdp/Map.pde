@@ -44,8 +44,8 @@ class Map{
     this.trash = createGraphics(width, height, P2D);
     this.path = new MapPath();
     this.line = new MapLine(this.path);
-    chaosVel = 0; 
-    chaosAcc = 1;
+    PVector chaosVel = new PVector(0,0); 
+    PVector chaosAcc = new PVector(0,0);
     for(int i = 0; i < NMAPPARTICLES; i++){
       chaoticParticles.add(new ChaoticParticle(chaosVel, chaosAcc)); 
     }
@@ -77,37 +77,57 @@ class Map{
     //SHOW CHAOTIC PARTICLES
     this.render.stroke(255,MAPPARTICLEALPHA);
     this.render.strokeWeight(3);
-    
-    if(this.pathDone && showChaoticParticles){ // BEHAVIOUR IF WE HAVE A PATH
-      if(frameCount%2 == 0){
-        pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
-        chaoticParticles.remove(0);
+    // FIRST CLICK PERFORMED
+    if(startup) {
+      //print("startup");
+      if(this.pathDone && showChaoticParticles){ // BEHAVIOUR IF WE HAVE A PATH
+        println("PATH DONE");
+        if(frameCount%2 == 0){
+          pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
+          chaoticParticles.remove(0);
+        }
+        
+        ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
+        while(chaoticParticlesIter.hasNext()){
+          ChaoticParticle m = chaoticParticlesIter.next();
+          m.moveNoise();
+          PVector p = m.getPos();
+          /*
+          if(particleIsNearStartPath(p)){
+            pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
+            chaoticParticlesIter.remove();
+          }
+          else{
+            */
+            render.point(p.x,p.y);
+          //}
+        }
+      } else{ // BEHAVIOUR IF WE DON'T HAVE A PATH
+         ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
+        while(chaoticParticlesIter.hasNext()){
+          ChaoticParticle m = chaoticParticlesIter.next();
+          m.moveNoise();
+          PVector p = m.getPos();
+          render.point(p.x,p.y);
+        }
       }
-      
+    //FIRST CLICK NOT PERFORMED
+    } else {
+      //println("not startup");
+      PVector userPos = currentPoint.getCoords();
       ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
       while(chaoticParticlesIter.hasNext()){
         ChaoticParticle m = chaoticParticlesIter.next();
-        m.moveNoise();
-        PVector p = m.getPos();
-        /*
-        if(particleIsNearStartPath(p)){
-          pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
+        PVector steeringForce = m.seek(userPos);
+        if(m.getDist(userPos) >10) {
+          m.applyForce(steeringForce);
+          m.moveNoise();
+          PVector p = m.getPos();
+          render.point(p.x,p.y);
+        } else {
           chaoticParticlesIter.remove();
         }
-        else{
-          */
-          render.point(p.x,p.y);
-        //}
-      }
-    }
-    else{ // BEHAVIOUR IF WE DON'T HAVE A PATH
-      ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
-      while(chaoticParticlesIter.hasNext()){
-        ChaoticParticle m = chaoticParticlesIter.next();
-        m.moveNoise();
-        PVector p = m.getPos();
-        render.point(p.x,p.y);
-      }
+     }
     }
    
    // RENDER SHADOW
@@ -122,7 +142,7 @@ class Map{
         float alpha = f.update();
         this.render.tint(255,alpha);
         //if(f.t>3){
-          this.render.image(f.show(),-HALF_WIDTH,-HALF_HEIGHT); 
+          //this.render.image(f.show(),-HALF_WIDTH,-HALF_HEIGHT); 
        // }
         //else{
          // println("WOW");
@@ -384,6 +404,15 @@ class Map{
       this.moving = true;
     }
     
+    /*
+    if(!startup) {
+    ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
+      while(chaoticParticlesIter.hasNext()){
+        ChaoticParticle m = chaoticParticlesIter.next();
+        m.setState(true);
+      }
+    }
+    */
     this.path.updatePath(this.getMapPoint(id));
     this.pathParticlePosBuffer = this.path.computeParticleBuffer();
     
@@ -488,4 +517,13 @@ class Map{
   boolean isMoving(){
     return this.moving; 
   }
+  
+  void setChaoticParticlesState() {
+    ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
+      while(chaoticParticlesIter.hasNext()){
+        ChaoticParticle m = chaoticParticlesIter.next();
+        m.setState(true);
+      }
+  }
+  
 }

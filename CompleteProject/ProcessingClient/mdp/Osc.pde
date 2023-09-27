@@ -75,18 +75,11 @@ void mousePressed(){
     oscP5.send(myMessage, myRemoteLocation);
     map.updatePath(id);
     map.setCurrentPoint(id);
-    //if(particle_alpha_count>=0) {
-    //  particle_alpha_count -= 1;
-    //  MAPPARTICLEALPHA = particle_alpha_count;
-      
-    //}
+    map.setChaoticParticlesState();
   }
 }
 
 void keyPressed(){
-  OscMessage myMessage = new OscMessage("/currentNode");
-  myMessage.add(55);
-  oscP5.send(myMessage, myRemoteLocation);
   
   if(key == LEFT){
     if(explosionPaths)
@@ -111,6 +104,11 @@ void keyPressed(){
      showInterestPoint = false;
    else
      showInterestPoint = true;
+  }
+  else if(keyCode == 65) {
+     OscMessage myMessage = new OscMessage("/currentNode");
+     myMessage.add(55);
+     oscP5.send(myMessage, myRemoteLocation);
   }
 }
 
