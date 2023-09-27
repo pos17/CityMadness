@@ -66,17 +66,18 @@ void mousePressed(){
   
   // UPDATE THE NUMBER OF TIMES THE USER HAS CLICKED
   if(!map.isMoving()){
+    
     time++;
     timeFromClick = 0;
-    
+    map.setChaoticParticlesState();
     OscMessage myMessage = new OscMessage("/currentNode");
     int id = map.getClosestPointId(mouseX-HALF_WIDTH, mouseY-HALF_HEIGHT);
     myMessage.add(id);
     oscP5.send(myMessage, myRemoteLocation);
     map.updatePath(id);
     map.setCurrentPoint(id);
-    map.setChaoticParticlesState();
-  }
+    
+  } 
 }
 
 void keyPressed(){

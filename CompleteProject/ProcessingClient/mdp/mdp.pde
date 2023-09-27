@@ -18,9 +18,9 @@ boolean click = false;
 boolean creatingExplosions = false;
 
 boolean explosionPaths = true;
-boolean showPathToInterestPoint = true;
-boolean showUser = true;
-boolean showInterestPoint = true;
+boolean showPathToInterestPoint = false;
+boolean showUser = false;
+boolean showInterestPoint = false;
 
 boolean showChaoticParticles = true;
 
