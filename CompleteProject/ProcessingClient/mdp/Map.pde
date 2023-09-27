@@ -135,8 +135,9 @@ class Map{
    // RENDER SHADOW
    this.render.image(this.shadow,-HALF_WIDTH,-HALF_HEIGHT);
    
+   
    // RENDER MAP FRAGMENTS
-    if(this.mapFragments.size()>0 && !creatingExplosions){
+    if(this.mapFragments.size()>0){
       this.trash.beginDraw();
       //ListIterator<MapFragment> mapFragmentsIter = this.mapFragments.listIterator();
       for(int i = 0; i< mapFragments.size(); i++){
@@ -359,55 +360,7 @@ class Map{
   }
   
   // REWARD INTEREST POINT
-  void setNextPointsExplode(IntList addr){
-    for(int i = 0; i<addr.size(); i++){
-      IntList t = new IntList();
-      if(i == 0){
-        t.append(addr.get(1));
-      }
-      else if(i == addr.size()-1){
-        t.append(addr.get(addr.size()-2));
-      }
-      else{
-        t.append(addr.get(i-1));
-        t.append(addr.get(i+1));
-      }
-      MapPoint p = this.getMapPoint(addr.get(i));
-      p.addToConnections(t);
-    }
-    
-    this.explosions.add(addr);
-    
-    //if(!creatingExplosions && this.explosions.size()>0){
-    //  thread("updateExplosions"); 
-    //}
-  }
-  
-  void updateExplosions(){
-    
-    
-    creatingExplosions = true;
-    for(int i = 0; i<explosions.size(); i++){
-      IntList l = explosions.get(i);
-      
-      if(l.size() > 2){
-        PVector from = this.getMapPoint(l.get(1)).getCoords();
-        ArrayList<PVector> to = new ArrayList<PVector>();
-        to.add(this.getMapPoint(l.get(0)).getCoords());
-        to.add(this.getMapPoint(l.get(2)).getCoords());
-        
-        this.mapFragments.add(new MapFragment(from, to, l.get(1), this.cityGraphics));
-        
-        l.remove(0);
-      }
-      else{
-        explosions.remove(i);
-      }
-    }
-    
-    creatingExplosions = false;
-  }
-  
+
   // UPDATE DEL PATH (ULTIMI NODI ESPLORATI)
   void updatePath(int id){
     if(!startup){
@@ -478,6 +431,23 @@ class Map{
     }
     this.shadow.pop();
     this.shadow.endDraw();
+    
+    
+    // PARSE EXPLOSIONS
+    if(this.explosions.size()>0){
+      IntList add = this.explosions.get(0);
+      int id = add.get(0);
+      MapPoint m = this.getMapPoint(id);
+      PVector f = m.getCoords();
+      ArrayList<PVector> t = new ArrayList<PVector>();
+      m.addToConnections(add);
+      for(int i = 1; i<add.size(); i++){
+         t.add(this.getMapPoint(add.get(i)).getCoords());
+      }
+      
+      this.mapFragments.add(new MapFragment(f, t, id, cityGraphics));
+    }
+    
     click = false;
   }
   

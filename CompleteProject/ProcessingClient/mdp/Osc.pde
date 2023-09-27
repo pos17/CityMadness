@@ -30,17 +30,18 @@ void oscEvent(OscMessage msg) {
   }
   
   else if(msg.checkAddrPattern("/mapDiscoveredPath")){
-    Object[] arg = msg.arguments();
     IntList addresses = new IntList();
-    ArrayList<PVector> p = new ArrayList<PVector>();
-    for(int i = 0; i<arg.length; i++){
-      addresses.append((int)arg[i]);
-      p.add(map.getMapPoint((int)arg[i]).getCoords());
+    
+    for(int i = 0; i<msg.arguments().length; i++){
+      addresses.append(msg.get(i).intValue()); 
+      
+      map.explosionsPaths.add(map.getMapPoint(msg.get(i).intValue()).getCoords()); 
     }
+      
+    //map.explosionParser(addresses);
+    map.explosions.add(addresses);
+    explosions = true; // IL PARSER EFFETTIVO STA IN MAP RIGA 395 CIRCA
     
-    map.explosionsPaths.addAll(p);
-    
-    map.setNextPointsExplode(addresses);
   }
   
   else if(msg.checkAddrPattern("/chaoticParticleAlpha")){
