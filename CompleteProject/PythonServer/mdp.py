@@ -372,27 +372,27 @@ def interestPathHandler(unused_addr, currentNode):
             client.send(msg)
 
 
-def interestNodeDistance(unused_addr, things, currentNode):
-    interest_point_list = things[0][0]
-    client = things[0][1]
-    max_dist = 0.02
+# def interestNodeDistance(unused_addr, things, currentNode):
+#     interest_point_list = things[0][0]
+#     client = things[0][1]
+#     max_dist = 0.02
     
-    to_send = [0,0,0,0,0]
-    in_circle = False
-    for i in range(len(interest_point_list)):
-        if(dm[currentNode,interest_point_list[i]] < max_dist):
-            percDist = dm[currentNode,interest_point_list[i]]/max_dist
-            to_send[i] = 1-percDist
-            in_circle = True
-    if(in_circle==False):
-        to_send[4] = 1
-    max_toSend = max(to_send)
-    for i in range(len(to_send)):
-        if to_send[i] < max_toSend:
-            to_send[i] = 0
+#     to_send = [0,0,0,0,0]
+#     in_circle = False
+#     for i in range(len(interest_point_list)):
+#         if(dm[currentNode,interest_point_list[i]] < max_dist):
+#             percDist = dm[currentNode,interest_point_list[i]]/max_dist
+#             to_send[i] = 1-percDist
+#             in_circle = True
+#     if(in_circle==False):
+#         to_send[4] = 1
+#     max_toSend = max(to_send)
+#     for i in range(len(to_send)):
+#         if to_send[i] < max_toSend:
+#             to_send[i] = 0
         
     
-    send_interest_node_distance(to_send,client)
+#     send_interest_node_distance(to_send,client)
 
 def send_interest_node_distance(to_send,client):
     print("to_send")
@@ -472,14 +472,19 @@ def nNearestNodes():
         Nodes[closer].append(i)
         distances[closer].append(dm[interestNodes[j],i])
     sorted_nodes = []
+    sorted_dist = []
+    for i in range(len(distances)):
+        distances[i] = (distances[i] - min(distances[i])) / ( max(distances[i]) - min(distances[i]))
     for i in range(len(distances)):
         pairs = list(zip(distances[i], Nodes[i]))
         sorted_pairs = sorted(pairs)
-        sorted_list = [pair[1] for pair in sorted_pairs]
-        print("SORTED LIST")
-        print(sorted_list.__len__())
-        sorted_nodes.append(sorted_list)
-    return sorted_nodes
+        sorted_list1 = [pair[1] for pair in sorted_pairs]
+        sorted_list2 = [pair[0] for pair in sorted_pairs]
+        #print("SORTED LIST")
+        #print(sorted_list.__len__())
+        sorted_nodes.append(sorted_list1)
+        sorted_dist.append(sorted_list2)
+    return sorted_nodes, sorted_dist
 
 def nNearestNodesHandler(unused_addr, things  ,currentNode):
     mynodes = things[0][0]
@@ -520,6 +525,20 @@ def firstPathHandler(unused_addr, things,  currentNodeFirst):
             conections[i].append(nodes[nearNodes[i]][3][j])
     scheduleOSCPathsFirstNode(conections, client, schedul)
     
+def synthHandler(unused_addr, things,  currentNode):
+    myNodes = things[0][2]
+    distances = things[0][0]
+    client = things[0][1]
+    to_send = [[] for _ in range(len(distances))]
+    for i in range(len(distances)):
+        if currentNode in myNodes[i]:
+            index = myNodes[i].index(currentNode)
+            to_send[i] = distances[i][index]
+        else:
+            to_send[i] = 0
+    print("TOSENT")
+    print(to_send)
+    send_interest_node_distance(to_send,client)
     
 
 if __name__ == "__main__":
@@ -556,11 +575,12 @@ if __name__ == "__main__":
     global steps
     steps = interestZonePaths()
     global nNodes
-    nNodes = nNearestNodes()
-    print("ALLNODES")
-    print(len(nodes))
-    print("LENNODES")
-    print(len(nNodes[0])+len(nNodes[1])+len(nNodes[2])+len(nNodes[3]))
+    nNodes, nDist = nNearestNodes()
+
+    print("MAXDIST")
+    print(max(nDist[1]))
+    print("MINDIST")
+    print(min(nDist[1]))
     dispatcher = dispatcher.Dispatcher()
 
     imageMap = ImageToMap("assets/COLORMAPTEST.png",[(10.060950707625352,
@@ -579,8 +599,9 @@ if __name__ == "__main__":
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNodeFirst", firstPathHandler, [client,scheduler2])
     dispatcher.map("/currentNode", interestPathHandler)
+    dispatcher.map("/currentNode", synthHandler, [nDist,client2,nNodes])
     dispatcher.map("/currentNode", nNearestNodesHandler, [nNodes, interestNodes2,client,scheduler2])
-    dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client2])
+    #dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client2])
     #dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
     frase = "ciao"
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
