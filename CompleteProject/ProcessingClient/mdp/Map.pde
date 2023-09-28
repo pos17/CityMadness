@@ -1,4 +1,3 @@
-
 class Map {
   ArrayList<MapPoint> mapPoints = new ArrayList<MapPoint>();
   MapPath path;
