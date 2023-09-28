@@ -36,13 +36,13 @@ s.waitForBoot({
 	s.latency = nil;
 
 	SynthDef.new(\synthLvl,{
-		arg inA, inB, outBus, ampA, ampB, ampC;
+		arg inA, inB, inC, outBus, ampA, ampB, ampC;
 		var sigA, sigB,sigC;
 		sigA = In.ar(inA,2);
 		sigB = In.ar(inB,2);
 		sigC = In.ar(inC,2);
 
-		Out.ar(outBus,Mix.ar([sigA*ampA,sigB*ampB,sigC*ampC]);
+		Out.ar(outBus,Mix.ar([sigA*ampA,sigB*ampB,sigC*ampC]));
 	}).add;
 
 	SynthDef.new(\reverb,{
@@ -59,7 +59,7 @@ s.waitForBoot({
 			)
 		};
 
-		Out.ar([0,1],MoogFF.ar(d,fcvalue, 1);
+		Out.ar([0,1],MoogFF.ar(d,fcvalue, 1));
 	}).add;
 
 	SynthDef(\lofi_soundscape,
@@ -210,7 +210,7 @@ s.waitForBoot({
 	~y = Synth.new(\synthLvl,[\inA,~lvl1,\inB,~lvl2,\inC,~lvl3,\ampA,~lvl_music,\ampB,~lvl_sc,\ampC,~lvl_grain,\outBus,~reverbBus],s,\addToTail);
 	~r = Synth.new(\reverb,[\in,~reverbBus,\fcvalue,~fcval],s,\addToTail);
 
-	OSCdef.new(\musicVol{
+	OSCdef.new(\musicVol,{
 		arg msg;
 		~lvl_music = msg[1];
 		~y.set(\ampA,~lvl_music);
@@ -218,7 +218,7 @@ s.waitForBoot({
 	path:"/musicVol"
 	);
 
-	OSCdef.new(\scVol{
+	OSCdef.new(\scVol,{
 		arg msg;
 		~lvl_sc = msg[1];
 		~y.set(\ampB,~lvl_sc);
@@ -226,7 +226,7 @@ s.waitForBoot({
 	path:"/scVol"
 	);
 
-	OSCdef.new(\grainVol{
+	OSCdef.new(\grainVol,{
 		arg msg;
 		~lvl_grain = msg[1];
 		~y.set(\ampC,~lvl_grain);
@@ -234,7 +234,7 @@ s.waitForBoot({
 	path:"/grainVol"
 	);
 
-	OSCdef.new(\fcVal{
+	OSCdef.new(\fcVal,{
 		arg msg;
 		~fcval = msg[1];
 		~r.set(\fcvalue,~fcval);
@@ -248,7 +248,7 @@ s.waitForBoot({
 
 	},
 	path:"/synthAgit"
-	)
+	);
 
 	OSCdef.new(\snrVal,{
 		arg msg;
