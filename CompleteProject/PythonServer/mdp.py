@@ -462,12 +462,14 @@ def goalHandler(unused_addr, things, currentNode):
 
 def nNearestNodes():
     Nodes = [[] for _ in range(len(interestNodes))]
-    for i in range(len(interestNodes)):
-        for j in range(len(nodes)):
-            if dm[interestNodes[i],j] < 0.04: #and dm[i,j] > 0.2:
-                Nodes[i].append(j)
+    for i in range(len(nodes)):
+        dist = 999
+        for j in range(len(interestNodes)):
+            if dm[interestNodes[j],i] < dist: #and dm[i,j] > 0.2:
+                closer = j
+                dist = dm[interestNodes[j],i]
+        Nodes[closer].append(i)
     return Nodes
-
 
 def nNearestNodesHandler(unused_addr, things  ,currentNode):
     mynodes = things[0][0]
@@ -545,6 +547,10 @@ if __name__ == "__main__":
     steps = interestZonePaths()
     global nNodes
     nNodes = nNearestNodes()
+    print("ALLNODES")
+    print(len(nodes))
+    print("LENNODES")
+    print(len(nNodes[0])+len(nNodes[1])+len(nNodes[2])+len(nNodes[3]))
     dispatcher = dispatcher.Dispatcher()
 
     imageMap = ImageToMap("assets/COLORMAPTEST.png",[(10.060950707625352,
