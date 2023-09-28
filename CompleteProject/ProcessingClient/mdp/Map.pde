@@ -8,6 +8,8 @@ class Map{
   PVector endPath;
   int endPathID;
   
+  ArrayList<PVector> explosionsPaths = new ArrayList<PVector>();
+  
   ArrayList<ChaoticParticle> chaoticParticles = new ArrayList<ChaoticParticle>();
   ArrayList<MapPathParticle> pathParticles = new ArrayList<MapPathParticle>();
   ArrayList<RandomPathParticle> wanderingParticles = new ArrayList<RandomPathParticle>();
@@ -19,7 +21,7 @@ class Map{
   MapPoint interestPoint;
   MapPoint currentPoint;  
   
-  boolean pathDone, systemCreated, moving;
+  boolean pathDone, systemCreated, moving,firstConnectionsArrived;
   
   PGraphics shadow;
   PGraphics trash;
@@ -29,18 +31,24 @@ class Map{
   PImage cityGraphics;
   ArrayList<MapFragment> mapFragments = new ArrayList<MapFragment>();
   
+  
+  ArrayList<IntList> explosions = new ArrayList<IntList>();
+  
   Map(){
     this.mapPoints = loadMapPoints();
     this.pathDone = false;
     this.systemCreated = false;
+    this.firstConnectionsArrived = false;
     this.renderMap();
     this.render = createGraphics(width, height, P2D);
     this.shadow = createGraphics(width, height, P2D);
     this.trash = createGraphics(width, height, P2D);
     this.path = new MapPath();
     this.line = new MapLine(this.path);
+    PVector chaosVel = new PVector(0,0); 
+    PVector chaosAcc = new PVector(0,0);
     for(int i = 0; i < NMAPPARTICLES; i++){
-      chaoticParticles.add(new ChaoticParticle()); 
+      chaoticParticles.add(new ChaoticParticle(chaosVel, chaosAcc)); 
     }
     this.cityGraphics = loadImage("map.png");
     this.cityGraphics.resize(width,height);
@@ -53,13 +61,20 @@ class Map{
     
   }
   
-  void show(){
+  void show(){ // Tutti i render stanno qua in ordine
     timeFromClick++;
+    
     this.render.beginDraw();
     //this.render.clear();
     
     this.render.noStroke();
-    this.render.fill(0,50);
+    if(startup) {
+      this.render.fill(0,50);
+    } else if(this.chaoticParticles.size() > 300) {
+      this.render.fill(0,80);
+    } else {
+      this.render.fill(0,5);
+    }
     this.render.rect(0,0,width,height);
     //this.render.background(0);
     
@@ -69,32 +84,39 @@ class Map{
     //SHOW CHAOTIC PARTICLES
     this.render.stroke(255,MAPPARTICLEALPHA);
     this.render.strokeWeight(3);
+    if(firstConnectionsArrived && this.wanderingParticles.size() < 300 &&  this.chaoticParticles.size() < 300) {
+      this.wanderingParticles.add(new RandomPathParticle(this.currentPoint.getId()));
     
-    
-    if(this.pathDone){ // BEHAVIOUR IF WE HAVE A PATH
-      
-      if(frameCount%2 == 0){
-        pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
-        chaoticParticles.remove(0);
-      }
-      
-      ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
-      while(chaoticParticlesIter.hasNext()){
-        ChaoticParticle m = chaoticParticlesIter.next();
-        m.moveNoise();
-        PVector p = m.getPos();
-        /*
-        if(particleIsNearStartPath(p)){
-          pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
-          chaoticParticlesIter.remove();
-        }
-        else{
-          */
-          render.point(p.x,p.y);
-        //}
-      }
     }
-    else{ // BEHAVIOUR IF WE DON'T HAVE A PATH
+        
+        //ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
+        //while(chaoticParticlesIter.hasNext()){
+        //  ChaoticParticle m = chaoticParticlesIter.next();
+        //  m.moveNoise();
+        //  PVector p = m.getPos();
+          /*
+          if(particleIsNearStartPath(p)){
+            pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
+            chaoticParticlesIter.remove();
+          }
+          else{
+            */
+            //render.point(p.x,p.y);
+          //}
+        //}
+      //} else{ // BEHAVIOUR IF WE DON'T HAVE A PATH
+         //ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
+         //while(chaoticParticlesIter.hasNext()){
+         // ChaoticParticle m = chaoticParticlesIter.next();
+         // m.moveNoise();
+         // PVector p = m.getPos();
+         // render.point(p.x,p.y);
+        //}
+      //}
+      
+    // CHAOTIIC PARTICLES GENERATION
+    //FIRST CLICK NOT PERFORMED
+    if(startup) {
       ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
       while(chaoticParticlesIter.hasNext()){
         ChaoticParticle m = chaoticParticlesIter.next();
@@ -102,26 +124,49 @@ class Map{
         PVector p = m.getPos();
         render.point(p.x,p.y);
       }
+    } else {
+      //println("not startup");
+      PVector userPos = currentPoint.getCoords();
+      ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
+      while(chaoticParticlesIter.hasNext()){
+        ChaoticParticle m = chaoticParticlesIter.next();
+        PVector steeringForce = m.seek(userPos);
+        if(m.getDist(userPos) >10) {
+          m.applyForce(steeringForce);
+          m.moveNoise();
+          PVector p = m.getPos();
+          render.point(p.x,p.y);
+        } else {
+          chaoticParticlesIter.remove();
+        }
+     }
     }
    
+   // RENDER SHADOW
    this.render.image(this.shadow,-HALF_WIDTH,-HALF_HEIGHT);
    
+   
+   // RENDER MAP FRAGMENTS
     if(this.mapFragments.size()>0){
       this.trash.beginDraw();
-      ListIterator<MapFragment> mapFragmentsIter = this.mapFragments.listIterator();
-      while(mapFragmentsIter.hasNext()){
-        MapFragment f = mapFragmentsIter.next();
-        f.update();
-        if(f.t>1){
-          this.render.image(f.show(),-HALF_WIDTH,-HALF_HEIGHT); 
-        }
-        else
-          this.trash.image(f.show(),0,0); // FIX ORRIBILE, NON TOCCARE
+      //ListIterator<MapFragment> mapFragmentsIter = this.mapFragments.listIterator();
+      for(int i = 0; i< mapFragments.size(); i++){
+        MapFragment f = mapFragments.get(i);
+        float alpha = f.update();
+        this.render.tint(255,alpha);
+        //if(f.t>3){
+          //this.render.image(f.show(),-HALF_WIDTH,-HALF_HEIGHT); 
+       // }
+        //else{
+         // println("WOW");
+         // this.trash.image(f.show(),0,0); // FIX ORRIBILE, NON TOCCARE
+       // }
       }
       this.trash.endDraw();
     }
+    this.render.tint(255);
     
-    
+    // GENERA LE OMBRE
     if(click){
        this.renderShadow();
     }
@@ -139,6 +184,14 @@ class Map{
       }
     }
     
+    // GENERATION OF PATH PARTICLES
+    if(this.pathDone ){
+        if(frameCount%2 == 0){
+          pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
+        }
+    }
+      
+    
     // RENDER PATH PARTICLES
     if(this.pathDone){
       this.render.stroke(255,200,0);
@@ -151,7 +204,8 @@ class Map{
       }
     }
     
-    if(!startup){
+    // PATH VERSO IL NODO D'INTERESSE
+    if(!startup && showPathToInterestPoint){
       ListIterator<PVector> toInterestPointIter = this.toInterestPoint.listIterator();
       this.render.strokeWeight(2);
       this.render.noFill();
@@ -164,8 +218,8 @@ class Map{
       this.render.endShape();
     }
     
-    
-    if(!startup){
+    // SEGNAPOSTO UTENTE
+    if(!startup && showUser){
       if(timeFromClick > 60){
         PVector p = currentPoint.getCoords();
         for(int j = 0; j<30; j++){
@@ -176,8 +230,8 @@ class Map{
           }  
       }
       
-      
-      if(time>0){
+      // SEGNAPOSTO INTEREST POINT
+      if(time>0 && showInterestPoint){
         PVector p = interestPoint.getCoords();
         this.render.stroke(255,255,0, 2.0*sin(radians(constrain(timeFromClick,0,180))));
 
@@ -188,52 +242,41 @@ class Map{
           }  
         
       }
-      /*
-      // PATH TO INTEREST POINT
-      this.render.stroke(0,255,255, 255*sin(5*radians(frameCount)));
-      p = toInterestPoint.getCoords();
-      this.render.point(p.x,p.y);
-      
-      // TEMP, CURRENT INTEREST POINT
-      
-      this.render.strokeWeight(12);
-      p = interestPoint.getCoords();
-      this.render.point(p.x,p.y);
-      */
     }
     
-    
-    /*
-    if(this.line.exists()){
-      ArrayList<PVector> lineList = line.show();
-      ListIterator<PVector> linetIter = lineList.listIterator();
-      
-      while(linetIter.hasNext()){
-        PVector p = linetIter.next();
-        this.render.stroke(255, map(linetIter.nextIndex(),0,lineList.size(),0,70));
-        this.render.point(p.x, p.y);
-      }
-    }
-    */
     
     this.render.pop();
     this.render.endDraw();
     image(this.render,0,0);
+    
+    // TEST: PATH GENERATI INTORNO AL'INTEREST POINT
+    if(explosionPaths){
+      stroke(255,0,0);
+      strokeWeight(5);
+      for(int i = 0; i<explosionsPaths.size(); i++){
+        PVector p = explosionsPaths.get(i);
+        point(p.x+HALF_WIDTH,p.y+HALF_HEIGHT);
+      }
         
+    }
   }
   
+  // INUTILIZZATO MA MEGLIO LASCIARLO
   void createLine(){
     this.line = new MapLine(this.path); 
   }
   
+  // OTTIENI MAPPOINT DA ID
   MapPoint getMapPoint(int id){
     return this.mapPoints.get(id);
   }
   
+  //OTTIENI COORDINATE DA ID
   PVector getPointCoords(int id){
      return this.mapPoints.get(id).getCoords();
   }
-
+  
+  // IMPORTA GEOJSON
   ArrayList<MapPoint> loadMapPoints(){
     
     ArrayList<MapPoint> map = new ArrayList<MapPoint>();
@@ -286,6 +329,7 @@ class Map{
     return map;
   }
   
+  // VECCHIO TEST, VISUALIZZA I NODI DELLA MAPPA
   void renderMap(){
     this.city = createGraphics(width, height, P2D);
     this.city.beginDraw();
@@ -301,6 +345,7 @@ class Map{
     this.city.endDraw();
   }
   
+  // USATO PER RITORNARE IL NODO PIU' VICINO A DOVE HA CLICCATO L'UTENTE
   int getClosestPointId(float x, float y){
     PVector p = new PVector(x,y);
     ArrayList<MapPoint> distSorted;
@@ -315,6 +360,7 @@ class Map{
     return distSorted.get(0).getId();
   }
   
+  // PROSSIMI PUNTI ESPLORABILI
   void setNextPoints(IntList addr){
     this.nextPoints.clear();
     for(int i = 0; i<addr.size(); i++){
@@ -323,11 +369,23 @@ class Map{
     
   }
   
+  // REWARD INTEREST POINT
+
+  // UPDATE DEL PATH (ULTIMI NODI ESPLORATI)
   void updatePath(int id){
     if(!startup){
       this.moving = true;
     }
     
+    /*
+    if(!startup) {
+    ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
+      while(chaoticParticlesIter.hasNext()){
+        ChaoticParticle m = chaoticParticlesIter.next();
+        m.setState(true);
+      }
+    }
+    */
     this.path.updatePath(this.getMapPoint(id));
     this.pathParticlePosBuffer = this.path.computeParticleBuffer();
     
@@ -345,6 +403,7 @@ class Map{
     startup = false; //After second click we exit map startup
   }
   
+  // GENERA LE OMBRE CHE NASCONDONO LE PARTICELLE
   void renderShadow(){
     for(int i = 0; i<mapFragments.size(); i++){
       if(mapFragments.get(i).id == currentPoint.id){
@@ -357,7 +416,7 @@ class Map{
     IntList addresses = this.currentPoint.getConnections();
     ArrayList<PVector> to = new ArrayList<PVector>();
     for(int i = 0; i<addresses.size(); i++){
-      to.add(this.getMapPoint(addresses.get(i)).getCoords());
+        to.add(this.getMapPoint(addresses.get(i)).getCoords());
     }
     mapFragments.add(new MapFragment(this.currentPoint.getCoords(), to, this.currentPoint.getId(), img));
     
@@ -382,14 +441,33 @@ class Map{
     }
     this.shadow.pop();
     this.shadow.endDraw();
+    
+    
+    // PARSE EXPLOSIONS
+    if(this.explosions.size()>0){
+      IntList add = this.explosions.get(0);
+      int id = add.get(0);
+      MapPoint m = this.getMapPoint(id);
+      PVector f = m.getCoords();
+      ArrayList<PVector> t = new ArrayList<PVector>();
+      m.addToConnections(add);
+      for(int i = 1; i<add.size(); i++){
+         t.add(this.getMapPoint(add.get(i)).getCoords());
+      }
+      
+      this.mapFragments.add(new MapFragment(f, t, id, cityGraphics));
+    }
+    
     click = false;
   }
+  
   
   void setNextInterestPoint(int p){
     this.interestPoint = this.getMapPoint(p);
     //println(p);
   }
   
+  // IMPORTA PATH VERSO NODO D'INTERESSE
   void updatePathToInterestPoint(IntList addresses){
     this.toInterestPoint.clear();
     for(int i = 0; i<addresses.size(); i++){
@@ -397,29 +475,21 @@ class Map{
     }
   }
   
+  // SET NODO CORRENTE SCELTO DALL'UTENTE
   void setCurrentPoint(int p){
     this.currentPoint = this.getMapPoint(p); 
   }
   
+  // UPDATE DELLE CONNESSIONI DEL NODO CORRENTE 
   void updateCurrentPointConnections(IntList addresses){
     this.currentPoint.addToConnections(addresses);
   }
   
-  // PARTICLE SYSTEM METHODS
-  
-  boolean particleIsNearStartPath(PVector p){
-    if(sqrt(sq(p.x-this.startPath.x) + sq(p.y-this.startPath.y)) < TRANSITION_RANGE)
-      return true;
-     
-    return false;
+  void updatePointConnections(int nodeID, IntList addresses) {
+     this.getMapPoint(nodeID).addToConnections(addresses);
   }
   
-  boolean particleIsNearEndPath(PVector p){
-    if(sqrt(sq(p.x-this.endPath.x) + sq(p.y-this.endPath.y)) < RETURN_RANGE)
-      return true;
-     
-    return false;
-  } 
+  // PARTICLE SYSTEM METHODS
   
   void removePathParticle(MapPathParticle p){
     this.wanderingParticles.add(new RandomPathParticle(p.getID()));
@@ -428,7 +498,7 @@ class Map{
     this.moving = false;
   }
   
-  
+  // UPDATE DEL PATH DELLE PATH PARTICLES PER NON FARLE FERMARE PRESTO
   void updatePathParticles(ArrayList<PVector> buffer, int id){
       ListIterator<MapPathParticle> iter = this.pathParticles.listIterator();
       while(iter.hasNext()){
@@ -436,8 +506,27 @@ class Map{
         p.addToPath(buffer, id);
       }
   }
-
+  
+  // C'E' STATO UN CLICK E NON SIAMO ANCORA ARRIVATI AL PROSSIMO NODO
   boolean isMoving(){
     return this.moving; 
   }
+  
+  void setChaoticParticlesState() {
+    ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
+      while(chaoticParticlesIter.hasNext()){
+        ChaoticParticle m = chaoticParticlesIter.next();
+        m.setState(true);
+      }
+  }
+  
+  void setFirstConnectionsArrived(boolean afcA) {
+    this.firstConnectionsArrived = afcA; 
+  }
+  
+  boolean getFirstConnectionsArrived() {
+    return this.firstConnectionsArrived; 
+  }
+  
+  
 }

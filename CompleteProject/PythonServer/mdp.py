@@ -1,7 +1,7 @@
 import json
 from multiprocessing.connection import wait
 import numpy as np
-from position import scheduleOSCPathsToInterestNode
+from position import scheduleOSCPathsToInterestNode, scheduleOSCPathsFirstNode
 from position import ImageToMap
 import mdptoolbox
 import scipy
@@ -375,7 +375,7 @@ def interestPathHandler(unused_addr, currentNode):
 def interestNodeDistance(unused_addr, things, currentNode):
     interest_point_list = things[0][0]
     client = things[0][1]
-    max_dist = 0.205
+    max_dist = 0.02
     
     to_send = [0,0,0,0,0]
     in_circle = False
@@ -406,8 +406,10 @@ def interestZonePaths():
     startNodes = [[] for _ in range(len(interestNodes))]
     for i in range(len(interestNodes)):
         for j in range(len(nodes)):
-            if dm[i,j] < 0.205 and dm[i,j] > 0.2:
+            if dm[interestNodes[i],j] < 0.01: #and dm[i,j] > 0.2:
                 startNodes[i].append(j)
+    #print("START NODES")
+    #print(startNodes[0].__len__())
 
     #print("printing start nodes")
     #print(startNodes)
@@ -456,8 +458,69 @@ def goalHandler(unused_addr, things, currentNode):
             paths = list[i]
             print(paths)
             ### ADD FUNCTION HERE
-            scheduleOSCPathsToInterestNode(paths,client,things[0][3])
+            scheduleOSCPathsToInterestNode(paths,client,scheduler2)
 
+def nNearestNodes():
+    Nodes = [[] for _ in range(len(interestNodes))]
+    distances = [[] for _ in range(len(interestNodes))]
+    for i in range(len(nodes)):
+        dist = 999
+        for j in range(len(interestNodes)):
+            if dm[interestNodes[j],i] < dist: #and dm[i,j] > 0.2:
+                closer = j
+                dist = dm[interestNodes[j],i]
+        Nodes[closer].append(i)
+        distances[closer].append(dm[interestNodes[j],i])
+    sorted_nodes = []
+    for i in range(len(distances)):
+        pairs = list(zip(distances[i], Nodes[i]))
+        sorted_pairs = sorted(pairs)
+        sorted_list = [pair[1] for pair in sorted_pairs]
+        print("SORTED LIST")
+        print(sorted_list.__len__())
+        sorted_nodes.append(sorted_list)
+    return sorted_nodes
+
+def nNearestNodesHandler(unused_addr, things  ,currentNode):
+    mynodes = things[0][0]
+    myinterestNodes = things[0][1]
+    client = things[0][2]
+    print("CURRENT NODE")
+    print(currentNode)
+    for i in range(len(mynodes)):
+        if currentNode == myinterestNodes[i]:
+            nearestNodes = mynodes[i]
+            # print("printing nearest nodes")
+            # print(nearestNodes)
+            conections = [[] for _ in range(len(nearestNodes))]
+            for i in range(len(conections)):
+                conections[i].append(nearestNodes[i])
+                # print("CHECKING")
+                # print(nearestNodes)
+                for j in range(len(nodes[nearestNodes[i]][3])):
+                    conections[i].append(nodes[nearestNodes[i]][3][j])
+            scheduleOSCPathsToInterestNode(conections,client,scheduler2)
+            print("printing conecctions")
+            print(conections)
+
+def firstPathHandler(unused_addr, things,  currentNodeFirst):
+    client = things[0][0]
+    schedul = things[0][1]
+    nearNodes = []
+    for j in range(len(nodes)):
+        if dm[currentNodeFirst,j] < 0.01: #and dm[i,j] > 0.2:
+            nearNodes.append(j)
+
+    conections = [[] for _ in range(len(nearNodes))]
+    for i in range(len(conections)):
+        conections[i].append(nearNodes[i])
+        # print("CHECKING")
+        # print(nearestNodes)
+        for j in range(len(nodes[nearNodes[i]][3])):
+            conections[i].append(nodes[nearNodes[i]][3][j])
+    scheduleOSCPathsFirstNode(conections, client, schedul)
+    
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -473,6 +536,8 @@ if __name__ == "__main__":
     loadNodes(features)
     global dm
     dm = distMatrix(nodes)
+    #print("DMDMDMDM")
+    #print(dm)
     global maxC
     maxC = getMaxC()
     global notes
@@ -490,7 +555,12 @@ if __name__ == "__main__":
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     global steps
     steps = interestZonePaths()
-    
+    global nNodes
+    nNodes = nNearestNodes()
+    print("ALLNODES")
+    print(len(nodes))
+    print("LENNODES")
+    print(len(nNodes[0])+len(nNodes[1])+len(nNodes[2])+len(nNodes[3]))
     dispatcher = dispatcher.Dispatcher()
 
     imageMap = ImageToMap("assets/COLORMAPTEST.png",[(10.060950707625352,
@@ -507,9 +577,11 @@ if __name__ == "__main__":
     # dispatcher.map("/target",targetHandler)
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
+    dispatcher.map("/currentNodeFirst", firstPathHandler, [client,scheduler2])
     dispatcher.map("/currentNode", interestPathHandler)
+    dispatcher.map("/currentNode", nNearestNodesHandler, [nNodes, interestNodes2,client,scheduler2])
     dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client2])
-    dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
+    #dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
     frase = "ciao"
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
     dispatcher.map("/reset", l_system.sendNoiseOn, [client2])

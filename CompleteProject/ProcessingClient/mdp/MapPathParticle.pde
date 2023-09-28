@@ -1,4 +1,4 @@
-class MapPathParticle{
+class MapPathParticle{ //PARTICELLE CHE SEGUONO GLI ULTIMI NODI VISITATI
   
   ArrayList<PVector> path;
   PVector p;
