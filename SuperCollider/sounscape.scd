@@ -1,7 +1,5 @@
 s.boot;
 Server.killAll;
-p=ServerOptions.new;
-p.memSize= 32.768;
 (
 var samplePath = thisProcess.nowExecutingPath.dirname +/+ "/recordings";
 ~buf_r =Buffer.readChannel(s, samplePath +/+ "./CR_Duomo_Corner.WAV", channels:[1]);
@@ -27,21 +25,6 @@ s.waitForBoot({
 	~reverbBus = Bus.audio(s,2);
 	~lvl = Bus.audio(s,2);
 	s.latency = nil;
-/*
-	SynthDef.new(\buffer_play,{
-		arg outBus, ampA, ampB, ampC, ampD;
-		var sigA, sigB, sigC, sigD;
-
-		sigA = PlayBuf.ar(2, ~a.bufnum, BufRateScale.kr(~a.bufnum), loop:1);
-		sigB = PlayBuf.ar(2, ~b.bufnum, BufRateScale.kr(~b.bufnum), loop:1);
-		sigC = PlayBuf.ar(2, ~c.bufnum, BufRateScale.kr(~c.bufnum), loop:1);
-		sigD = PlayBuf.ar(2, ~d.bufnum, BufRateScale.kr(~d.bufnum), loop:1);
-
-		Out.ar(outBus,sigA*ampA);
-		Out.ar(outBus,sigB*ampB);
-		Out.ar(outBus,sigC*ampC);
-		Out.ar(outBus,sigD*ampD);
-	}).add;*/
 
 	SynthDef.new(\reverb,{
 		arg in;
@@ -62,7 +45,7 @@ s.waitForBoot({
 
 	SynthDef(\lofi_soundscape,
 		{
-			arg outBus, ampA, ampB, ampC, ampD;
+			arg outBus, ampA, ampB, ampC, ampD, fcval=16000, resgain=0;
 			var nfilters = 6;
 			var sig;
 			var shrate = \shrate.kr(22050).lag(1);
@@ -89,6 +72,7 @@ s.waitForBoot({
 
 			sig = HPF.ar(sig, \hpf.kr(100));
 
+			sig = MoogFF.ar(sig, MouseY.kr(100, 10000, 1), MouseX.kr(0, 4));
 			dw = \drywet.kr(1);
 			/*Mix([
 			in * ( 1 - dw.abs ),
@@ -210,19 +194,10 @@ s.waitForBoot({
 		Out.ar(outBus,sig*amp);
 	}).add;
 
-/*	SynthDef.new(\master,{
-		arg in, out=0;
-		var sig;
-		sig = In.ar(in,2);
-		Out.ar(out,sig);
-	}).add;*/
-
-	//~z = Synth.new(\buffer_play,[\outBus,~scBus.index]);
 	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
 	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index]);
 	~y = Synth.new(\synthLvl,[\in,~lvl,\outBus,~reverbBus],s,\addToTail);
 	~r = Synth.new(\reverb,[\in,~reverbBus],s,\addToTail);
-	//~m = Synth.new(\master,[\in,~master],s,\addToTail);
 
 	OSCdef.new(\snrVal,{
 		arg msg;

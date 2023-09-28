@@ -45,3 +45,62 @@ SynthDef.new(\buffer_play,{
 
 h = Synth.newPaused(\buffer_play,[\outBus,~buss]);
 ~r = Synth.new(\reverb,[\in,~buss],s,\addToTail);
+
+
+
+
+(
+SynthDef(\lofi_soundscape,
+	{
+		arg outBus, ampA, ampB, ampC, ampD, fcval=16000, resgain=0;
+		var nfilters = 6;
+		var sig;
+		var shrate = \shrate.kr(22050).lag(1);
+		//var in = PlayBuf.ar(2, ~b.bufnum, BufRateScale.kr(~b.bufnum), loop:1);
+		var sigA = PlayBuf.ar(2, ~a.bufnum, BufRateScale.kr(~a.bufnum), loop:1);
+		var sigB = PlayBuf.ar(2, ~b.bufnum, BufRateScale.kr(~b.bufnum), loop:1);
+		var sigC = PlayBuf.ar(2, ~c.bufnum, BufRateScale.kr(~c.bufnum), loop:1);
+		var sigD = PlayBuf.ar(2, ~d.bufnum, BufRateScale.kr(~d.bufnum), loop:1);
+
+		var in = Mix.ar([sigA*ampA,sigC*ampC,sigC*ampC,sigD*ampD]);
+		//var in = WhiteNoise.ar(0.1);  //
+		var dw;
+		var trigFreq = LFDNoise3.ar(shrate * \jitterScale.kr(1) !2).range(shrate * ( 1 - \jitter.kr(0.1)), shrate);
+		var trig = Impulse.ar(trigFreq);
+
+
+		sig = Latch.ar(in, trig);
+
+		sig = Slew.ar(sig, \slewrate.kr(4410), \slewrate.kr);
+
+		nfilters.do { |i| // steep LPF
+			sig = LPF.ar(sig, ( shrate * \lpfscale.kr( 0.25 ) ).clip(100, SampleRate.ir * 0.45), mul:1.2).atan;
+		};
+
+		sig = HPF.ar(sig, \hpf.kr(100));
+
+		sig = MoogFF.ar(sig, MouseY.kr(100, 10000, 1), MouseX.kr(0, 4));
+
+			dw = \drywet.kr(1);
+		/*Mix([
+		in * ( 1 - dw.abs ),
+		sig * dw
+		]);*/
+		Out.ar([0,1],(Mix([
+			in * ( 1 - dw.abs ),
+			sig * dw
+		])))
+
+	}
+).add;
+
+)
+
+
+~x = Synth.newPaused(\lofi_soundscape,['shrate',491.25,'drywet', 1,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
+
+~x.run;
+~x.set(\fcval,12000,\regain,1);
+~x.set(\fcval,8000,\regain,2);
+~x.set(\fcval,100,\regain,3);
+
