@@ -462,6 +462,7 @@ def goalHandler(unused_addr, things, currentNode):
 
 def nNearestNodes():
     Nodes = [[] for _ in range(len(interestNodes))]
+    distances = [[] for _ in range(len(interestNodes))]
     for i in range(len(nodes)):
         dist = 999
         for j in range(len(interestNodes)):
@@ -469,7 +470,16 @@ def nNearestNodes():
                 closer = j
                 dist = dm[interestNodes[j],i]
         Nodes[closer].append(i)
-    return Nodes
+        distances[closer].append(dm[interestNodes[j],i])
+    sorted_nodes = []
+    for i in range(len(distances)):
+        pairs = list(zip(distances[i], Nodes[i]))
+        sorted_pairs = sorted(pairs)
+        sorted_list = [pair[1] for pair in sorted_pairs]
+        print("SORTED LIST")
+        print(sorted_list.__len__())
+        sorted_nodes.append(sorted_list)
+    return sorted_nodes
 
 def nNearestNodesHandler(unused_addr, things  ,currentNode):
     mynodes = things[0][0]
