@@ -98,7 +98,7 @@ def sendPath(path,client):
     #print("path sent")
 
 def scheduleOSCPathsFirstNode(pathsList,client,myscheduler):
-    delay = 0
+    delay = 6
     for path in pathsList: 
         myscheduler.enter(delay,4,sendConections,argument=(path,client))
         delay += 0.1

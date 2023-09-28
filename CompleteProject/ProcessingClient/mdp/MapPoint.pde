@@ -33,7 +33,8 @@ class MapPoint{ //CLASSE DEL MAP POINT
   void addConnection(int id){
     if(!this.connections.hasValue(id)){
         this.connections.append(id); 
-        map.getMapPoint(add).addConnection(this.id);
+        map.getMapPoint(id).addConnection(this.id);
+        
       }
   }
   

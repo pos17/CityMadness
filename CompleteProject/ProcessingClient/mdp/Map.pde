@@ -21,7 +21,7 @@ class Map{
   MapPoint interestPoint;
   MapPoint currentPoint;  
   
-  boolean pathDone, systemCreated, moving;
+  boolean pathDone, systemCreated, moving,firstConnectionsArrived;
   
   PGraphics shadow;
   PGraphics trash;
@@ -38,6 +38,7 @@ class Map{
     this.mapPoints = loadMapPoints();
     this.pathDone = false;
     this.systemCreated = false;
+    this.firstConnectionsArrived = false;
     this.renderMap();
     this.render = createGraphics(width, height, P2D);
     this.shadow = createGraphics(width, height, P2D);
@@ -67,7 +68,13 @@ class Map{
     //this.render.clear();
     
     this.render.noStroke();
-    this.render.fill(0,50);
+    if(startup) {
+      this.render.fill(0,50);
+    } else if(this.chaoticParticles.size() > 300) {
+      this.render.fill(0,80);
+    } else {
+      this.render.fill(0,15);
+    }
     this.render.rect(0,0,width,height);
     //this.render.background(0);
     
@@ -77,7 +84,10 @@ class Map{
     //SHOW CHAOTIC PARTICLES
     this.render.stroke(255,MAPPARTICLEALPHA);
     this.render.strokeWeight(3);
+    if(firstConnectionsArrived && this.wanderingParticles.size() < 300 &&  this.chaoticParticles.size() < 300) {
+      this.wanderingParticles.add(new RandomPathParticle(this.currentPoint.getId()));
     
+    }
         
         //ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
         //while(chaoticParticlesIter.hasNext()){
@@ -509,5 +519,14 @@ class Map{
         m.setState(true);
       }
   }
+  
+  void setFirstConnectionsArrived(boolean afcA) {
+    this.firstConnectionsArrived = afcA; 
+  }
+  
+  boolean getFirstConnectionsArrived() {
+    return this.firstConnectionsArrived; 
+  }
+  
   
 }
