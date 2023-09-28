@@ -25,16 +25,25 @@ boolean showInterestPoint = false;
 
 boolean showChaoticParticles = true;
 
+// SUPERCOLLIDER CONTROL PARAMETERS 
+int filterFreqValDEF = 1000;
+int filterFreqVal = filterFreqValDEF;
+int filterFreqValRANDOM = 16000;
+float musicVol = 0;
+float scVol = 1;
+float grainVol = 1; 
 
 OscP5 oscP5;
 OscP5 oscP52;
 
 NetAddress myRemoteLocation;
+NetAddress myRemoteLocation2;
 boolean startup = true;
 
 Map map;
 int inport = 1235;
 int outport = 5005;
+int outport2 = 57120;
 
 PFont font;
 
@@ -51,7 +60,7 @@ void setup(){
   oscP5 = new OscP5(this,inport);
   oscP52 = new OscP5(this,inport);
   myRemoteLocation = new NetAddress("127.0.0.1", outport);
-  
+  myRemoteLocation2 = new NetAddress("127.0.0.1", outport2);
   OscMessage myMessage = new OscMessage("/reset");
   oscP5.send(myMessage, myRemoteLocation);
   

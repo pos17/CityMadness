@@ -145,3 +145,35 @@ IntList oscPathParser(OscMessage msg){
   
   return addresses;
 }
+// 60 - 16000
+void controlFilter(int freq) {
+  OscMessage myMessage = new OscMessage("/fcVal");
+  myMessage.add(freq);
+  oscP5.send(myMessage, myRemoteLocation);
+} 
+
+// 0.0 - 1.0
+void controlMusicVol(float val) {
+  OscMessage myMessage = new OscMessage("/musicVol");
+  myMessage.add(val);
+  oscP52.send(myMessage, myRemoteLocation2);
+} 
+
+// 0.0 - 0.8
+void controlGrainAgit(float valAgit) {
+  OscMessage myMessage = new OscMessage("/synthAgit");
+  myMessage.add(valAgit);
+  oscP52.send(myMessage, myRemoteLocation2);
+} 
+// 0.0 - 1.0
+void controlscVol(float val) {
+  OscMessage myMessage = new OscMessage("/scVol");
+  myMessage.add(val);
+  oscP52.send(myMessage, myRemoteLocation2);
+} 
+// 0.0 - 1.0
+void controlGrainVol(float val) {
+  OscMessage myMessage = new OscMessage("/grainVol");
+  myMessage.add(val);
+  oscP52.send(myMessage, myRemoteLocation2);
+} 
