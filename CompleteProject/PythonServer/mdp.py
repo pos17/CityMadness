@@ -406,7 +406,7 @@ def interestZonePaths():
     startNodes = [[] for _ in range(len(interestNodes))]
     for i in range(len(interestNodes)):
         for j in range(len(nodes)):
-            if dm[interestNodes[i],j] < 0.02: #and dm[i,j] > 0.2:
+            if dm[interestNodes[i],j] < 0.01: #and dm[i,j] > 0.2:
                 startNodes[i].append(j)
     #print("START NODES")
     #print(startNodes[0].__len__())
@@ -464,7 +464,7 @@ def nNearestNodes():
     Nodes = [[] for _ in range(len(interestNodes))]
     for i in range(len(interestNodes)):
         for j in range(len(nodes)):
-            if dm[interestNodes[i],j] < 0.01: #and dm[i,j] > 0.2:
+            if dm[interestNodes[i],j] < 0.04: #and dm[i,j] > 0.2:
                 Nodes[i].append(j)
     return Nodes
 

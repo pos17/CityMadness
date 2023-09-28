@@ -73,7 +73,7 @@ class Map{
     } else if(this.chaoticParticles.size() > 300) {
       this.render.fill(0,80);
     } else {
-      this.render.fill(0,15);
+      this.render.fill(0,5);
     }
     this.render.rect(0,0,width,height);
     //this.render.background(0);
