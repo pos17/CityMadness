@@ -15,7 +15,7 @@ s.waitForBoot({
 	var right, left,bass;
 	var n0, n1, n2;
 	var note_getter;
-	~n1 = NetAddr.new("127.0.0.1",57121);
+	~n1 = NetAddr.new("127.0.0.1",57120);
 	NetAddr.localAddr;
 	~note_table = 0!127;
 	~n = nil;
@@ -104,12 +104,12 @@ s.waitForBoot({
 		}
 	).add;
 
-	SynthDef(\grain_synth,{|outBus,loop = 0,amp=1,gate=1|
+	SynthDef(\grain_synth,{|outBus,loop = 0,amp=1,gate=1,agit|
 		var sigL,sigR, trate, dur, rate;
 		trate = MouseY.kr(2,200,1);
 		dur = 4/trate;
 		rate = Dseq([1, 1, 1, 0.5, 0.5, 0.2, -1], inf);
-		sigR = TGrains.ar(1, Impulse.ar(trate), ~buf_r, rate, MouseX.kr(0,BufDur.kr(~buf_r)), dur, Dseq([-1,1,inf]), 0.9, 2);
+		sigR = TGrains.ar(1, Impulse.ar(trate), ~buf_r, rate, agit, dur, Dseq([-1,1,inf]), 0.9, 2);
 		sigR = Pan2.ar(sigR,LFNoise1.kr(10));
 		Out.ar(outBus,sigR*amp);
 	}).add;
@@ -206,13 +206,14 @@ s.waitForBoot({
 	}).store;
 
 	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
-	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index]);
+	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index,\agit,~agit]);
 	~y = Synth.new(\synthLvl,[\inA,~lvl1,\inB,~lvl2,\inC,~lvl3,\ampA,~lvl_music,\ampB,~lvl_sc,\ampC,~lvl_grain,\outBus,~reverbBus],s,\addToTail);
 	~r = Synth.new(\reverb,[\in,~reverbBus,\fcvalue,~fcval],s,\addToTail);
 
 	OSCdef.new(\musicVol{
 		arg msg;
 		~lvl_music = msg[1];
+		~y.set(\ampA,~lvl_music);
 	},
 	path:"/musicVol"
 	);
@@ -220,6 +221,7 @@ s.waitForBoot({
 	OSCdef.new(\scVol{
 		arg msg;
 		~lvl_sc = msg[1];
+		~y.set(\ampB,~lvl_sc);
 	},
 	path:"/scVol"
 	);
@@ -227,6 +229,7 @@ s.waitForBoot({
 	OSCdef.new(\grainVol{
 		arg msg;
 		~lvl_grain = msg[1];
+		~y.set(\ampC,~lvl_grain);
 	},
 	path:"/grainVol"
 	);
@@ -234,13 +237,15 @@ s.waitForBoot({
 	OSCdef.new(\fcVal{
 		arg msg;
 		~fcval = msg[1];
+		~r.set(\fcvalue,~fcval);
 	},
 	path:"/fcVal"
 	);
 
 	OSCdef.new(\synthAgit,{
 		arg msg;
-		//~fcval = msg[1];
+		~agit= msg[1].linlin(0,1,0,BufDur.kr(~buf_r));
+
 	},
 	path:"/synthAgit"
 	)
