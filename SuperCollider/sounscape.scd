@@ -9,7 +9,7 @@ var samplePath = thisProcess.nowExecutingPath.dirname +/+ "/recordings";
 ~c =Buffer.read(s, samplePath +/+ "/CR_MarketWalk.WAV");
 ~d =Buffer.read(s, samplePath +/+ "/CR_PStradivari_Corner.WAV");
 )
-
+//sig = MoogFF.ar(sig, MouseY.kr(100, 10000, 1), MouseX.kr(0, 4));
 (
 s.waitForBoot({
 	var right, left,bass;
@@ -20,14 +20,33 @@ s.waitForBoot({
 	~note_table = 0!127;
 	~n = nil;
 
+	~lvl_music = 0;
+	~lvl_sc = 0;
+	~lvl_grain = 0;
+	~fcval = 0;
 	//~master = Bus.audio(s,2);
+
+	//Bus
 	~scBus = Bus.audio(s,2);
 	~reverbBus = Bus.audio(s,2);
-	~lvl = Bus.audio(s,2);
+	~lvl1 = Bus.audio(s,2);
+	~lvl2 = Bus.audio(s,2);
+	~lvl3 = Bus.audio(s,2);
+
 	s.latency = nil;
 
+	SynthDef.new(\synthLvl,{
+		arg inA, inB, outBus, ampA, ampB, ampC;
+		var sigA, sigB,sigC;
+		sigA = In.ar(inA,2);
+		sigB = In.ar(inB,2);
+		sigC = In.ar(inC,2);
+
+		Out.ar(outBus,Mix.ar([sigA*ampA,sigB*ampB,sigC*ampC]);
+	}).add;
+
 	SynthDef.new(\reverb,{
-		arg in;
+		arg in, fcvalue;
 		var d = in;
 		var diffusion = \diffusion.kr(50);
 		var spacesize = \spacesize.kr(30);
@@ -40,7 +59,7 @@ s.waitForBoot({
 			)
 		};
 
-		Out.ar([0,1],d);
+		Out.ar([0,1],MoogFF.ar(d,fcvalue, 1);
 	}).add;
 
 	SynthDef(\lofi_soundscape,
@@ -72,7 +91,6 @@ s.waitForBoot({
 
 			sig = HPF.ar(sig, \hpf.kr(100));
 
-			sig = MoogFF.ar(sig, MouseY.kr(100, 10000, 1), MouseX.kr(0, 4));
 			dw = \drywet.kr(1);
 			/*Mix([
 			in * ( 1 - dw.abs ),
@@ -187,17 +205,45 @@ s.waitForBoot({
 		Out.ar(outBus, c)
 	}).store;
 
-	SynthDef.new(\synthLvl,{
-		arg in, outBus, amp;
-		var sig;
-		sig = In.ar(in,2);
-		Out.ar(outBus,sig*amp);
-	}).add;
-
 	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
 	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index]);
-	~y = Synth.new(\synthLvl,[\in,~lvl,\outBus,~reverbBus],s,\addToTail);
-	~r = Synth.new(\reverb,[\in,~reverbBus],s,\addToTail);
+	~y = Synth.new(\synthLvl,[\inA,~lvl1,\inB,~lvl2,\inC,~lvl3,\ampA,~lvl_music,\ampB,~lvl_sc,\ampC,~lvl_grain,\outBus,~reverbBus],s,\addToTail);
+	~r = Synth.new(\reverb,[\in,~reverbBus,\fcvalue,~fcval],s,\addToTail);
+
+	OSCdef.new(\musicVol{
+		arg msg;
+		~lvl_music = msg[1];
+	},
+	path:"/musicVol"
+	);
+
+	OSCdef.new(\scVol{
+		arg msg;
+		~lvl_sc = msg[1];
+	},
+	path:"/scVol"
+	);
+
+	OSCdef.new(\grainVol{
+		arg msg;
+		~lvl_grain = msg[1];
+	},
+	path:"/grainVol"
+	);
+
+	OSCdef.new(\fcVal{
+		arg msg;
+		~fcval = msg[1];
+	},
+	path:"/fcVal"
+	);
+
+	OSCdef.new(\synthAgit,{
+		arg msg;
+		//~fcval = msg[1];
+	},
+	path:"/synthAgit"
+	)
 
 	OSCdef.new(\snrVal,{
 		arg msg;
@@ -206,7 +252,7 @@ s.waitForBoot({
 		dw = msg[1]/10;
 		~lvl_synth = 1-(msg[1]/10);
 		~x.set('drywet',dw);
-		~y.set(\amp,~lvl_synth);
+		~y.set(\amp,~lvl_music);
 		~t.stop;
 	},
 	path:"/snrVal"
@@ -273,7 +319,7 @@ s.waitForBoot({
 		\midinote, Pseq([ n0, n2, n1, n2] ++ (([ n0, n2, n1, n2] + 12)!2).flatten),
 		\dur, Pseq([1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 ].normalizeSum*2),
 		//\lvl,~lvl_synth,
-		\outBus,~lvl,
+		\outBus,~lvl1,
 		\delta,2,
 		//
 		\levA,Pdefn(\levA,1),
@@ -290,7 +336,7 @@ s.waitForBoot({
 		\instrument, \sin_pulsar,
 		\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
 		\dur, Pseq([1, 1, 1, 1, 1, 1, 1, 1].normalizeSum*2),
-		\outBus,~lvl,
+		\outBus,~lvl1,
 		\delta, 2,
 		//
 		\levA,Pdefn(\levA,1),
@@ -310,7 +356,7 @@ s.waitForBoot({
 		\ampSynth,Pdefn(\ampSynth),
 		\cutoff,450,
 		\decay,4,
-		\outBus,~lvl,
+		\outBus,~lvl1,
 		\delta,2,
 		//
 		\levA,Pdefn(\levA,1),
