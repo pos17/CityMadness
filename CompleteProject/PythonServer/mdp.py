@@ -1,7 +1,7 @@
 import json
 from multiprocessing.connection import wait
 import numpy as np
-from position import scheduleOSCPathsToInterestNode
+from position import scheduleOSCPathsToInterestNode, scheduleOSCPathsFirstNode
 from position import ImageToMap
 import mdptoolbox
 import scipy
@@ -491,6 +491,24 @@ def nNearestNodesHandler(unused_addr, things  ,currentNode):
             print("printing conecctions")
             print(conections)
 
+def firstPathHandler(unused_addr, things,  currentNodeFirst):
+    client = things[0][0]
+    schedul = things[0][1]
+    nearNodes = []
+    for j in range(len(nodes)):
+        if dm[currentNodeFirst,j] < 0.01: #and dm[i,j] > 0.2:
+            nearNodes.append(j)
+
+    conections = [[] for _ in range(len(nearNodes))]
+    for i in range(len(conections)):
+        conections[i].append(nearNodes[i])
+        # print("CHECKING")
+        # print(nearestNodes)
+        for j in range(len(nodes[nearNodes[i]][3])):
+            conections[i].append(nodes[nearNodes[i]][3][j])
+    scheduleOSCPathsFirstNode(conections, client, schedul)
+    
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -543,6 +561,7 @@ if __name__ == "__main__":
     # dispatcher.map("/target",targetHandler)
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
+    dispatcher.map("/currentNodeFirst", firstPathHandler, [client,scheduler2])
     dispatcher.map("/currentNode", interestPathHandler)
     dispatcher.map("/currentNode", nNearestNodesHandler, [nNodes, interestNodes2,client,scheduler2])
     dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client2])
