@@ -11,9 +11,19 @@ void oscEvent(OscMessage msg) {
     //println("Next Points Set");
     
     //println("Next addresses: " + addresses);
-  }
   
-  else if(msg.checkAddrPattern("/interestPath")){
+
+  } else if (msg.checkAddrPattern("/nextNodesFirst") {
+    IntList addresses = new IntList();
+    int nodeID = msg.get(0).intValue()
+    for(int i = 1; i<msg.arguments().length; i++){
+      addresses.append(msg.get(i).intValue()); 
+    }
+    println("STARTID: " + nodeID + ", conn: " + addresses)
+    map.updatePointConnections(nodeID, addresses);
+    map.wanderingParticles.add(new RandomPathParticle(map.currentPoint.getID()));
+      
+  } else if(msg.checkAddrPattern("/interestPath")){
     
     //[0] interest node, [1] path len, [...] path
 
@@ -71,12 +81,20 @@ void mousePressed(){
     time++;
     timeFromClick = 0;
     map.setChaoticParticlesState();
-    OscMessage myMessage = new OscMessage("/currentNode");
     int id = map.getClosestPointId(mouseX-HALF_WIDTH, mouseY-HALF_HEIGHT);
-    myMessage.add(id);
-    oscP5.send(myMessage, myRemoteLocation);
+    if(!startup) {
+      OscMessage myMessage = new OscMessage("/currentNode");
+      myMessage.add(id);
+      oscP5.send(myMessage, myRemoteLocation);
+    } else {
+      OscMessage myMessage = new OscMessage("/currentNodeFirst");
+      myMessage.add(id);
+      oscP5.send(myMessage, myRemoteLocation);
+    }
+    //after this call !startup
     map.updatePath(id);
     map.setCurrentPoint(id);
+    
     
   } 
 }

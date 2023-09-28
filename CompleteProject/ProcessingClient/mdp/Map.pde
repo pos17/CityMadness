@@ -475,6 +475,10 @@ class Map{
     this.currentPoint.addToConnections(addresses);
   }
   
+  void updatePointConnections(int nodeID, IntList addresses) {
+     this.getMapPoint(nodeID).addToConnections(addresses);
+  }
+  
   // PARTICLE SYSTEM METHODS
   
   void removePathParticle(MapPathParticle p){
