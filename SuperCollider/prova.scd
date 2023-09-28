@@ -104,3 +104,26 @@ SynthDef(\lofi_soundscape,
 ~x.set(\fcval,8000,\regain,2);
 ~x.set(\fcval,100,\regain,3);
 
+(
+{
+    var trate, dur, rate;
+    trate = MouseY.kr(2,200,1);
+    dur = 4 / trate;
+    rate = Dseq([10, 1, 1, 0.5, 0.5, 0.2, 0.1], inf);
+    TGrains.ar(2, Impulse.ar(trate), ~b, rate, MouseX.kr(0,BufDur.kr(~b)), dur, Dseq([-1, 1], inf), 0.1, 2);
+}.play;
+)
+
+
+(
+SynthDef(\grain_synth,{|outBus,loop = 0,amp=1,gate=1|
+		var sigL,sigR, trate, dur, rate;
+		trate = MouseY.kr(2,200,1);
+		dur = 4/trate;
+		rate = Dseq([1, 1, 1, 0.5, 0.5, 0.2, -1], inf);
+		sigR = TGrains.ar(1, Impulse.ar(trate), ~buf_r, rate, MouseX.kr(0,BufDur.kr(~buf_r)), dur, Dseq([-1,1,inf]), 0.9, 2);
+		sigR = Pan2.ar(sigR,LFNoise1.kr(10));
+		Out.ar(outBus,sigR*amp);
+	}).play;
+
+)
