@@ -470,10 +470,12 @@ def nNearestNodes():
                 closer = j
                 dist = dm[interestNodes[j],i]
         Nodes[closer].append(i)
-        distances[closer].append(dm[interestNodes[j],i])
+        distances[closer].append(dm[interestNodes[closer],i])
     sorted_nodes = []
     sorted_dist = []
     for i in range(len(distances)):
+        #print("MINDISTR")
+        #print(min(distances[i]))
         distances[i] = (distances[i] - min(distances[i])) / ( max(distances[i]) - min(distances[i]))
     for i in range(len(distances)):
         pairs = list(zip(distances[i], Nodes[i]))
@@ -484,6 +486,11 @@ def nNearestNodes():
         #print(sorted_list.__len__())
         sorted_nodes.append(sorted_list1)
         sorted_dist.append(sorted_list2)
+    for i in range(len(sorted_nodes)):
+        if 1013 in sorted_nodes[i]:
+            index = sorted_nodes[i].index(1013)
+            #print("DIST0000")
+            #print(sorted_dist[i][index])
     return sorted_nodes, sorted_dist
 
 def nNearestNodesHandler(unused_addr, things  ,currentNode):
@@ -533,7 +540,7 @@ def synthHandler(unused_addr, things,  currentNode):
     for i in range(len(distances)):
         if currentNode in myNodes[i]:
             index = myNodes[i].index(currentNode)
-            to_send[i] = distances[i][index]
+            to_send[i] = 1 - distances[i][index]
         else:
             to_send[i] = 0
     print("TOSENT")
