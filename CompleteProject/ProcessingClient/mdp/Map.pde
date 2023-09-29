@@ -50,7 +50,7 @@ class Map {
     for (int i = 0; i < NMAPPARTICLES; i++) {
       int rand = (int)random(preParticles.size());
       //println("rand: " +rand);
-      chaoticParticles.add(new ChaoticParticle(preParticles.get(rand).getPoint(),chaosVel, chaosAcc));
+      chaoticParticles.add(new ChaoticParticle(preParticles.get(rand).getPoint(), chaosVel, chaosAcc));
       preParticles.remove(rand);
     }
     this.cityGraphics = loadImage("map.png");
@@ -99,27 +99,55 @@ class Map {
     }
 
     //HANDLING OSC MESSAGES FOR SUPERCOLLIDER
+    /*
     if (startup) {
-      //if()
-    } else {
-      if ( this.chaoticParticles.size()>=NMAPPARTICLES) {
-        if (filterFreqVal<= filterFreqValRANDOM) {
-          filterFreqVal += 1;
-          controlFilter(filterFreqVal);
-        }
-      } else {
-        filterFreqVal -= 1;
+     //if()
+     } else {
+     if ( this.chaoticParticles.size()>=NMAPPARTICLES) {
+     if (filterFreqVal<= filterFreqValRANDOM) {
+     filterFreqVal += 1;
+     controlFilter(filterFreqVal);
+     }
+     } else if(filterFreqVal > 60 && ) {
+     
+     filterFreqVal -= 1;
+     controlFilter(filterFreqVal);
+     if (this.wanderingParticles.size() < 500) {
+     if (musicVol<0.5) {
+     musicVol += 0.0001;
+     controlMusicVol(musicVol);
+     }
+     if (scVol>0.5) {
+     scVol -= 0.0001;
+     controlscVol(scVol);
+     }
+     }
+     }
+     }
+     */
+
+    if (music_phase == 1 ) {
+      if (filterFreqVal< filterFreqValRANDOM) {
+        filterFreqVal = ceil((float)filterFreqVal + 0.5);
         controlFilter(filterFreqVal);
-        if (this.wanderingParticles.size() < 500) {
-          if (musicVol<0.5) {
-            musicVol += 0.0001;
-            controlMusicVol(musicVol);
-          }
-          if (scVol>0.5) {
-            scVol -= 0.0001;
-            controlscVol(scVol);
-          }
-        }
+      }
+    } else if (music_phase == 2 ) {
+      if (filterFreqVal> filterFreqValATT) {
+        filterFreqVal = ceil((float)filterFreqVal - 0.5);
+        controlFilter(filterFreqVal);
+      }
+    } else if (music_phase == 3) {
+      if(filterFreqVal!=16000) {
+        filterFreqVal = 16000;
+        controlFilter(filterFreqVal);
+      }
+      if (musicVol<0.5) {
+        musicVol += 0.0001;
+        controlMusicVol(musicVol);
+      }
+      if (scVol>0.5) {
+        scVol -= 0.0001;
+        controlscVol(scVol);
       }
     }
 
@@ -154,11 +182,11 @@ class Map {
       ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
       while (chaoticParticlesIter.hasNext()) {
         ChaoticParticle m = chaoticParticlesIter.next();
-        if(chaoticParticlesMove) {
+        if (chaoticParticlesMove) {
           m.moveNoise();
         }
         PVector p = m.getPos();
-        
+
         render.point(p.x, p.y);
       }
     } else {
@@ -181,8 +209,9 @@ class Map {
 
     // RENDER SHADOW
     this.render.image(this.shadow, -HALF_WIDTH, -HALF_HEIGHT);
-    this.updateExplosions();
-
+    if (frameCount%2 == 0) {
+      this.updateExplosions();
+    }
     // RENDER MAP FRAGMENTS
     if (this.mapFragments.size()>0) {
       this.trash.beginDraw();
@@ -286,14 +315,16 @@ class Map {
     image(this.render, 0, 0);
 
     // TEST: PATH GENERATI INTORNO AL'INTEREST POINT
+    /*
     if (explosionPaths) {
-      stroke(255, 0, 0);
-      strokeWeight(5);
-      for (int i = 0; i<explosionsPaths.size(); i++) {
-        PVector p = explosionsPaths.get(i);
-        point(p.x+HALF_WIDTH, p.y+HALF_HEIGHT);
-      }
-    }
+     stroke(255, 0, 0);
+     strokeWeight(5);
+     for (int i = 0; i<explosionsPaths.size(); i++) {
+     PVector p = explosionsPaths.get(i);
+     point(p.x+HALF_WIDTH, p.y+HALF_HEIGHT);
+     }
+     }
+     */
   }
 
   // INUTILIZZATO MA MEGLIO LASCIARLO
@@ -437,7 +468,7 @@ class Map {
   }
 
   // GENERA LE OMBRE CHE NASCONDONO LE PARTICELLE
-  
+
   void renderShadow() {
     for (int i = 0; i<mapFragments.size(); i++) {
       if (mapFragments.get(i).id == currentPoint.id) {
@@ -478,12 +509,12 @@ class Map {
 
     println("explosionsInUpdate");
     // PARSE EXPLOSIONS
-    
+
 
     click = false;
-  } 
-  
-  void updateExplosions(){
+  }
+
+  void updateExplosions() {
     if (this.explosions.size()>0) {
       println("starting to update");
       IntList add = this.explosions.get(0);
@@ -501,54 +532,52 @@ class Map {
       this.mapFragments.add(new MapFragment(f, t, id, cityGraphics));
       this.explosions.remove(0);
     }
-    
-    
-  } 
-  
+  }
+
   // VERSIONE DI CODICE ALTERNATIVA NON UTILIZZATA
-  
+
   /*
   void renderShadow() {
-    for (int i = 0; i<mapFragments.size(); i++) {
-      if (mapFragments.get(i).id == currentPoint.id) {
-        return;
-      }
-    }
-    PImage img = loadImage("map.png");
-    img.resize(width, height);
-
-    IntList addresses = this.currentPoint.getConnections();
-    ArrayList<PVector> to = new ArrayList<PVector>();
-    for (int i = 0; i<addresses.size(); i++) {
-      to.add(this.getMapPoint(addresses.get(i)).getCoords());
-    }
-    mapFragments.add(new MapFragment(this.currentPoint.getCoords(), to, this.currentPoint.getId(), img));
-
-
-
-    this.shadow.beginDraw();
-    this.shadow.push();
-    this.shadow.translate(HALF_WIDTH, HALF_HEIGHT);
-    this.shadow.stroke(0, 5);
-    this.shadow.noFill();
-    this.shadow.strokeJoin(ROUND);
-
-
-    PVector from = this.currentPoint.getCoords();
-
-    for (int i = 0; i<to.size(); i++) {
-      PVector t = to.get(i);
-      for (int j = 0; j<10; j++) {
-        this.shadow.strokeWeight(map(j, 0, 20, 5, 25));
-        this.shadow.line(t.x, t.y, from.x, from.y);
-      }
-    }
-    this.shadow.pop();
-    this.shadow.endDraw();
-
-    click = false;
-  }
-  */
+   for (int i = 0; i<mapFragments.size(); i++) {
+   if (mapFragments.get(i).id == currentPoint.id) {
+   return;
+   }
+   }
+   PImage img = loadImage("map.png");
+   img.resize(width, height);
+   
+   IntList addresses = this.currentPoint.getConnections();
+   ArrayList<PVector> to = new ArrayList<PVector>();
+   for (int i = 0; i<addresses.size(); i++) {
+   to.add(this.getMapPoint(addresses.get(i)).getCoords());
+   }
+   mapFragments.add(new MapFragment(this.currentPoint.getCoords(), to, this.currentPoint.getId(), img));
+   
+   
+   
+   this.shadow.beginDraw();
+   this.shadow.push();
+   this.shadow.translate(HALF_WIDTH, HALF_HEIGHT);
+   this.shadow.stroke(0, 5);
+   this.shadow.noFill();
+   this.shadow.strokeJoin(ROUND);
+   
+   
+   PVector from = this.currentPoint.getCoords();
+   
+   for (int i = 0; i<to.size(); i++) {
+   PVector t = to.get(i);
+   for (int j = 0; j<10; j++) {
+   this.shadow.strokeWeight(map(j, 0, 20, 5, 25));
+   this.shadow.line(t.x, t.y, from.x, from.y);
+   }
+   }
+   this.shadow.pop();
+   this.shadow.endDraw();
+   
+   click = false;
+   }
+   */
 
 
   void setNextInterestPoint(int p) {
