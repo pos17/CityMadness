@@ -209,8 +209,8 @@ s.waitForBoot({
 	}).store;
 
 	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~lvl2,'shrate',491.25,'drywet', 0.95,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
-	~t = Synth.newPaused(\grain_synth,[\outBus,~lvl2]);
-	~y = Synth.new(\synthLvl,[\inA,~lvl1,\inB,~lvl2,\inC,~lvl3,\ampA,~lvl_music,\ampB,0.8,\ampC,0.2,\outBus,~reverbBus],s,\addToTail);
+	~t = Synth.newPaused(\grain_synth,[\outBus,~lvl3,\agit,~agitVal]);
+	~y = Synth.new(\synthLvl,[\inA,~lvl1,\inB,~lvl2,\inC,~lvl3,\ampA,~lvl_music,\ampB,~lvl_sc,\ampC,~lvl_sc,\outBus,~reverbBus],s,\addToTail);
 	~r = Synth.new(\reverb,[\in,~reverbBus,\fcvalue,16000],s,\addToTail);
 
 	OSCdef.new(\musicVol,{
@@ -240,21 +240,21 @@ s.waitForBoot({
 	OSCdef.new(\fcVal,{
 		arg msg;
 		~fcval = msg[1];
-		//postln(msg[1]);
-		~r.set(\fcvalue,~fcval);
+		postln(msg[1]);
+		//~r.set(\fcvalue,~fcval);
 	},
 	path:"/fcVal"
 	);
 
 	OSCdef.new(\synthAgit,{
 		arg msg;
-		~agit= msg[1].linlin(0,1,0,BufDur.kr(~buf_r));
+		~agitVal= msg[1].linlin(0,1,0,BufDur.kr(~buf_r));
 
 	},
 	path:"/synthAgit"
 	);
 
-	OSCdef.new(\snrVal,{
+	/*OSCdef.new(\snrVal,{
 		arg msg;
 		var dw;
 
@@ -265,7 +265,7 @@ s.waitForBoot({
 		~t.stop;
 	},
 	path:"/snrVal"
-	);
+	);*/
 
 	OSCdef.new(\noiseOn,{
 		arg msg;
