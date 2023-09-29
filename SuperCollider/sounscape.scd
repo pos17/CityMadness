@@ -36,6 +36,35 @@ s.waitForBoot({
 	s.latency = nil;
 
 
+	SynthDef.new(\synthLvl,{
+		arg inA, inB, inC, outBus, ampA=0, ampB=0.5, ampC=0.5;
+		var sig, sigA, sigB,sigC;
+		sigA = In.ar(inA,2);
+		sigB = In.ar(inB,2);
+		sigC = In.ar(inC,2);
+
+		sig = Mix.ar([sigA*ampA,sigB*ampB,sigC*ampC]);
+
+		Out.ar(outBus,sig);
+	}).add;
+
+	SynthDef.new(\reverb,{
+		arg in, fcvalue=16000;
+		var d = in;
+		var diffusion = \diffusion.kr(50);
+		var spacesize = \spacesize.kr(30);
+		d = In.ar(d,1);
+		8.do { |i|
+			d = AllpassC.ar(
+				d,
+				delaytime: LFNoise1.kr(0.01!2).range(0.01, spacesize),
+				decaytime: diffusion
+			)
+		};
+
+		Out.ar([0,1],MoogFF.ar(d,fcvalue, 1));
+	}).add;
+
 	SynthDef(\lofi_soundscape,
 		{
 			arg outBus, ampA, ampB, ampC, ampD, fcval=16000, resgain=0;
@@ -179,36 +208,6 @@ s.waitForBoot({
 		Out.ar(outBus, c)
 	}).store;
 
-	SynthDef.new(\synthLvl,{
-		arg inA, inB, inC, outBus, ampA=0, ampB=0.5, ampC=0.5;
-		var sig, sigA, sigB,sigC;
-		sigA = In.ar(inA,2);
-		sigB = In.ar(inB,2);
-		sigC = In.ar(inC,2);
-
-		sig = Mix.ar([sigA*ampA,sigB*ampB,sigC*ampC]);
-
-		Out.ar(outBus,sig);
-	}).add;
-
-	SynthDef.new(\reverb,{
-		arg in, fcvalue=16000;
-		var d = in;
-		var diffusion = \diffusion.kr(50);
-		var spacesize = \spacesize.kr(30);
-		d = In.ar(d,1);
-		8.do { |i|
-			d = AllpassC.ar(
-				d,
-				delaytime: LFNoise1.kr(0.01!2).range(0.01, spacesize),
-				decaytime: diffusion
-			)
-		};
-
-		Out.ar([0,1],MoogFF.ar(d,fcvalue, 1));
-	}).add;
-
-
 	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~lvl2,'shrate',491.25,'drywet', 0.95,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
 	~t = Synth.newPaused(\grain_synth,[\outBus,~lvl2]);
 	~y = Synth.new(\synthLvl,[\inA,~lvl1,\inB,~lvl2,\inC,~lvl3,\ampA,~lvl_music,\ampB,0.8,\ampC,0.2,\outBus,~reverbBus],s,\addToTail);
@@ -241,7 +240,7 @@ s.waitForBoot({
 	OSCdef.new(\fcVal,{
 		arg msg;
 		~fcval = msg[1];
-		postln(msg[1]);
+		//postln(msg[1]);
 		~r.set(\fcvalue,~fcval);
 	},
 	path:"/fcVal"
@@ -282,7 +281,7 @@ s.waitForBoot({
 		arg msg;
 		var dw;
 		postln(msg);
-		dw = msg[1]+msg[2]+msg[3]+msg[4];
+		dw = 1-(msg[1]+msg[2]+msg[3]+msg[4]);
 		dw.postln;
 		~x.set('ampA',msg[1],'ampB',msg[2],'ampC',msg[3],'ampD',msg[4]);
 		~x.set('drywet',dw);
