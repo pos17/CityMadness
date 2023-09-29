@@ -38,6 +38,7 @@ void oscEvent(OscMessage msg) {
 
     map.updatePathToInterestPoint(addresses);
   } else if (msg.checkAddrPattern("/mapDiscoveredPath")) {
+    music_phase = 3;
     println("type: " + 3 );
     IntList addresses = new IntList();
     println("new message");
@@ -96,10 +97,12 @@ void oscEvent(OscMessage msg) {
 
 void mousePressed() {
   if(loaded) {
+    
     // UPDATE THE NUMBER OF TIMES THE USER HAS CLICKED
     if (!map.isMoving()) {
       time++;
       if (time == 0 ) {
+        music_phase = 1; 
         map.chaoticParticlesMove = true;
       } else {
     
@@ -112,6 +115,7 @@ void mousePressed() {
           oscP5.send(myMessage, myRemoteLocation);
         } else {
           // primo click
+          music_phase = 2
           OscMessage myMessage = new OscMessage("/currentNodeFirst");
           myMessage.add(id);
           oscP5.send(myMessage, myRemoteLocation);

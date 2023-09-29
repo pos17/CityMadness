@@ -24,6 +24,7 @@ boolean showUser = false;
 boolean showInterestPoint = false;
 
 boolean showChaoticParticles = true;
+
 //Points used to build random particles 
 ArrayList<PreParticle> preParticles = new ArrayList<PreParticle>();
 
@@ -32,10 +33,18 @@ ArrayList<PreParticle> preParticles = new ArrayList<PreParticle>();
 int filterFreqValDEF = 1000;
 int filterFreqVal = filterFreqValDEF;
 int filterFreqValRANDOM = 16000;
+int filterFreqValATT= 500;
 float musicVol = 0;
 float scVol = 1;
 float grainVol = 1; 
-
+/*
+ music_phases:
+  0 title: filter static, only noise
+  1 randomNoise: filter lifting to filterFreqVal
+  2 attracted noise: filter lowering down to 500 Hz
+  3 streets phase
+*/
+int music_phase= 0
 OscP5 oscP5;
 //OscP5 oscP52;
 
