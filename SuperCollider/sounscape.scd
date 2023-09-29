@@ -11,8 +11,6 @@ var samplePath = thisProcess.nowExecutingPath.dirname +/+ "/recordings";
 )
 //sig = MoogFF.ar(sig, MouseY.kr(100, 10000, 1), MouseX.kr(0, 4));
 (
-
-
 s.waitForBoot({
 	var right, left,bass;
 	var n0, n1, n2;
@@ -28,6 +26,7 @@ s.waitForBoot({
 	~fcval = 0;*/
 	//~master = Bus.audio(s,2);
 
+
 	//Bus
 	~scBus = Bus.audio(s,2);
 	~reverbBus = Bus.audio(s,2);
@@ -39,13 +38,11 @@ s.waitForBoot({
 
 
 	SynthDef.new(\synthLvl,{
-		arg inA, inB, inC, outBus, ampA=0, ampB=0.5, ampC=0.5;
-		var sig, sigA, sigB,sigC;
-		sigA = In.ar(inA,2);
-		sigB = In.ar(inB,2);
-		sigC = In.ar(inC,2);
+		arg inA, outBus, ampA=0;
+		var sig;
+		sig = In.ar(inA,2);
 
-		sig = Mix.ar([sigA*ampA,sigB*ampB,sigC*ampC]);
+		sig = sig*ampA;
 
 		Out.ar(outBus,sig);
 	}).add;
@@ -71,7 +68,7 @@ s.waitForBoot({
 
 	SynthDef(\lofi_soundscape,
 		{
-			arg outBus, ampA, ampB, ampC, ampD, fcval=16000, resgain=0;
+			arg outBus, outBus2, ampA, ampB, ampC, ampD, fcval=16000, resgain=0, wetval=1;
 			var nfilters = 6;
 			var sig;
 			var shrate = \shrate.kr(22050).lag(1);
@@ -83,7 +80,7 @@ s.waitForBoot({
 
 			var in = Mix.ar([sigA*ampA,sigC*ampC,sigC*ampC,sigD*ampD]);
 			//var in = WhiteNoise.ar(0.1);  //
-			var dw;
+			var dw,outsig,dryval;
 			var trigFreq = LFDNoise3.ar(shrate * \jitterScale.kr(1) !2).range(shrate * ( 1 - \jitter.kr(0.1)), shrate);
 			var trig = Impulse.ar(trigFreq);
 
@@ -95,19 +92,20 @@ s.waitForBoot({
 			nfilters.do { |i| // steep LPF
 				sig = LPF.ar(sig, ( shrate * \lpfscale.kr( 0.25 ) ).clip(100, SampleRate.ir * 0.45), mul:1.2).atan;
 			};
+			//ampOut = wetval;
+			dryval = 1 - wetval;
 
 			sig = HPF.ar(sig, \hpf.kr(100));
 
 			dw = \drywet.kr(1);
+
+			outsig = Mix([in * ( 1 - dw.abs ),sig * dw]);
 			/*Mix([
 			in * ( 1 - dw.abs ),
 			sig * dw
 			]);*/
-			Out.ar(outBus,(Mix([
-				in * ( 1 - dw.abs ),
-				sig * dw
-			])))
-
+			Out.ar(outBus,outsig*wetval);
+			Out.ar([0,1],outsig*dryval);
 		}
 	).add;
 
@@ -131,7 +129,7 @@ s.waitForBoot({
 	}).add;
 
 	SynthDef(\sin_pulsar, {
-		arg outBus,lev, formantA, formantB, overlapA, overlapB,levA, levB;
+		arg outBus,lev, formantA, formantB, overlapA, overlapB,levA, levB,ampOut;
 		var a,b,c,d,e,f, f_ ,t;
 
 		//lev = \lev.kr(0.3);
@@ -209,12 +207,12 @@ s.waitForBoot({
 
 		c = Pan2.ar(c, Rand(-1,1));
 
-		Out.ar(outBus, c)
+		Out.ar(outBus, c*ampOut)
 	}).store;
 
-	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~lvl2,'shrate',491.25,'drywet', 0.95,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
-	~t = Synth.newPaused(\grain_synth,[\outBus,~lvl3]);
-	~y = Synth.new(\synthLvl,[\inA,~lvl1,\inB,~lvl2,\inC,~lvl3,\ampA,~lvl_music,\ampB,~lvl_sc,\ampC,~lvl_sc,\outBus,~reverbBus],s,\addToTail);
+	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus,\wetval,~lvl_sc,'shrate',491.25,'drywet', 0.95,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
+	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus,\ampOut,~lvl_grain]);
+	~y = Synth.new(\synthLvl,[\inA,~lvl1,\ampA,~lvl_music,\outBus,~reverbBus],s,\addToTail);
 	~r = Synth.new(\reverb,[\in,~reverbBus,\fcvalue,~fcval],s,\addToTail);
 
 	OSCdef.new(\musicVol,{
@@ -234,7 +232,7 @@ s.waitForBoot({
 		postln("sc vol:");
 		msg[1].postln;
 		~lvl_sc = msg[1];
-		~y.set(\ampB,~lvl_sc);
+		~x.set(\ampOut,~lvl_sc);
 	},
 	path:"/scVol"
 	);
@@ -244,7 +242,7 @@ s.waitForBoot({
 		postln("grain vol:");
 		msg[1].postln;
 		~lvl_grain = msg[1];
-		~y.set(\ampC,~lvl_grain);
+		~t.set(\ampOut,~lvl_grain);
 	},
 	path:"/grainVol"
 	);
