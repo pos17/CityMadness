@@ -116,7 +116,7 @@ void mousePressed() {
           oscP5.send(myMessage, myRemoteLocation);
         } else {
           // primo click
-          music_phase = 2
+          music_phase = 2;
           OscMessage myMessage = new OscMessage("/currentNodeFirst");
           myMessage.add(id);
           oscP5.send(myMessage, myRemoteLocation);

@@ -209,13 +209,14 @@ s.waitForBoot({
 	}).store;
 
 	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~lvl2,'shrate',491.25,'drywet', 0.95,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
-	~t = Synth.newPaused(\grain_synth,[\outBus,~lvl3,\agit,~agitVal]);
+	~t = Synth.newPaused(\grain_synth,[\outBus,~lvl3]);
 	~y = Synth.new(\synthLvl,[\inA,~lvl1,\inB,~lvl2,\inC,~lvl3,\ampA,~lvl_music,\ampB,~lvl_sc,\ampC,~lvl_sc,\outBus,~reverbBus],s,\addToTail);
-	~r = Synth.new(\reverb,[\in,~reverbBus,\fcvalue,16000],s,\addToTail);
+	~r = Synth.new(\reverb,[\in,~reverbBus,\fcvalue,~fcval],s,\addToTail);
 
 	OSCdef.new(\musicVol,{
 		arg msg;
 		~lvl_music = msg[1];
+		//msg[1].postln;
 		~y.set(\ampA,~lvl_music);
 	},
 	path:"/musicVol"
@@ -240,8 +241,8 @@ s.waitForBoot({
 	OSCdef.new(\fcVal,{
 		arg msg;
 		~fcval = msg[1];
-		postln(msg[1]);
-		//~r.set(\fcvalue,~fcval);
+		//postln(msg[1]);
+		~r.set(\fcvalue,~fcval);
 	},
 	path:"/fcVal"
 	);

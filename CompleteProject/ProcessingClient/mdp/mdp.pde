@@ -44,7 +44,7 @@ float grainVol = 1;
   2 attracted noise: filter lowering down to 500 Hz
   3 streets phase
 */
-int music_phase= 0
+int music_phase= 0;
 OscP5 oscP5;
 //OscP5 oscP52;
 
