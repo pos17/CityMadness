@@ -53,8 +53,10 @@ s.waitForBoot({
 	SynthDef.new(\reverb,{
 		arg in, fcvalue=16000;
 		var d = in;
-		var diffusion = \diffusion.kr(50);
-		var spacesize = \spacesize.kr(30);
+		//var diffusion = \diffusion.kr(50);
+		//var spacesize = \spacesize.kr(30);
+		var diffusion = \diffusion.kr(1);
+		var spacesize = \spacesize.kr(1);
 		d = In.ar(d,1);
 		8.do { |i|
 			d = AllpassC.ar(

@@ -141,14 +141,20 @@ class Map {
         filterFreqVal += 0.5;
         controlFilter(filterFreqVal);
       }
+      
       if (musicVol<0.1) {
         musicVol += 0.001;
-        controlMusicVol(musicVol);
+        //controlMusicVol(musicVol);
       }
       if (scVol>=0.9) {
         scVol -= 0.001;
         controlscVol(scVol);
       }
+      if (grainVol>0.0) {
+        grainVol -= 0.001;
+        controlGrainVol(grainVol);
+      }
+      
     }
 
     //ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
