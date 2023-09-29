@@ -541,6 +541,13 @@ def synthHandler(unused_addr, things,  currentNode):
     send_interest_node_distance(to_send,client)
     
 
+def forwardOSCMessage(used_addr, things, args):
+    myclient = things[0][0]
+    myclient.send_message(used_addr,args)
+    #print("/noteOn",midiValue)
+
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", default="127.0.0.1",
@@ -606,6 +613,11 @@ if __name__ == "__main__":
     frase = "ciao"
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
     dispatcher.map("/reset", l_system.sendNoiseOn, [client2])
+    dispatcher.map("/fcVal", forwardOSCMessage, [client2])
+    dispatcher.map("/musicVol", forwardOSCMessage, [client2])
+    dispatcher.map("/synthAgit", forwardOSCMessage, [client2])
+    dispatcher.map("/scVol", forwardOSCMessage, [client2])
+    dispatcher.map("/grainVol", forwardOSCMessage, [client2])
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
     #print("These are the nodes")
     #print(nodes)
