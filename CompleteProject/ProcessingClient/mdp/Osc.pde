@@ -2,9 +2,11 @@
 void oscEvent(OscMessage msg) {
 
   click = true;
-
+  println("new OSC MESSAGE: ");
+  println(msg);
 
   if (msg.checkAddrPattern("/nextNodes")) {
+    println("type: " + 0 );
     IntList addresses = oscPathParser(msg);
     map.setNextPoints(addresses);
     map.updateCurrentPointConnections(addresses);
@@ -12,6 +14,7 @@ void oscEvent(OscMessage msg) {
 
     //println("Next addresses: " + addresses);
   } else if (msg.checkAddrPattern("/firstConections")) {
+    println("type: " + 1 );
     IntList addresses = new IntList();
     int nodeID = msg.get(0).intValue();
     for (int i = 1; i<msg.arguments().length; i++) {
@@ -21,7 +24,7 @@ void oscEvent(OscMessage msg) {
     map.updatePointConnections(nodeID, addresses);
     map.setFirstConnectionsArrived(true);
   } else if (msg.checkAddrPattern("/interestPath")) {
-
+    println("type: " + 2 );
     //[0] interest node, [1] path len, [...] path
 
     int interestPointId = msg.get(0).intValue();
@@ -35,9 +38,12 @@ void oscEvent(OscMessage msg) {
 
     map.updatePathToInterestPoint(addresses);
   } else if (msg.checkAddrPattern("/mapDiscoveredPath")) {
+    println("type: " + 3 );
     IntList addresses = new IntList();
-
+    println("new message");
+    println("MESSAGE ARGS: " + msg.arguments().length);
     for (int i = 0; i<msg.arguments().length; i++) {
+      //println("msg: " +  msg.get(i));
       addresses.append(msg.get(i).intValue());
 
       map.explosionsPaths.add(map.getMapPoint(msg.get(i).intValue()).getCoords());
@@ -48,11 +54,11 @@ void oscEvent(OscMessage msg) {
     
     // PARSE EXPLOSIONS
     if (map.explosions.size()>0) {
-      print("explosions");
+      //println("explosions");
       IntList add = map.explosions.get(0);
       int id = add.get(0);
       add.remove(0);
-      print("STARTID: "+ id + "addresses: " + addresses);
+      //print("STARTID: "+ id + " addresses: " + addresses);
       MapPoint m = map.getMapPoint(id);
       PVector f = m.getCoords();
       ArrayList<PVector> t = new ArrayList<PVector>();
@@ -67,6 +73,7 @@ void oscEvent(OscMessage msg) {
     
     explosions = true; // IL PARSER EFFETTIVO STA IN MAP RIGA 395 CIRCA
   } else if (msg.checkAddrPattern("/chaoticParticleAlpha")) {
+    println("type: " + 4 );
     MAPPARTICLEALPHA = msg.get(0).intValue();
 
     if (MAPPARTICLEALPHA <=0) {

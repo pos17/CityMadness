@@ -71,17 +71,18 @@ void setup(){
   
   strokeJoin(ROUND);
   
-  font = createFont("Arial", 200);
+  font = createFont("cityscape.ttf", 200);
   textFont(font);
   background(0);
   //fill(255);
   textSize(200);
-  String title = "SOLI VAGANT";
+  String title = "RESFERB";
   //push();
   //translate(HALF_WIDTH,HALF_HEIGHT);
   //translate(-HALF_WIDTH,-HALF_HEIGHT);
   //pop();
-  text(title, 20, (height/2)-100, width-20, (height/2)+100);
+  textAlign(CENTER);
+  text(title, 0, (height/2)-100, width, (height/2)+100);
   
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
