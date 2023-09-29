@@ -11,6 +11,8 @@ var samplePath = thisProcess.nowExecutingPath.dirname +/+ "/recordings";
 )
 //sig = MoogFF.ar(sig, MouseY.kr(100, 10000, 1), MouseX.kr(0, 4));
 (
+
+
 s.waitForBoot({
 	var right, left,bass;
 	var n0, n1, n2;
@@ -216,14 +218,19 @@ s.waitForBoot({
 	OSCdef.new(\musicVol,{
 		arg msg;
 		~lvl_music = msg[1];
-		//msg[1].postln;
+		postln("music vol:");
+		msg[1].postln;
+
 		~y.set(\ampA,~lvl_music);
+
 	},
 	path:"/musicVol"
 	);
 
 	OSCdef.new(\scVol,{
 		arg msg;
+		postln("sc vol:");
+		msg[1].postln;
 		~lvl_sc = msg[1];
 		~y.set(\ampB,~lvl_sc);
 	},
@@ -232,6 +239,8 @@ s.waitForBoot({
 
 	OSCdef.new(\grainVol,{
 		arg msg;
+		postln("grain vol:");
+		msg[1].postln;
 		~lvl_grain = msg[1];
 		~y.set(\ampC,~lvl_grain);
 	},
@@ -284,8 +293,8 @@ s.waitForBoot({
 		postln(msg);
 		dw = 1-(msg[1]+msg[2]+msg[3]+msg[4]);
 		dw.postln;
-		~x.set('ampA',msg[1],'ampB',msg[2],'ampC',msg[3],'ampD',msg[4]);
-		~x.set('drywet',dw);
+		~x.set('ampA',msg[1],'ampB',msg[2],'ampC',msg[3],'ampD',msg[4],'drywet',dw);
+
 	},
 	path:"/scMix"
 	);

@@ -137,16 +137,16 @@ class Map {
         controlFilter(filterFreqVal);
       }
     } else if (music_phase == 3) {
-      if(filterFreqVal!=16000) {
-        filterFreqVal = 16000;
+      if(filterFreqVal<=16000) {
+        filterFreqVal += 0.5;
         controlFilter(filterFreqVal);
       }
-      if (musicVol<0.7) {
-        musicVol += 0.0001;
+      if (musicVol<0.1) {
+        musicVol += 0.001;
         controlMusicVol(musicVol);
       }
-      if (scVol>0.3) {
-        scVol -= 0.0001;
+      if (scVol>=0.9) {
+        scVol -= 0.001;
         controlscVol(scVol);
       }
     }
