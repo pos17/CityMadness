@@ -141,11 +141,11 @@ class Map {
         filterFreqVal = 16000;
         controlFilter(filterFreqVal);
       }
-      if (musicVol<0.5) {
+      if (musicVol<0.7) {
         musicVol += 0.0001;
         controlMusicVol(musicVol);
       }
-      if (scVol>0.5) {
+      if (scVol>0.3) {
         scVol -= 0.0001;
         controlscVol(scVol);
       }

@@ -14,6 +14,7 @@ void oscEvent(OscMessage msg) {
 
     //println("Next addresses: " + addresses);
   } else if (msg.checkAddrPattern("/firstConections")) {
+    music_phase = 3;
     println("type: " + 1 );
     IntList addresses = new IntList();
     int nodeID = msg.get(0).intValue();
@@ -38,7 +39,7 @@ void oscEvent(OscMessage msg) {
 
     map.updatePathToInterestPoint(addresses);
   } else if (msg.checkAddrPattern("/mapDiscoveredPath")) {
-    music_phase = 3;
+    
     println("type: " + 3 );
     IntList addresses = new IntList();
     println("new message");
