@@ -45,15 +45,19 @@ void oscEvent(OscMessage msg) {
 
     //map.explosionParser(addresses);
     map.explosions.add(addresses);
+    
     // PARSE EXPLOSIONS
     if (map.explosions.size()>0) {
+      print("explosions");
       IntList add = map.explosions.get(0);
       int id = add.get(0);
       add.remove(0);
+      print("STARTID: "+ id + "addresses: " + addresses);
       MapPoint m = map.getMapPoint(id);
       PVector f = m.getCoords();
       ArrayList<PVector> t = new ArrayList<PVector>();
-      m.addToConnections(add);
+      //m.addToConnections(add);
+      map.updatePointConnections(m.id, addresses);
       for (int i = 1; i<add.size(); i++) {
         t.add(map.getMapPoint(add.get(i)).getCoords());
       }
@@ -78,33 +82,34 @@ void oscEvent(OscMessage msg) {
 }
 
 void mousePressed() {
-
-  // UPDATE THE NUMBER OF TIMES THE USER HAS CLICKED
-  if (!map.isMoving()) {
-    time++;
-    if (time == 0 ) {
-      map.chaoticParticlesMove = true;
-    } else {
-
-      timeFromClick = 0;
-      map.setChaoticParticlesState();
-      int id = map.getClosestPointId(mouseX-HALF_WIDTH, mouseY-HALF_HEIGHT);
-      if (!startup) {
-        OscMessage myMessage = new OscMessage("/currentNode");
-        myMessage.add(id);
-        oscP5.send(myMessage, myRemoteLocation);
+  if(loaded) {
+    // UPDATE THE NUMBER OF TIMES THE USER HAS CLICKED
+    if (!map.isMoving()) {
+      time++;
+      if (time == 0 ) {
+        map.chaoticParticlesMove = true;
       } else {
-        // primo click
-        OscMessage myMessage = new OscMessage("/currentNodeFirst");
-        myMessage.add(id);
-        oscP5.send(myMessage, myRemoteLocation);
-        OscMessage myMessage2 = new OscMessage("/currentNode");
-        myMessage2.add(id);
-        oscP5.send(myMessage2, myRemoteLocation);
+    
+        timeFromClick = 0;
+        map.setChaoticParticlesState();
+        int id = map.getClosestPointId(mouseX-HALF_WIDTH, mouseY-HALF_HEIGHT);
+        if (!startup) {
+          OscMessage myMessage = new OscMessage("/currentNode");
+          myMessage.add(id);
+          oscP5.send(myMessage, myRemoteLocation);
+        } else {
+          // primo click
+          OscMessage myMessage = new OscMessage("/currentNodeFirst");
+          myMessage.add(id);
+          oscP5.send(myMessage, myRemoteLocation);
+          OscMessage myMessage2 = new OscMessage("/currentNode");
+          myMessage2.add(id);
+          oscP5.send(myMessage2, myRemoteLocation);
+        }
+        //after this call !startup
+        map.updatePath(id);
+        map.setCurrentPoint(id);
       }
-      //after this call !startup
-      map.updatePath(id);
-      map.setCurrentPoint(id);
     }
   }
 }

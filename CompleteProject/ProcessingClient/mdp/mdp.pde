@@ -17,7 +17,7 @@ boolean click = false;
 boolean explosions = false;
 
 boolean creatingExplosions = false;
-
+boolean loaded = false;
 boolean explosionPaths = true;
 boolean showPathToInterestPoint = false;
 boolean showUser = false;
@@ -101,7 +101,7 @@ void draw(){
   background(0);
   
 //windowTitle(String.valueOf(frameRate));
-  
+  loaded = true;
   map.show();
   
 }
