@@ -98,7 +98,7 @@ class Map {
     if (startup) {
       //if()
     } else {
-      if ( this.chaoticsParticle.size()>=NMAPPARTICLES) {
+      if ( this.chaoticParticles.size()>=NMAPPARTICLES) {
         if (filterFreqVal<= filterFreqValRANDOM) {
           filterFreqVal += 1;
           controlFilter(filterFreqVal);

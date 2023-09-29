@@ -20,10 +20,10 @@ s.waitForBoot({
 	~note_table = 0!127;
 	~n = nil;
 
-	~lvl_music = 0;
+	/*~lvl_music = 0;
 	~lvl_sc = 0;
 	~lvl_grain = 0;
-	~fcval = 0;
+	~fcval = 0;*/
 	//~master = Bus.audio(s,2);
 
 	//Bus
@@ -35,32 +35,6 @@ s.waitForBoot({
 
 	s.latency = nil;
 
-	SynthDef.new(\synthLvl,{
-		arg inA, inB, inC, outBus, ampA, ampB, ampC;
-		var sigA, sigB,sigC;
-		sigA = In.ar(inA,2);
-		sigB = In.ar(inB,2);
-		sigC = In.ar(inC,2);
-
-		Out.ar(outBus,Mix.ar([sigA*ampA,sigB*ampB,sigC*ampC]));
-	}).add;
-
-	SynthDef.new(\reverb,{
-		arg in, fcvalue;
-		var d = in;
-		var diffusion = \diffusion.kr(50);
-		var spacesize = \spacesize.kr(30);
-		d = In.ar(d,1);
-		8.do { |i|
-			d = AllpassC.ar(
-				d,
-				delaytime: LFNoise1.kr(0.01!2).range(0.01, spacesize),
-				decaytime: diffusion
-			)
-		};
-
-		Out.ar([0,1],MoogFF.ar(d,fcvalue, 1));
-	}).add;
 
 	SynthDef(\lofi_soundscape,
 		{
@@ -205,9 +179,39 @@ s.waitForBoot({
 		Out.ar(outBus, c)
 	}).store;
 
-	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus.index,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
-	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus.index,\agit,~agit]);
-	~y = Synth.new(\synthLvl,[\inA,~lvl1,\inB,~lvl2,\inC,~lvl3,\ampA,~lvl_music,\ampB,~lvl_sc,\ampC,~lvl_grain,\outBus,~reverbBus],s,\addToTail);
+	SynthDef.new(\synthLvl,{
+		arg inA, inB, inC, outBus, ampA=0, ampB=0.5, ampC=0.5;
+		var sig, sigA, sigB,sigC;
+		sigA = In.ar(inA,2);
+		sigB = In.ar(inB,2);
+		sigC = In.ar(inC,2);
+
+		sig = Mix.ar([sigA*ampA,sigB*ampB,sigC*ampC]);
+
+		Out.ar(outBus,sig);
+	}).add;
+
+	SynthDef.new(\reverb,{
+		arg in, fcvalue=16000;
+		var d = in;
+		var diffusion = \diffusion.kr(50);
+		var spacesize = \spacesize.kr(30);
+		d = In.ar(d,1);
+		8.do { |i|
+			d = AllpassC.ar(
+				d,
+				delaytime: LFNoise1.kr(0.01!2).range(0.01, spacesize),
+				decaytime: diffusion
+			)
+		};
+
+		Out.ar([0,1],MoogFF.ar(d,fcvalue, 1));
+	}).add;
+
+
+	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~lvl2,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
+	~t = Synth.newPaused(\grain_synth,[\outBus,~lvl2]);
+	~y = Synth.new(\synthLvl,[\inA,~lvl1,\inB,~lvl2,\inC,~lvl3,\ampA,~lvl_music,\ampB,0.8,\ampC,0.2,\outBus,~reverbBus],s,\addToTail);
 	~r = Synth.new(\reverb,[\in,~reverbBus,\fcvalue,~fcval],s,\addToTail);
 
 	OSCdef.new(\musicVol,{
@@ -237,6 +241,7 @@ s.waitForBoot({
 	OSCdef.new(\fcVal,{
 		arg msg;
 		~fcval = msg[1];
+		postln(msg[1]);
 		~r.set(\fcvalue,~fcval);
 	},
 	path:"/fcVal"
