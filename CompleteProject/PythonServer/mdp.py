@@ -536,11 +536,19 @@ def synthHandler(unused_addr, things,  currentNode):
     myNodes = things[0][2]
     distances = things[0][0]
     client = things[0][1]
+    myInterestNodes = things[0][3]
     to_send = [[] for _ in range(len(distances))]
     for i in range(len(distances)):
         if currentNode in myNodes[i]:
-            index = myNodes[i].index(currentNode)
-            to_send[i] = 1 - distances[i][index]
+            #index = myNodes[i].index(currentNode)
+            #to_send[i] = 1 - distances[i][index]
+            dist = 999
+            for j in range(len(myInterestNodes)):
+                if i != j and dm[myInterestNodes[i], myInterestNodes[j]] < dist:
+                    dist = dm[myInterestNodes[i], myInterestNodes[j]]
+                    closer = myInterestNodes[j]
+            to_send[i] = dm[currentNode, myInterestNodes[i]]/dm[currentNode, closer]
+                    
         else:
             to_send[i] = 0
     print("TOSENT")
@@ -613,7 +621,7 @@ if __name__ == "__main__":
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNodeFirst", firstPathHandler, [client,scheduler2])
     dispatcher.map("/currentNode", interestPathHandler)
-    dispatcher.map("/currentNode", synthHandler, [nDist,client2,nNodes])
+    dispatcher.map("/currentNode", synthHandler, [nDist,client2,nNodes, interestNodes2])
     dispatcher.map("/currentNode", nNearestNodesHandler, [nNodes, interestNodes2,client,scheduler2])
     #dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client2])
     #dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
