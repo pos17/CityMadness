@@ -50,10 +50,10 @@ s.waitForBoot({
 	SynthDef.new(\reverb,{
 		arg in, fcvalue=16000;
 		var d = in;
-		//var diffusion = \diffusion.kr(50);
-		//var spacesize = \spacesize.kr(30);
-		var diffusion = \diffusion.kr(1);
-		var spacesize = \spacesize.kr(1);
+		var diffusion = \diffusion.kr(50);
+		var spacesize = \spacesize.kr(30);
+		//var diffusion = \diffusion.kr(1);
+		//var spacesize = \spacesize.kr(1);
 		d = In.ar(d,1);
 		8.do { |i|
 			d = AllpassC.ar(
@@ -292,7 +292,7 @@ s.waitForBoot({
 		var dw;
 		postln(msg);
 		//dryrev = 1-(msg[1]+msg[2]+msg[3]+msg[4]);
-		dw = 1-(msg[1]+msg[2]+msg[3]+msg[4]);
+		dw = msg[1]+msg[2]+msg[3]+msg[4];
 		dw.postln;
 		~x.set('ampA',msg[1],'ampB',msg[2],'ampC',msg[3],'ampD',msg[4],'drywet',dw,'wetval',dw);
 
