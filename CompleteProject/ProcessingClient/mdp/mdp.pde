@@ -59,6 +59,8 @@ int outport = 5005;
 
 PFont font;
 
+PImage sprite;  
+
 void setup(){
   //size(900,800,P2D);
   fullScreen(P2D);
@@ -79,7 +81,8 @@ void setup(){
   oscP5.send(myMessage, myRemoteLocation);
   
   strokeJoin(ROUND);
-  
+  sprite = loadImage("sprite.png");
+  sprite.resize(20,20);
   font = createFont("cityscape.ttf", 200);
   textFont(font);
   background(0);

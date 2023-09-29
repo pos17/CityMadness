@@ -32,6 +32,7 @@ class Map {
 
 
   ArrayList<IntList> explosions = new ArrayList<IntList>();
+ 
 
   Map() {
     this.mapPoints = loadMapPoints();
@@ -61,6 +62,7 @@ class Map {
     this.trash.beginDraw();
     this.trash.circle(200, 200, 200);
     this.trash.endDraw();
+    
 
     // HANDLING STARTUP VALUES FOR SUPERCOLLIDER
 
@@ -239,10 +241,11 @@ class Map {
     this.render.tint(255);
 
     // GENERA LE OMBRE
+    /*
     if (click) {
       this.renderShadow();
     }
-
+    */
     this.render.strokeWeight(3);
     //RENDER RANDOM PATH PARTICLES
     if (this.wanderingParticles.size()>0) {
@@ -292,6 +295,7 @@ class Map {
 
     // SEGNAPOSTO UTENTE
     if (!startup && showUser) {
+      /*
       if (timeFromClick > 60) {
         PVector p = currentPoint.getCoords();
         for (int j = 0; j<30; j++) {
@@ -301,8 +305,16 @@ class Map {
           this.render.point(p.x, p.y);
         }
       }
-
-      // SEGNAPOSTO INTEREST POINT
+      */
+        PVector pUser = currentPoint.getCoords();
+        this.render.push();
+        this.render.translate(pUser.x,pUser.y);
+        this.render.tint(255, 30);
+        this.render.image(sprite,-sprite.width/2,-sprite.height/2);
+        this.render.tint(255, 255);
+        //this.render.image(sprite,0,0);
+        this.render.pop();
+        // SEGNAPOSTO INTEREST POINT
       if (time>0 && showInterestPoint) {
         PVector p = interestPoint.getCoords();
         this.render.stroke(255, 255, 0, 2.0*sin(radians(constrain(timeFromClick, 0, 180))));
