@@ -68,7 +68,7 @@ s.waitForBoot({
 
 	SynthDef(\lofi_soundscape,
 		{
-			arg outBus, outBus2, ampA, ampB, ampC, ampD, fcval=16000, resgain=0, wetval=1;
+			arg outBus, outBus2, ampA, ampB, ampC, ampD, fcval=16000, resgain=0, wetval=1,ampOut=1;
 			var nfilters = 6;
 			var sig;
 			var shrate = \shrate.kr(22050).lag(1);
@@ -99,7 +99,7 @@ s.waitForBoot({
 
 			dw = \drywet.kr(1);
 
-			outsig = Mix([in * ( 1 - dw.abs ),sig * dw]);
+			outsig = (Mix([in * ( 1 - dw.abs ),sig * dw]))*ampOut;
 			/*Mix([
 			in * ( 1 - dw.abs ),
 			sig * dw
@@ -210,7 +210,7 @@ s.waitForBoot({
 		Out.ar(outBus, c*ampOut)
 	}).store;
 
-	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus,\wetval,~lvl_sc,'shrate',491.25,'drywet', 0.95,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
+	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus,'shrate',491.25,'drywet', 0.95,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
 	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus,\ampOut,~lvl_grain]);
 	~y = Synth.new(\synthLvl,[\inA,~lvl1,\ampA,~lvl_music,\outBus,~reverbBus],s,\addToTail);
 	~r = Synth.new(\reverb,[\in,~reverbBus,\fcvalue,~fcval],s,\addToTail);
@@ -291,9 +291,10 @@ s.waitForBoot({
 		arg msg;
 		var dw;
 		postln(msg);
+		//dryrev = 1-(msg[1]+msg[2]+msg[3]+msg[4]);
 		dw = 1-(msg[1]+msg[2]+msg[3]+msg[4]);
 		dw.postln;
-		~x.set('ampA',msg[1],'ampB',msg[2],'ampC',msg[3],'ampD',msg[4],'drywet',dw);
+		~x.set('ampA',msg[1],'ampB',msg[2],'ampC',msg[3],'ampD',msg[4],'drywet',dw,'wetval',dw);
 
 	},
 	path:"/scMix"
