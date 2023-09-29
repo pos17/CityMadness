@@ -20,7 +20,7 @@ class Map {
   MapPoint interestPoint;
   MapPoint currentPoint;
 
-  boolean pathDone, systemCreated, moving, firstConnectionsArrived;
+  boolean pathDone, systemCreated, moving, firstConnectionsArrived, chaoticParticlesMove;
 
   PGraphics shadow;
   PGraphics trash;
@@ -38,6 +38,7 @@ class Map {
     this.pathDone = false;
     this.systemCreated = false;
     this.firstConnectionsArrived = false;
+    this.chaoticParticlesMove = false;
     this.renderMap();
     this.render = createGraphics(width, height, P2D);
     this.shadow = createGraphics(width, height, P2D);
@@ -47,7 +48,10 @@ class Map {
     PVector chaosVel = new PVector(0, 0);
     PVector chaosAcc = new PVector(0, 0);
     for (int i = 0; i < NMAPPARTICLES; i++) {
-      chaoticParticles.add(new ChaoticParticle(chaosVel, chaosAcc));
+      int rand = (int)random(preParticles.size());
+      //println("rand: " +rand);
+      chaoticParticles.add(new ChaoticParticle(preParticles.get(rand).getPoint(),chaosVel, chaosAcc));
+      preParticles.remove(rand);
     }
     this.cityGraphics = loadImage("map.png");
     this.cityGraphics.resize(width, height);
@@ -98,7 +102,7 @@ class Map {
     if (startup) {
       //if()
     } else {
-      if ( this.chaoticsParticle.size()>=NMAPPARTICLES) {
+      if ( this.chaoticParticles.size()>=NMAPPARTICLES) {
         if (filterFreqVal<= filterFreqValRANDOM) {
           filterFreqVal += 1;
           controlFilter(filterFreqVal);
@@ -150,8 +154,11 @@ class Map {
       ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
       while (chaoticParticlesIter.hasNext()) {
         ChaoticParticle m = chaoticParticlesIter.next();
-        m.moveNoise();
+        if(chaoticParticlesMove) {
+          m.moveNoise();
+        }
         PVector p = m.getPos();
+        
         render.point(p.x, p.y);
       }
     } else {
@@ -430,7 +437,8 @@ class Map {
   }
 
   // GENERA LE OMBRE CHE NASCONDONO LE PARTICELLE
-  void renderShadow() {
+  
+  /*void renderShadow() {
     for (int i = 0; i<mapFragments.size(); i++) {
       if (mapFragments.get(i).id == currentPoint.id) {
         return;
@@ -473,6 +481,7 @@ class Map {
     if (this.explosions.size()>0) {
       IntList add = this.explosions.get(0);
       int id = add.get(0);
+      add.remove(0);
       MapPoint m = this.getMapPoint(id);
       PVector f = m.getCoords();
       ArrayList<PVector> t = new ArrayList<PVector>();
@@ -485,7 +494,49 @@ class Map {
     }
 
     click = false;
+  } */
+  
+  void renderShadow() {
+    for (int i = 0; i<mapFragments.size(); i++) {
+      if (mapFragments.get(i).id == currentPoint.id) {
+        return;
+      }
+    }
+    PImage img = loadImage("map.png");
+    img.resize(width, height);
+
+    IntList addresses = this.currentPoint.getConnections();
+    ArrayList<PVector> to = new ArrayList<PVector>();
+    for (int i = 0; i<addresses.size(); i++) {
+      to.add(this.getMapPoint(addresses.get(i)).getCoords());
+    }
+    mapFragments.add(new MapFragment(this.currentPoint.getCoords(), to, this.currentPoint.getId(), img));
+
+
+
+    this.shadow.beginDraw();
+    this.shadow.push();
+    this.shadow.translate(HALF_WIDTH, HALF_HEIGHT);
+    this.shadow.stroke(0, 5);
+    this.shadow.noFill();
+    this.shadow.strokeJoin(ROUND);
+
+
+    PVector from = this.currentPoint.getCoords();
+
+    for (int i = 0; i<to.size(); i++) {
+      PVector t = to.get(i);
+      for (int j = 0; j<10; j++) {
+        this.shadow.strokeWeight(map(j, 0, 20, 5, 25));
+        this.shadow.line(t.x, t.y, from.x, from.y);
+      }
+    }
+    this.shadow.pop();
+    this.shadow.endDraw();
+
+    click = false;
   }
+
 
 
   void setNextInterestPoint(int p) {

@@ -21,11 +21,11 @@ class ChaoticParticle{ // Particelle caotiche
   }
   ChaoticParticle(PVector p,PVector velocity, PVector acc){
     this.state = false;
-    this.p = p;
+    this.p = p.sub(new PVector(width/2,height/2));
     this.velocity = velocity;
     this.acc = acc;
     this.maxspeed = 2;
-    this.maxforce = 40;
+    this.maxforce = 30;
     this.mass = 1;
   }
   
@@ -35,7 +35,7 @@ class ChaoticParticle{ // Particelle caotiche
     this.velocity = velocity;
     this.acc = acc;
     this.maxspeed = 2;
-    this.maxforce = 40;
+    this.maxforce = 30;
     this.mass = 1;
   }
   void applyForce(PVector force) {
@@ -53,9 +53,9 @@ class ChaoticParticle{ // Particelle caotiche
     return this.acc;
   }
   
-  void addVel(PVector acc) {
-    
-  }
+  //void addVel(PVector acc) {
+  //  
+  //}
   
   void setState(Boolean aState) {
     this.state = aState;
@@ -63,9 +63,10 @@ class ChaoticParticle{ // Particelle caotiche
   
   
   void moveNoise(){
-    if(this.state == false)
-      this.p.add((this.p.cross(PVector.fromAngle((noise(this.p.x/100, this.p.y/100, float(frameCount)/100)-0.5)*TWO_PI))).setMag(2));
-    else{
+    if(this.state == false) {
+      this.p.add((this.p.cross(PVector.fromAngle((noise(this.p.x/100, this.p.y/100, float(frameCount)/100)-0.5)*TWO_PI))).setMag(2.0));
+      this.p.add(new PVector(random(-0.5,0.5),random(-0.5,0.5)));
+    }else{
       if(behaviourFade< behaviourFadeMax) {
         behaviourFade++; 
       }

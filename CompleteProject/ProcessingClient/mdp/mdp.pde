@@ -10,7 +10,7 @@ float HALF_WIDTH;
 float HALF_HEIGHT;
 float QUARTER_WIDTH;
 float PMASS = 0.1;
-int time = 0; // n° di click
+int time = -1; // n° di click
 int timeFromClick = 0;
 
 boolean click = false;
@@ -24,6 +24,9 @@ boolean showUser = false;
 boolean showInterestPoint = false;
 
 boolean showChaoticParticles = true;
+//Points used to build random particles 
+ArrayList<PreParticle> preParticles = new ArrayList<PreParticle>();
+
 
 // SUPERCOLLIDER CONTROL PARAMETERS 
 int filterFreqValDEF = 1000;
@@ -48,11 +51,13 @@ int outport2 = 57120;
 PFont font;
 
 void setup(){
-  size(900,800,P2D);
+  //size(900,800,P2D);
   fullScreen(P2D);
   pixelDensity(displayDensity());
-  //pixelDensity(1);
   frameRate(60);
+  pixelDensity(1);
+  
+  
   HALF_WIDTH = width/2;
   HALF_HEIGHT = height/2;
   QUARTER_WIDTH = width/4;
@@ -66,9 +71,28 @@ void setup(){
   
   strokeJoin(ROUND);
   
-  font = createFont("Arial", 15);
+  font = createFont("Arial", 200);
   textFont(font);
+  background(0);
+  //fill(255);
+  textSize(200);
+  String title = "SOLI VAGANT";
+  //push();
+  //translate(HALF_WIDTH,HALF_HEIGHT);
+  //translate(-HALF_WIDTH,-HALF_HEIGHT);
+  //pop();
+  text(title, 20, (height/2)-100, width-20, (height/2)+100);
   
+  for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++) {
+      if (get(x, y) == color(255)) {
+        preParticles.add(new PreParticle(x,y));
+      }
+    }
+  }
+  
+  println("preParticles size: "+ preParticles.size());
+  background(0);
   map = new Map();
 }
 
@@ -80,4 +104,16 @@ void draw(){
   
   map.show();
   
+}
+
+class PreParticle {
+  PVector point;
+  
+  PreParticle(int x,int y){
+    this.point = new PVector(x,y);//.mult(0.5);    
+  }
+  
+  PVector getPoint() {
+    return point;
+  }
 }

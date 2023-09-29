@@ -30,10 +30,10 @@ class MapPoint{ //CLASSE DEL MAP POINT
     }
   }
   
-  void addConnection(int id){
-    if(!this.connections.hasValue(id)){
-        this.connections.append(id); 
-        map.getMapPoint(id).addConnection(this.id);
+  void addConnection(int myId){
+    if(!this.connections.hasValue(myId)){
+        this.connections.append(myId); 
+        map.getMapPoint(myId).addConnection(this.id);
         
       }
   }
