@@ -209,10 +209,10 @@ s.waitForBoot({
 	}).add;
 
 
-	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~lvl2,'shrate',491.25,'drywet', 0.85,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
+	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~lvl2,'shrate',491.25,'drywet', 0.95,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
 	~t = Synth.newPaused(\grain_synth,[\outBus,~lvl2]);
 	~y = Synth.new(\synthLvl,[\inA,~lvl1,\inB,~lvl2,\inC,~lvl3,\ampA,~lvl_music,\ampB,0.8,\ampC,0.2,\outBus,~reverbBus],s,\addToTail);
-	~r = Synth.new(\reverb,[\in,~reverbBus,\fcvalue,~fcval],s,\addToTail);
+	~r = Synth.new(\reverb,[\in,~reverbBus,\fcvalue,16000],s,\addToTail);
 
 	OSCdef.new(\musicVol,{
 		arg msg;
@@ -280,8 +280,12 @@ s.waitForBoot({
 
 	OSCdef.new(\scMix,{
 		arg msg;
+		var dw;
 		postln(msg);
+		dw = msg[1]+msg[2]+msg[3]+msg[4];
+		dw.postln;
 		~x.set('ampA',msg[1],'ampB',msg[2],'ampC',msg[3],'ampD',msg[4]);
+		~x.set('drywet',dw);
 	},
 	path:"/scMix"
 	);
