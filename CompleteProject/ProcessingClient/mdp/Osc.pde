@@ -2,8 +2,8 @@
 void oscEvent(OscMessage msg) {
 
   click = true;
-  println("new OSC MESSAGE: ");
-  println(msg);
+  //println("new OSC MESSAGE: ");
+  //println(msg);
 
   if (msg.checkAddrPattern("/nextNodes")) {
     println("type: " + 0 );
@@ -44,6 +44,7 @@ void oscEvent(OscMessage msg) {
     println("MESSAGE ARGS: " + msg.arguments().length);
     for (int i = 0; i<msg.arguments().length; i++) {
       //println("msg: " +  msg.get(i));
+      
       addresses.append(msg.get(i).intValue());
 
       map.explosionsPaths.add(map.getMapPoint(msg.get(i).intValue()).getCoords());
@@ -51,8 +52,12 @@ void oscEvent(OscMessage msg) {
 
     //map.explosionParser(addresses);
     map.explosions.add(addresses);
-    
+    //println("explosions");
+    //println("addresses: " + addresses);
+    //print("STARTID: "+ id + " addresses: " + addresses);
+    // VERSIONE DI PARSING ALTERNATIVA NON USATA
     // PARSE EXPLOSIONS
+    /*
     if (map.explosions.size()>0) {
       //println("explosions");
       IntList add = map.explosions.get(0);
@@ -67,10 +72,11 @@ void oscEvent(OscMessage msg) {
       for (int i = 1; i<add.size(); i++) {
         t.add(map.getMapPoint(add.get(i)).getCoords());
       }
+      
 
       //map.mapFragments.add(new MapFragment(f, t, id, cityGraphics));
     }
-    
+    */
     explosions = true; // IL PARSER EFFETTIVO STA IN MAP RIGA 395 CIRCA
   } else if (msg.checkAddrPattern("/chaoticParticleAlpha")) {
     println("type: " + 4 );
@@ -171,24 +177,24 @@ void controlFilter(int freq) {
 void controlMusicVol(float val) {
   OscMessage myMessage = new OscMessage("/musicVol");
   myMessage.add(val);
-  oscP52.send(myMessage, myRemoteLocation2);
+  oscP5.send(myMessage, myRemoteLocation);
 }
 
 // 0.0 - 0.8
 void controlGrainAgit(float valAgit) {
   OscMessage myMessage = new OscMessage("/synthAgit");
   myMessage.add(valAgit);
-  oscP52.send(myMessage, myRemoteLocation2);
+  oscP5.send(myMessage, myRemoteLocation);
 }
 // 0.0 - 1.0
 void controlscVol(float val) {
   OscMessage myMessage = new OscMessage("/scVol");
   myMessage.add(val);
-  oscP52.send(myMessage, myRemoteLocation2);
+  oscP5.send(myMessage, myRemoteLocation);
 }
 // 0.0 - 1.0
 void controlGrainVol(float val) {
   OscMessage myMessage = new OscMessage("/grainVol");
   myMessage.add(val);
-  oscP52.send(myMessage, myRemoteLocation2);
+  oscP5.send(myMessage, myRemoteLocation);
 }

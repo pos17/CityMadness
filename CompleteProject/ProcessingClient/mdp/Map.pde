@@ -181,7 +181,7 @@ class Map {
 
     // RENDER SHADOW
     this.render.image(this.shadow, -HALF_WIDTH, -HALF_HEIGHT);
-
+    this.updateExplosions();
 
     // RENDER MAP FRAGMENTS
     if (this.mapFragments.size()>0) {
@@ -438,7 +438,7 @@ class Map {
 
   // GENERA LE OMBRE CHE NASCONDONO LE PARTICELLE
   
-  /*void renderShadow() {
+  void renderShadow() {
     for (int i = 0; i<mapFragments.size(); i++) {
       if (mapFragments.get(i).id == currentPoint.id) {
         return;
@@ -476,10 +476,18 @@ class Map {
     this.shadow.pop();
     this.shadow.endDraw();
 
-
+    println("explosionsInUpdate");
     // PARSE EXPLOSIONS
+    
+
+    click = false;
+  } 
+  
+  void updateExplosions(){
     if (this.explosions.size()>0) {
+      println("starting to update");
       IntList add = this.explosions.get(0);
+      println("add: " + add);
       int id = add.get(0);
       add.remove(0);
       MapPoint m = this.getMapPoint(id);
@@ -491,11 +499,15 @@ class Map {
       }
 
       this.mapFragments.add(new MapFragment(f, t, id, cityGraphics));
+      this.explosions.remove(0);
     }
-
-    click = false;
-  } */
+    
+    
+  } 
   
+  // VERSIONE DI CODICE ALTERNATIVA NON UTILIZZATA
+  
+  /*
   void renderShadow() {
     for (int i = 0; i<mapFragments.size(); i++) {
       if (mapFragments.get(i).id == currentPoint.id) {
@@ -536,7 +548,7 @@ class Map {
 
     click = false;
   }
-
+  */
 
 
   void setNextInterestPoint(int p) {
