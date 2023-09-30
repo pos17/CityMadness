@@ -87,7 +87,7 @@ class Map {
     } else if (this.chaoticParticles.size() > 300) {
       this.render.fill(0, 80);
     } else {
-      this.render.fill(0, 5);
+      this.render.fill(0, 20);
     }
     this.render.rect(0, 0, width, height);
     //this.render.background(0);
@@ -133,30 +133,6 @@ class Map {
       
     }
 
-    //ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
-    //while(chaoticParticlesIter.hasNext()){
-    //  ChaoticParticle m = chaoticParticlesIter.next();
-    //  m.moveNoise();
-    //  PVector p = m.getPos();
-    /*
-          if(particleIsNearStartPath(p)){
-     pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
-     chaoticParticlesIter.remove();
-     }
-     else{
-     */
-    //render.point(p.x,p.y);
-    //}
-    //}
-    //} else{ // BEHAVIOUR IF WE DON'T HAVE A PATH
-    //ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
-    //while(chaoticParticlesIter.hasNext()){
-    // ChaoticParticle m = chaoticParticlesIter.next();
-    // m.moveNoise();
-    // PVector p = m.getPos();
-    // render.point(p.x,p.y);
-    //}
-    //}
 
     // CHAOTIIC PARTICLES GENERATION
     //FIRST CLICK NOT PERFORMED
@@ -189,42 +165,13 @@ class Map {
       }
     }
 
-    // RENDER SHADOW
-    this.render.image(this.shadow, -HALF_WIDTH, -HALF_HEIGHT);
-    if (frameCount%2 == 0) {
-      this.updateExplosions();
-    }
-    // RENDER MAP FRAGMENTS
-    if (this.mapFragments.size()>0) {
-      this.trash.beginDraw();
-      //ListIterator<MapFragment> mapFragmentsIter = this.mapFragments.listIterator();
-      for (int i = 0; i< mapFragments.size(); i++) {
-        MapFragment f = mapFragments.get(i);
-        float alpha = f.update();
-        this.render.tint(255, alpha);
-        //if(f.t>3){
-        //this.render.image(f.show(),-HALF_WIDTH,-HALF_HEIGHT);
-        // }
-        //else{
-        // println("WOW");
-        // this.trash.image(f.show(),0,0); // FIX ORRIBILE, NON TOCCARE
-        // }
-      }
-      this.trash.endDraw();
-    }
-    this.render.tint(255);
+ 
 
-    // GENERA LE OMBRE
-    /*
-    if (click) {
-      this.renderShadow();
-    }
-    */
     this.render.strokeWeight(3);
     //RENDER RANDOM PATH PARTICLES
     if (this.wanderingParticles.size()>0) {
       ListIterator<RandomPathParticle> wanderingParticlesIter = this.wanderingParticles.listIterator();
-      this.render.stroke(50, 50, 255);
+      this.render.stroke(44,100,105);
       while (wanderingParticlesIter.hasNext()) {
         RandomPathParticle m = wanderingParticlesIter.next();
         m.move();
@@ -243,10 +190,10 @@ class Map {
 
     // RENDER PATH PARTICLES
     if (this.pathDone) {
-      this.render.stroke(255, 200, 0);
 
       for (int i = 0; i<pathParticles.size(); i++) {
         MapPathParticle m = pathParticles.get(i);
+        this.render.stroke(lerpColor(color(255, 100,0),color(255, 195, 34), sq(float(i)/pathParticles.size())));
         PVector p = m.getP();
         render.point(p.x, p.y);
         m.move();
@@ -283,7 +230,7 @@ class Map {
         PVector pUser = currentPoint.getCoords();
         this.render.push();
         this.render.translate(pUser.x,pUser.y);
-        this.render.tint(255, 30);
+        this.render.tint(255, 70);
         this.render.image(sprite,-sprite.width/2,-sprite.height/2);
         this.render.tint(255, 255);
         //this.render.image(sprite,0,0);

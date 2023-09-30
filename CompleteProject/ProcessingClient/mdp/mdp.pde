@@ -3,7 +3,6 @@ import oscP5.*;
 import netP5.*;
 import java.util.*;
 
-int PATHMAXLENGTH = 30; // lunghezza massima path ovvero ultimi nodi esplorati
 int NMAPPARTICLES = 20000;
 int MAPPARTICLEALPHA = 30; //valore iniziale
 float HALF_WIDTH;
