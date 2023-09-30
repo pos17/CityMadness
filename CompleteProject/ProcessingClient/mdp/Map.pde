@@ -48,12 +48,14 @@ class Map {
     this.line = new MapLine(this.path);
     PVector chaosVel = new PVector(0, 0);
     PVector chaosAcc = new PVector(0, 0);
+    
     for (int i = 0; i < NMAPPARTICLES; i++) {
       int rand = (int)random(preParticles.size());
       //println("rand: " +rand);
-      chaoticParticles.add(new ChaoticParticle(preParticles.get(rand).getPoint(), chaosVel, chaosAcc));
-      preParticles.remove(rand);
+      chaoticParticles.add(new ChaoticParticle(preParticles.get(rand), chaosVel, chaosAcc));
+      //preParticles.remove(rand);
     }
+    println(chaoticParticles.size());
     this.cityGraphics = loadImage("map.png");
     this.cityGraphics.resize(width, height);
     this.startPath = new PVector();
@@ -99,34 +101,6 @@ class Map {
     if (firstConnectionsArrived && this.wanderingParticles.size() < 300 &&  this.chaoticParticles.size() < 300) {
       this.wanderingParticles.add(new RandomPathParticle(this.currentPoint.getId()));
     }
-
-    //HANDLING OSC MESSAGES FOR SUPERCOLLIDER
-    /*
-    if (startup) {
-     //if()
-     } else {
-     if ( this.chaoticParticles.size()>=NMAPPARTICLES) {
-     if (filterFreqVal<= filterFreqValRANDOM) {
-     filterFreqVal += 1;
-     controlFilter(filterFreqVal);
-     }
-     } else if(filterFreqVal > 60 && ) {
-     
-     filterFreqVal -= 1;
-     controlFilter(filterFreqVal);
-     if (this.wanderingParticles.size() < 500) {
-     if (musicVol<0.5) {
-     musicVol += 0.0001;
-     controlMusicVol(musicVol);
-     }
-     if (scVol>0.5) {
-     scVol -= 0.0001;
-     controlscVol(scVol);
-     }
-     }
-     }
-     }
-     */
 
     if (music_phase == 1 ) {
       if (filterFreqVal< filterFreqValRANDOM) {
