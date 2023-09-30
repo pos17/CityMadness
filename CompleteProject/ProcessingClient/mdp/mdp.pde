@@ -105,7 +105,6 @@ void setup(){
   //text(title, 100,900);
   float xRatio = pixelWidth/width;
   float yRatio = pixelHeight/height; 
-  save("AAA.png");
   loadPixels();
   for (int x = 0; x < pixelWidth; x++) {
     for (int y = 10; y < pixelHeight; y++) {
