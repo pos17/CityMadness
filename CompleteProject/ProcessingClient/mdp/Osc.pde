@@ -158,6 +158,8 @@ void keyPressed() {
     OscMessage myMessage = new OscMessage("/currentNode");
     myMessage.add(55);
     oscP5.send(myMessage, myRemoteLocation);
+  } else if(key == 'r' || key == 'R') {
+    reset();
   }
 }
 
@@ -204,22 +206,7 @@ void controlGrainVol(float val) {
   oscP5.send(myMessage, myRemoteLocation);
 }
 
-void resettingSystem() {
-  click = false;
-  explosions = false;
-
-  creatingExplosions = false;
-  loaded = false;
-  explosionPaths = true;
-  showPathToInterestPoint = false;
-  showUser = false;
-  showInterestPoint = false;
-
-  showChaoticParticles = true;
-  
-  filterFreqVal = filterFreqValDEF;
-  musicVol = 0;
-  scVol = 1;
-  grainVol = 1; 
-  music_phase= 0;
+void sendReset() {
+  OscMessage myMessage = new OscMessage("/reset");
+  oscP5.send(myMessage, myRemoteLocation);
 }

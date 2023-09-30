@@ -433,11 +433,12 @@ def resetHandler(unused_addr):
     global interestNodes
     global interest_pol
     # resetting scheduler
-    while ~scheduler.empty():
-        scheduler.cancel()
+    while len(scheduler.queue) >0:
+
+        scheduler.cancel(scheduler.queue[0])
     # resetting scheduler 2
-    while ~scheduler2.empty():
-        scheduler2.cancel()
+    while len(scheduler.queue) >0:
+        scheduler.cancel(scheduler.queue[0])
     # resetting l_system
     l_system.dirList = ""
     l_system.positionsList = []
