@@ -26,7 +26,9 @@ boolean showInterestPoint = false;
 boolean showChaoticParticles = true;
 
 //Points used to build random particles 
-ArrayList<PreParticle> preParticles = new ArrayList<PreParticle>();
+ArrayList<PVector> preParticles = new ArrayList<PVector>();
+
+PGraphics title;
 
 
 // SUPERCOLLIDER CONTROL PARAMETERS 
@@ -63,10 +65,11 @@ PImage sprite;
 
 void setup(){
   //size(900,800,P2D);
+  pixelDensity(2);
   fullScreen(P2D);
-  pixelDensity(displayDensity());
-  frameRate(60);
-  pixelDensity(1);
+  //size(900,800,P2D);
+  //frameRate(60);
+  //pixelDensity(1);
   
   
   HALF_WIDTH = width/2;
@@ -83,27 +86,34 @@ void setup(){
   strokeJoin(ROUND);
   sprite = loadImage("sprite.png");
   sprite.resize(20,20);
-  font = createFont("cityscape.ttf", 200);
+  font = createFont("cityscape.ttf", 300);
   textFont(font);
   background(0);
-  //fill(255);
   textSize(200);
-  String title = "RESFERB";
-  //push();
-  //translate(HALF_WIDTH,HALF_HEIGHT);
-  //translate(-HALF_WIDTH,-HALF_HEIGHT);
-  //pop();
-  textAlign(CENTER);
-  text(title, 0, (height/2)-100, width, (height/2)+100);
   
-  for (int x = 0; x < width; x++) {
-    for (int y = 0; y < height; y++) {
-      if (get(x, y) == color(255)) {
-        preParticles.add(new PreParticle(x,y));
+  // QUESTO PGRAPHICS NON FA NULLA MA PER QUALCHE MOTIVO FA FUNZIONARE IL SETUP
+  title = createGraphics(width,height,P2D);
+  title.beginDraw();
+  title.background(0);
+  title.textFont(font);
+  title.text("RESFERB", 100,400);
+  title.endDraw();
+  
+  background(0);
+  textAlign(CENTER);
+  text("RESFERB", width/2,height/2);
+  //text(title, 100,900);
+  float xRatio = pixelWidth/width;
+  float yRatio = pixelHeight/height; 
+  loadPixels();
+  for (int x = 0; x < pixelWidth; x++) {
+    for (int y = 10; y < pixelHeight; y++) {
+      if(pixels[x+y*pixelWidth] == color(255)){
+        preParticles.add(new PVector(x/xRatio,y/yRatio));
       }
     }
   }
-  
+  save("AAA.png");
   println("preParticles size: "+ preParticles.size());
   background(0);
   map = new Map();
@@ -122,7 +132,7 @@ void draw(){
 class PreParticle {
   PVector point;
   
-  PreParticle(int x,int y){
+  PreParticle(float x,float y){
     this.point = new PVector(x,y);//.mult(0.5);    
   }
   
