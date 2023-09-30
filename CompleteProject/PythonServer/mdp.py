@@ -432,6 +432,22 @@ def interestZonePaths():
 def resetHandler(unused_addr):
     global interestNodes
     global interest_pol
+    # resetting scheduler
+    while ~scheduler.empty():
+        scheduler.cancel()
+    # resetting scheduler 2
+    while ~scheduler2.empty():
+        scheduler2.cancel()
+    # resetting l_system
+    l_system.dirList = ""
+    l_system.positionsList = []
+    l_system.SchedStartTime = 0
+    global axiom 
+    axiom = 'NWSWSENNNEEEWWNW'
+    global l_system_started
+    l_system_started = False
+    global snr
+    snr = 0 
     #interestNodes = [1013, 340, 1428, 1594]
     interestNodes = [715, 1676, 196, 1731]
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
@@ -630,7 +646,6 @@ if __name__ == "__main__":
     dispatcher.map("/currentNode", nNearestNodesHandler, [nNodes, interestNodes2,client,scheduler2])
     #dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client2])
     #dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
-    frase = "ciao"
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
     dispatcher.map("/reset", l_system.sendNoiseOn, [client2])
     dispatcher.map("/fcVal", forwardOSCMessage, [client2])
