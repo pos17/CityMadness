@@ -203,3 +203,23 @@ void controlGrainVol(float val) {
   myMessage.add(val);
   oscP5.send(myMessage, myRemoteLocation);
 }
+
+void resettingSystem() {
+  click = false;
+  explosions = false;
+
+  creatingExplosions = false;
+  loaded = false;
+  explosionPaths = true;
+  showPathToInterestPoint = false;
+  showUser = false;
+  showInterestPoint = false;
+
+  showChaoticParticles = true;
+  
+  filterFreqVal = filterFreqValDEF;
+  musicVol = 0;
+  scVol = 1;
+  grainVol = 1; 
+  music_phase= 0;
+}

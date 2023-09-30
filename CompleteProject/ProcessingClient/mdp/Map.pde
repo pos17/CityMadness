@@ -48,11 +48,13 @@ class Map {
     this.line = new MapLine(this.path);
     PVector chaosVel = new PVector(0, 0);
     PVector chaosAcc = new PVector(0, 0);
+    ArrayList<PreParticle> myPreParticles = new ArrayList<PreParticle>()
+    myPreParticles = preParticles.clone();
     for (int i = 0; i < NMAPPARTICLES; i++) {
       int rand = (int)random(preParticles.size());
       //println("rand: " +rand);
       chaoticParticles.add(new ChaoticParticle(preParticles.get(rand).getPoint(), chaosVel, chaosAcc));
-      preParticles.remove(rand);
+      myPreParticles.remove(rand);
     }
     this.cityGraphics = loadImage("map.png");
     this.cityGraphics.resize(width, height);
