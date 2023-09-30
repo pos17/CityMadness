@@ -66,8 +66,8 @@ PImage sprite;
 void setup(){
   //size(900,800,P2D);
   pixelDensity(2);
-  //fullScreen(P2D);
-  size(900,800,P2D);
+  fullScreen(P2D);
+  //size(900,800,P2D);
   //frameRate(60);
   //pixelDensity(1);
   
@@ -86,7 +86,7 @@ void setup(){
   strokeJoin(ROUND);
   sprite = loadImage("sprite.png");
   sprite.resize(20,20);
-  font = createFont("cityscape.ttf", 200);
+  font = createFont("cityscape.ttf", 300);
   textFont(font);
   background(0);
   textSize(200);
