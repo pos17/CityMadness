@@ -210,7 +210,7 @@ s.waitForBoot({
 
 		c = Pan2.ar(c, Rand(-1,1));
 
-		Out.ar(outBus, c*ampOut)
+		Out.ar(outBus, c)
 	}).store;
 
 	SynthDef(\interestPoint, {| out = 0, bufnum = 0 |
@@ -315,6 +315,7 @@ s.waitForBoot({
 		arg msg;
 		postln("arrival of point ");
 		~v.run;
+		~v = Synth.newPaused(\interestPoint, [\out, [0,1], \bufnum, ~i]);
 	},
 	path:"/pointArrival"
 	);
@@ -361,7 +362,7 @@ s.waitForBoot({
 		\instrument, \sin_pulsar,
 		\midinote, Pseq([ n0, n2, n1, n2] ++ (([ n0, n2, n1, n2] + 12)!2).flatten),
 		\dur, Pseq([1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 ].normalizeSum*2),
-		\lvl,~lvl_synth,
+		//\lvl,~lvl_synth,
 		\outBus,~lvl1,
 		\delta,2,
 		//
@@ -379,7 +380,7 @@ s.waitForBoot({
 		\instrument, \sin_pulsar,
 		\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
 		\dur, Pseq([1, 1, 1, 1, 1, 1, 1, 1].normalizeSum*2),
-		\lvl,~lvl_synth,
+		//\lvl,~lvl_synth,
 		\outBus,~lvl1,
 		\delta, 2,
 		//
@@ -465,4 +466,3 @@ s.freeAll;
 ~x.free;
 ~r.free;
 ~y.free;
-
