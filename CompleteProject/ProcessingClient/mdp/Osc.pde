@@ -110,9 +110,11 @@ void oscEvent(OscMessage msg) {
 }
 
 void mousePressed() {
+  suggestionVisible = false;
+  suggestionCount = 0; 
   if (loaded) {
     if (allowClick) {
-
+      startSuggestionCount = true; 
       // UPDATE THE NUMBER OF TIMES THE USER HAS CLICKED
       if (!map.isMoving()) {
         time++;
@@ -146,6 +148,8 @@ void mousePressed() {
           
         }
       }
+    } else {
+      startSuggestionCount = false;
     }
   }
 }

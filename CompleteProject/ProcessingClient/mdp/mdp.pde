@@ -15,7 +15,7 @@ int timeFromClick;
 
 
 boolean click;
-boolean allowClick; 
+boolean allowClick;
 boolean explosions;
 boolean creatingExplosions;
 boolean loaded;
@@ -28,6 +28,10 @@ boolean showChaoticParticles;
 boolean resetting;
 boolean explosionRunning;
 
+boolean suggestionVisible;
+int suggestionCount;
+boolean startSuggestionCount;
+final int suggestionCountMax = 100;
 //Points used to build random particles
 ArrayList<PVector> preParticles = new ArrayList<PVector>();
 
@@ -67,6 +71,7 @@ int outport = 5005;
 //int outport2 = 57120;
 
 PFont font;
+PFont fontSuggestion;
 
 PImage sprite;
 
@@ -94,6 +99,7 @@ void setup() {
   sprite = loadImage("sprite.png");
   sprite.resize(20, 20);
   font = createFont("CfGlitchCityRegular-L1vZ.ttf", 220);
+  fontSuggestion = createFont("NeonAdventure-VoOy.ttf", 100);
   textFont(font);
   background(0);
   textSize(220);
@@ -127,11 +133,23 @@ void setup() {
 
 
 void draw() {
+  if (startSuggestionCount) {
+    suggestionCount++;
+  }
+  if (suggestionCount > suggestionCountMax) {
+    suggestionVisible = true;
+  } else {
+  }
   background(0);
   if (!resetting) {
     //windowTitle(String.valueOf(frameRate));
     loaded = true;
     map.show();
+    if (suggestionVisible) {
+      tint(255, 255);
+      text("CLICK TO START THE EXPERIENCE", width/2, height * 10/11);
+      tint(255, 255);
+    }
   } else {
     background(0);
   }
@@ -143,7 +161,7 @@ void reset() {
   timeFromClick = 0;
   click = false;
   explosions = false;
-  allowClick = true; 
+  allowClick = true;
   creatingExplosions = true;
   loaded = false;
   explosionPaths = true;
@@ -165,11 +183,13 @@ void reset() {
   map = new Map();
   sendReset();
   resetting = false;
+  suggestionVisible = true;
+  suggestionCount = 0;
+  startSuggestionCount = true;
 }
 
-void scMixFade(float aScMix0,float aScMix1,float aScMix2,float aScMix3) {  
-  
-  if(aScMix0 != scMix0Ref || aScMix1 != scMix1Ref ||  aScMix2 != scMix2Ref || aScMix3 != scMix3Ref) {
-      
+void scMixFade(float aScMix0, float aScMix1, float aScMix2, float aScMix3) {
+
+  if (aScMix0 != scMix0Ref || aScMix1 != scMix1Ref ||  aScMix2 != scMix2Ref || aScMix3 != scMix3Ref) {
   }
 }

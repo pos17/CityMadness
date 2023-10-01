@@ -170,8 +170,8 @@ class Map { //<>//
         }
       }
     }
-    if(this.chaoticParticles.size() <=0) {
-      allowClick = true; 
+    if (this.chaoticParticles.size() <=0) {
+      allowClick = true;
     }
 
     updateExplosions();
@@ -198,7 +198,7 @@ class Map { //<>//
         pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
       }
     }
-    
+
     if (explosionRunning) {
       explosionTime++;
       if (this.randomParticlesExp.size()>0) {
@@ -285,7 +285,7 @@ class Map { //<>//
           sprite.resize(floor(resizeVal), floor(resizeVal));
           this.render.tint(255, 255);
         } else {
-          sprite.resize(20,20);
+          sprite.resize(20, 20);
         }
       }
       this.render.image(sprite, -sprite.width/2, -sprite.height/2);
@@ -305,9 +305,12 @@ class Map { //<>//
       }
     }
     // random particles for explosion
+    textFont(fontSuggestion);
+    //background(0);
+    textSize(40);
     
-
     this.render.pop();
+    
     this.render.endDraw();
     image(this.render, 0, 0);
 
