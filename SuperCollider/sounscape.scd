@@ -8,8 +8,9 @@ var samplePath = thisProcess.nowExecutingPath.dirname +/+ "/recordings";
 ~b =Buffer.read(s, samplePath +/+ "/CR_Duomo_Corner.WAV");
 ~c =Buffer.read(s, samplePath +/+ "/CR_MarketWalk.WAV");
 ~d =Buffer.read(s, samplePath +/+ "/CR_PStradivari_Corner.WAV");
+~i =Buffer.read(s, samplePath +/+ "/InterestPoint.WAV");
 )
-//sig = MoogFF.ar(sig, MouseY.kr(100, 10000, 1), MouseX.kr(0, 4));
+
 (
 s.waitForBoot({
 	var right, left,bass;
@@ -78,7 +79,7 @@ s.waitForBoot({
 			var sigC = PlayBuf.ar(2, ~c.bufnum, BufRateScale.kr(~c.bufnum), loop:1);
 			var sigD = PlayBuf.ar(2, ~d.bufnum, BufRateScale.kr(~d.bufnum), loop:1);
 
-			var in = Mix.ar([sigA*ampA,sigC*ampC,sigC*ampC,sigD*ampD]);
+			var in = Mix.ar([sigA*ampA,sigB*ampB,sigC*ampC,sigD*ampD]);
 			//var in = WhiteNoise.ar(0.1);  //
 			var dw,outsig,dryval;
 			var trigFreq = LFDNoise3.ar(shrate * \jitterScale.kr(1) !2).range(shrate * ( 1 - \jitter.kr(0.1)), shrate);
@@ -104,19 +105,21 @@ s.waitForBoot({
 			in * ( 1 - dw.abs ),
 			sig * dw
 			]);*/
-			Out.ar(outBus,outsig*wetval);
-			Out.ar([0,1],outsig*dryval);
+
+			Out.ar(outBus,outsig*1);
+			//Out.ar(outBus,outsig*wetval);
+			//Out.ar([0,1],outsig*dryval);
 		}
 	).add;
 
-	SynthDef(\grain_synth,{|outBus,loop = 0,amp=1,gate=1,agit|
+	SynthDef(\grain_synth,{|outBus,loop = 0,ampOut=1,gate=1,agit|
 		var sigL,sigR, trate, dur, rate;
 		trate = MouseY.kr(2,200,1);
-		dur = 4/trate;
+		dur = 4/200;
 		rate = Dseq([1, 1, 1, 0.5, 0.5, 0.2, -1], inf);
-		sigR = TGrains.ar(1, Impulse.ar(trate), ~buf_r, rate, agit, dur, Dseq([-1,1,inf]), 0.9, 2);
+		sigR = TGrains.ar(1, Impulse.ar(trate), ~buf_r, rate, BufDur.kr(~buf_r), dur, Dseq([-1,1,inf]), 0.9, 2);
 		sigR = Pan2.ar(sigR,LFNoise1.kr(10));
-		Out.ar(outBus,sigR*amp);
+		Out.ar(outBus,sigR*ampOut);
 	}).add;
 
 	SynthDef(\sub,{
@@ -210,8 +213,15 @@ s.waitForBoot({
 		Out.ar(outBus, c*ampOut)
 	}).store;
 
-	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus,'shrate',491.25,'drywet', 0.95,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
+	SynthDef(\interestPoint, {| out = 0, bufnum = 0 |
+		Out.ar(out,
+			PlayBuf.ar(2, ~i, BufRateScale.kr(~i), loop: 1.0)
+		)
+	}).add;
+
+	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus,'shrate',491.25,'drywet', 0.95,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
 	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus,\ampOut,~lvl_grain]);
+	~v = Synth.newPaused(\interestPoint, [\out, [0,1], \bufnum, ~i]);
 	~y = Synth.new(\synthLvl,[\inA,~lvl1,\ampA,~lvl_music,\outBus,~reverbBus],s,\addToTail);
 	~r = Synth.new(\reverb,[\in,~reverbBus,\fcvalue,~fcval],s,\addToTail);
 
@@ -293,11 +303,20 @@ s.waitForBoot({
 		postln(msg);
 		//dryrev = 1-(msg[1]+msg[2]+msg[3]+msg[4]);
 		dw = msg[1]+msg[2]+msg[3]+msg[4];
+
 		dw.postln;
-		~x.set('ampA',msg[1],'ampB',msg[2],'ampC',msg[3],'ampD',msg[4],'drywet',dw,'wetval',dw);
+		~x.set('ampA',1 - msg[1],'ampB',1 - msg[2],'ampC',1 - msg[3],'ampD',1 - msg[4],'drywet',dw,'wetval',dw);
 
 	},
 	path:"/scMix"
+	);
+
+	OSCdef.new(\arrival,{
+		arg msg;
+
+		~v.run;
+	},
+	path:"/pointArrival"
 	);
 
 	OSCdef.new(\noteOn,{
@@ -435,13 +454,14 @@ Pdefn(\overlapA,6.2);
 )
 
 
-Ndef('grainsin_pulsar').set('levA', 0.30271236992455, 'formantA', 3.5714285714286, 'overlapB', 0.40443672029499, 'levB', 0.28498187848462, 'lev', 0.81859410430839, 'formantB', 4.2698412698413, 'overlapA', 2.1898421014008);
-
-Ndef('grainsin_pulsar').set('levA', 0.49765180538124, 'formantA', 6.007874015748, 'levB', 0.31759720095202, 'spacesize', 0.16952380952381, 'overlapB', 1.0651340032941, 'wet150', 0.34391534391534, 'lev', 0.19443238886478, 'formantB', 3.2204724409449, 'diffusion', 1.6931793650794, 'overlapA', 1.8253052748325, 'freq', 69.877455494983);
 
 
 s.record(duration:20);
 
 s.freeAll;
 
-p.stop;
+~t.free;
+~x.free;
+~r.free;
+~y.free;
+
