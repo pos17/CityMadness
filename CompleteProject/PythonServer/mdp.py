@@ -476,6 +476,7 @@ def goalHandler(unused_addr, things, currentNode):
             paths = list[i]
             print(paths)
             ### ADD FUNCTION HERE
+            sendNodeFeedback(client2)
             scheduleOSCPathsToInterestNode(paths,client,scheduler2)
 
 def nNearestNodes():
@@ -577,6 +578,10 @@ def synthHandler(unused_addr, things,  currentNode):
 def forwardOSCMessage(used_addr, things, args):
     myclient = things[0][0]
     myclient.send_message(used_addr,args)
+    #print("/noteOn",midiValue)
+
+def sendNodeFeedback(myclient): 
+    myclient.send_message("pointArrival",0)
     #print("/noteOn",midiValue)
 
 

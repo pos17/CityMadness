@@ -14,7 +14,7 @@ void oscEvent(OscMessage msg) {
 
     //println("Next addresses: " + addresses);
   } else if (msg.checkAddrPattern("/firstConections")) {
-    
+
     music_phase = 3;
     println("type: " + 1 );
     IntList addresses = new IntList();
@@ -40,12 +40,12 @@ void oscEvent(OscMessage msg) {
 
     map.updatePathToInterestPoint(addresses);
   } else if (msg.checkAddrPattern("/mapDiscoveredPath")) {
-    if(!explosionRunning) {
+    if (!explosionRunning) {
       println("explosionRunning");
-      explosionRunning = true; 
+      explosionRunning = true;
       for (int i = 0; i < 10000; i++) {
         map.randomParticlesExp.add(new RandomPathParticle(map.currentPoint.getId()));
-      }  
+      }
     }
     println("type: " + 3 );
     IntList addresses = new IntList();
@@ -53,7 +53,7 @@ void oscEvent(OscMessage msg) {
     println("MESSAGE ARGS: " + msg.arguments().length);
     for (int i = 0; i<msg.arguments().length; i++) {
       //println("msg: " +  msg.get(i));
-      
+
       addresses.append(msg.get(i).intValue());
 
       map.explosionsPaths.add(map.getMapPoint(msg.get(i).intValue()).getCoords());
@@ -68,24 +68,24 @@ void oscEvent(OscMessage msg) {
     // PARSE EXPLOSIONS
     /*
     if (map.explosions.size()>0) {
-      //println("explosions");
-      IntList add = map.explosions.get(0);
-      int id = add.get(0);
-      add.remove(0);
-      //print("STARTID: "+ id + " addresses: " + addresses);
-      MapPoint m = map.getMapPoint(id);
-      PVector f = m.getCoords();
-      ArrayList<PVector> t = new ArrayList<PVector>();
-      //m.addToConnections(add);
-      map.updatePointConnections(m.id, addresses);
-      for (int i = 1; i<add.size(); i++) {
-        t.add(map.getMapPoint(add.get(i)).getCoords());
-      }
-      
-
-      //map.mapFragments.add(new MapFragment(f, t, id, cityGraphics));
-    }
-    */
+     //println("explosions");
+     IntList add = map.explosions.get(0);
+     int id = add.get(0);
+     add.remove(0);
+     //print("STARTID: "+ id + " addresses: " + addresses);
+     MapPoint m = map.getMapPoint(id);
+     PVector f = m.getCoords();
+     ArrayList<PVector> t = new ArrayList<PVector>();
+     //m.addToConnections(add);
+     map.updatePointConnections(m.id, addresses);
+     for (int i = 1; i<add.size(); i++) {
+     t.add(map.getMapPoint(add.get(i)).getCoords());
+     }
+     
+     
+     //map.mapFragments.add(new MapFragment(f, t, id, cityGraphics));
+     }
+     */
     explosions = true; // IL PARSER EFFETTIVO STA IN MAP RIGA 395 CIRCA
   } else if (msg.checkAddrPattern("/chaoticParticleAlpha")) {
     println("type: " + 4 );
@@ -104,36 +104,41 @@ void oscEvent(OscMessage msg) {
 }
 
 void mousePressed() {
-  if(loaded) {
-    
-    // UPDATE THE NUMBER OF TIMES THE USER HAS CLICKED
-    if (!map.isMoving()) {
-      time++;
-      if (time == 0 ) {
-        music_phase = 1; 
-        map.chaoticParticlesMove = true;
-      } else {
-    
-        timeFromClick = 0;
-        map.setChaoticParticlesState(1);
-        int id = map.getClosestPointId(mouseX-HALF_WIDTH, mouseY-HALF_HEIGHT);
-        if (!startup) {
-          OscMessage myMessage = new OscMessage("/currentNode");
-          myMessage.add(id);
-          oscP5.send(myMessage, myRemoteLocation);
+  if (loaded) {
+    if (allowClick) {
+
+      // UPDATE THE NUMBER OF TIMES THE USER HAS CLICKED
+      if (!map.isMoving()) {
+        time++;
+        if (time == 0 ) {
+          music_phase = 1;
+          map.chaoticParticlesMove = true;
+          
         } else {
-          // primo click
-          music_phase = 2;
-          OscMessage myMessage = new OscMessage("/currentNodeFirst");
-          myMessage.add(id);
-          oscP5.send(myMessage, myRemoteLocation);
-          OscMessage myMessage2 = new OscMessage("/currentNode");
-          myMessage2.add(id);
-          oscP5.send(myMessage2, myRemoteLocation);
+
+          timeFromClick = 0;
+          map.setChaoticParticlesState(1);
+          int id = map.getClosestPointId(mouseX-HALF_WIDTH, mouseY-HALF_HEIGHT);
+          if (!startup) {
+            OscMessage myMessage = new OscMessage("/currentNode");
+            myMessage.add(id);
+            oscP5.send(myMessage, myRemoteLocation);
+          } else {
+            // primo click
+            allowClick = false;
+            music_phase = 2;
+            OscMessage myMessage = new OscMessage("/currentNodeFirst");
+            myMessage.add(id);
+            oscP5.send(myMessage, myRemoteLocation);
+            OscMessage myMessage2 = new OscMessage("/currentNode");
+            myMessage2.add(id);
+            oscP5.send(myMessage2, myRemoteLocation);
+          }
+          //after this call !startup
+          map.updatePath(id);
+          map.setCurrentPoint(id);
+          
         }
-        //after this call !startup
-        map.updatePath(id);
-        map.setCurrentPoint(id);
       }
     }
   }
@@ -165,7 +170,7 @@ void keyPressed() {
     OscMessage myMessage = new OscMessage("/currentNode");
     myMessage.add(55);
     oscP5.send(myMessage, myRemoteLocation);
-  } else if(key == 'r' || key == 'R') {
+  } else if (key == 'r' || key == 'R') {
     reset();
   }
 }

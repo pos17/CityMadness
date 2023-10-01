@@ -127,7 +127,7 @@ class Map { //<>//
 
       if (musicVol<0.1) {
         musicVol += 0.001;
-        //controlMusicVol(musicVol);
+        controlMusicVol(musicVol);
       }
       if (scVol>=0.9) {
         scVol -= 0.001;
@@ -169,6 +169,9 @@ class Map { //<>//
           chaoticParticlesIter.remove();
         }
       }
+    }
+    if(this.chaoticParticles.size() <=0) {
+      allowClick = true; 
     }
 
     updateExplosions();

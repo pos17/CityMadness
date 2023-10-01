@@ -15,8 +15,8 @@ int timeFromClick;
 
 
 boolean click;
+boolean allowClick; 
 boolean explosions;
-
 boolean creatingExplosions;
 boolean loaded;
 boolean explosionPaths;
@@ -139,7 +139,7 @@ void reset() {
   timeFromClick = 0;
   click = false;
   explosions = false;
-
+  allowClick = true; 
   creatingExplosions = true;
   loaded = false;
   explosionPaths = true;
