@@ -6,6 +6,7 @@ void oscEvent(OscMessage msg) {
   //println(msg);
 
   if (msg.checkAddrPattern("/nextNodes")) {
+    startInterestGlowCount = true;
     println("type: " + 0 );
     IntList addresses = oscPathParser(msg);
     map.setNextPoints(addresses);
@@ -40,6 +41,8 @@ void oscEvent(OscMessage msg) {
 
     map.updatePathToInterestPoint(addresses);
   } else if (msg.checkAddrPattern("/mapDiscoveredPath")) {
+    showInterestPoint = false;
+    interestGlowCount = 0; 
     if (!explosionRunning) {
       println("explosionRunning");
       explosionRunning = true;

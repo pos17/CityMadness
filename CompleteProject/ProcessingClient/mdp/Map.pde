@@ -141,7 +141,7 @@ class Map { //<>//
 
 
     // CHAOTIIC PARTICLES GENERATION
-    //FIRST CLICK NOT PERFORMED
+    // FIRST CLICK NOT PERFORMED
     if (startup) {
       ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
       while (chaoticParticlesIter.hasNext()) {
@@ -292,25 +292,36 @@ class Map { //<>//
       this.render.tint(255, 255);
       //this.render.image(sprite,0,0);
       this.render.pop();
-      // SEGNAPOSTO INTEREST POINT
-      if (time>0 && showInterestPoint) {
-        PVector p = interestPoint.getCoords();
-        this.render.stroke(255, 255, 0, 2.0*sin(radians(constrain(timeFromClick, 0, 180))));
-
-        for (int j = 0; j<50; j++) {
-          float fade = float(j)/50;
-          this.render.strokeWeight(map(fade, 0, 1, 1, 100));
-          this.render.point(p.x, p.y);
-        }
+    }
+    // SEGNAPOSTO INTEREST POINT
+    if(startInterestGlowCount == true) {
+      interestGlowCount++;
+      if(interestGlowCount > interestGlowCountMAX) {
+        showInterestPoint= true;
       }
+    }
+    if (time>0 && showInterestPoint) {
+      this.render.tint(255, 127);
+      PVector p = interestPoint.getCoords();
+      this.render.translate(p.x, p.y);
+      float resizeVal2 = 60+ 30* sin(timeFromClick*(10*PI)/500);
+      sprite2.resize(floor(resizeVal2), floor(resizeVal2));
+      this.render.image(sprite2, -sprite2.width/2, -sprite2.height/2);
+      this.render.tint(255, 255);
+      //this.render.stroke(255, 255, 0, 2.0*sin(radians(constrain(timeFromClick, 0, 180))));
+
+      //for (int j = 0; j<50; j++) {
+      //  float fade = float(j)/50;
+      //  this.render.strokeWeight(map(fade, 0, 1, 1, 100));
+      //  this.render.point(p.x, p.y);
     }
     // random particles for explosion
     textFont(fontSuggestion);
     //background(0);
     textSize(40);
-    
+
     this.render.pop();
-    
+
     this.render.endDraw();
     image(this.render, 0, 0);
 

@@ -27,6 +27,9 @@ boolean showInterestPoint;
 boolean showChaoticParticles;
 boolean resetting;
 boolean explosionRunning;
+boolean startInterestGlowCount; 
+int interestGlowCount;
+final int interestGlowCountMAX = 1500;
 
 boolean suggestionVisible;
 int suggestionCount;
@@ -74,6 +77,7 @@ PFont font;
 PFont fontSuggestion;
 
 PImage sprite;
+PImage sprite2;
 
 void setup() {
   //size(900,800,P2D);
@@ -97,7 +101,9 @@ void setup() {
 
   strokeJoin(ROUND);
   sprite = loadImage("sprite.png");
+  sprite2 = loadImage("sprite.png");
   sprite.resize(20, 20);
+  sprite2.resize(60, 60);
   font = createFont("CfGlitchCityRegular-L1vZ.ttf", 220);
   fontSuggestion = createFont("NeonAdventure-VoOy.ttf", 100);
   textFont(font);
@@ -186,6 +192,8 @@ void reset() {
   suggestionVisible = true;
   suggestionCount = 0;
   startSuggestionCount = true;
+  startInterestGlowCount = false;
+  interestGlowCount = 0;
 }
 
 void scMixFade(float aScMix0, float aScMix1, float aScMix2, float aScMix3) {
