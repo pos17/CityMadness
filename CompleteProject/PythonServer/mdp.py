@@ -533,11 +533,11 @@ def nNearestNodesHandler(unused_addr, things  ,currentNode):
                 # print(nearestNodes)
                 for j in range(len(nodes[nearestNodes[i]][3])):
                     conections[i].append(nodes[nearestNodes[i]][3][j])
-            print("ciccia")
+            #print("ciccia")
             sendPointArrivalFeedback(client2)
             scheduleOSCPathsToInterestNode(conections,client,scheduler2)
             
-            print("printing conecctions")
+            #print("printing conecctions")
             print(conections)
 
 def firstPathHandler(unused_addr, things,  currentNodeFirst):
@@ -671,7 +671,7 @@ if __name__ == "__main__":
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNodeFirst", firstPathHandler, [client,scheduler2])
     dispatcher.map("/currentNode", interestPathHandler)
-    dispatcher.map("/currentNode", synthHandler, [nDist,client2,nNodes, interestNodes2])
+    dispatcher.map("/currentNode", synthHandler, [nDist,client,nNodes, interestNodes2])
     dispatcher.map("/currentNode", nNearestNodesHandler, [nNodes, interestNodes2,client,scheduler2,client2])
     #dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client2])
     #dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])

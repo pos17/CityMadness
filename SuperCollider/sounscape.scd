@@ -215,7 +215,7 @@ s.waitForBoot({
 
 	SynthDef(\interestPoint, {| out = 0, bufnum = 0 |
 		Out.ar(out,
-			PlayBuf.ar(2, ~i, BufRateScale.kr(~i), loop: 1.0)
+			PlayBuf.ar(2, ~i, BufRateScale.kr(~i), loop: 0.0)
 		)
 	}).add;
 

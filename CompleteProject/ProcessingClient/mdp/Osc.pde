@@ -97,6 +97,12 @@ void oscEvent(OscMessage msg) {
     }
   } else if (msg.checkAddrPattern("/pathToInterestPath")) {
     showPathToInterestPoint = msg.get(0).booleanValue();
+  } else if (msg.checkAddrPattern("/pathToInterestPath")) {
+    float scMix0 = msg.get(0).floatValue();
+    float scMix1 = msg.get(1).floatValue();
+    float scMix2 = msg.get(2).floatValue();
+    float scMix3 = msg.get(3).floatValue();
+    
   } else {
     println("something else");
     println(msg);

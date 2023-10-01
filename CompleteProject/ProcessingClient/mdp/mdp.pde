@@ -42,6 +42,10 @@ int filterFreqValATT;
 float musicVol;
 float scVol;
 float grainVol;
+float scMix0Ref = 0;
+float scMix1Ref = 0;
+float scMix2Ref = 0;
+float scMix3Ref = 0;
 /*
  music_phases:
  0 title: filter static, only noise
@@ -89,28 +93,28 @@ void setup() {
   strokeJoin(ROUND);
   sprite = loadImage("sprite.png");
   sprite.resize(20, 20);
-  font = createFont("cityscape.ttf", 300);
+  font = createFont("CfGlitchCityRegular-L1vZ.ttf", 220);
   textFont(font);
   background(0);
-  textSize(200);
-
+  textSize(220);
+  String titleString = "SOLI\nVAGANT";
   // QUESTO PGRAPHICS NON FA NULLA MA PER QUALCHE MOTIVO FA FUNZIONARE IL SETUP
   title = createGraphics(width, height, P2D);
   title.beginDraw();
   title.background(0);
   title.textFont(font);
-  title.text("RESFERB", 100, 400);
+  title.text(titleString, 10, 40);
   title.endDraw();
 
   background(0);
   textAlign(CENTER);
-  text("RESFERB", width/2, height/2);
+  text(titleString, width/2, height/2);
   //text(title, 100,900);
   float xRatio = pixelWidth/width;
   float yRatio = pixelHeight/height;
   loadPixels();
   for (int x = 0; x < pixelWidth; x++) {
-    for (int y = 10; y < pixelHeight; y++) {
+    for (int y = 0; y < pixelHeight; y++) {
       if (pixels[x+y*pixelWidth] == color(255)) {
         preParticles.add(new PVector(x/xRatio, y/yRatio));
       }
@@ -161,4 +165,11 @@ void reset() {
   map = new Map();
   sendReset();
   resetting = false;
+}
+
+void scMixFade(float aScMix0,float aScMix1,float aScMix2,float aScMix3) {  
+  
+  if(aScMix0 != scMix0Ref || aScMix1 != scMix1Ref ||  aScMix2 != scMix2Ref || aScMix3 != scMix3Ref) {
+      
+  }
 }

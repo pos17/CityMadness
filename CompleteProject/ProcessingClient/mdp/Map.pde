@@ -60,7 +60,7 @@ class Map { //<>//
       int rand = (int)random(preParticles.size());
       //println("rand: " +rand);
       chaoticParticles.add(new ChaoticParticle(preParticles.get(rand), chaosVel, chaosAcc));
-      //preParticles.remove(rand);
+      preParticles.remove(rand);
     }
     println(chaoticParticles.size());
     this.cityGraphics = loadImage("map.png");
@@ -129,7 +129,7 @@ class Map { //<>//
         musicVol += 0.005;
         controlMusicVol(musicVol);
       }
-      if (scVol>=0.6) {
+      if (scVol>0.6) {
         scVol -= 0.005;
         controlscVol(scVol);
       }
