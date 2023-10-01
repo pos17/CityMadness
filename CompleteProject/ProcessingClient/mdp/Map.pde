@@ -275,7 +275,7 @@ class Map { //<>//
       this.render.tint(255, user_alpha);
       if (explosionRunning) {
         if ( explosionTime < explosionTimeMax/(10*PI)) {
-          float resizeVal = 20+ 40* sin(explosionTime* (10*PI)/explosionTimeMax);
+          float resizeVal = 20+ 200* sin(explosionTime* (10*PI)/explosionTimeMax);
           if (resizeVal < 20 ) {
             resizeVal = 20;
           }

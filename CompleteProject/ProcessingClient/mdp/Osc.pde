@@ -41,7 +41,7 @@ void oscEvent(OscMessage msg) {
     map.updatePathToInterestPoint(addresses);
   } else if (msg.checkAddrPattern("/mapDiscoveredPath")) {
     if(!explosionRunning) {
-      print("explosionRunning");
+      println("explosionRunning");
       explosionRunning = true; 
       for (int i = 0; i < 10000; i++) {
         map.randomParticlesExp.add(new RandomPathParticle(map.currentPoint.getId()));
