@@ -132,7 +132,7 @@ s.waitForBoot({
 	}).add;
 
 	SynthDef(\sin_pulsar, {
-		arg outBus,lev, formantA, formantB, overlapA, overlapB,levA, levB,ampOut;
+		arg outBus,lev, formantA, formantB, overlapA, overlapB,levA, levB,ampOut=0.8;
 		var a,b,c,d,e,f, f_ ,t;
 
 		//lev = \lev.kr(0.3);
@@ -361,7 +361,7 @@ s.waitForBoot({
 		\instrument, \sin_pulsar,
 		\midinote, Pseq([ n0, n2, n1, n2] ++ (([ n0, n2, n1, n2] + 12)!2).flatten),
 		\dur, Pseq([1, 1, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 ].normalizeSum*2),
-		//\lvl,~lvl_synth,
+		\lvl,~lvl_synth,
 		\outBus,~lvl1,
 		\delta,2,
 		//
@@ -379,6 +379,7 @@ s.waitForBoot({
 		\instrument, \sin_pulsar,
 		\midinote, Pseq([ n0, n2, n0, n2, n0, n2, n0, n2] - 12),
 		\dur, Pseq([1, 1, 1, 1, 1, 1, 1, 1].normalizeSum*2),
+		\lvl,~lvl_synth,
 		\outBus,~lvl1,
 		\delta, 2,
 		//

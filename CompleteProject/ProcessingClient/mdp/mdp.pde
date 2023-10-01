@@ -31,7 +31,7 @@ boolean explosionRunning;
 boolean suggestionVisible;
 int suggestionCount;
 boolean startSuggestionCount;
-final int suggestionCountMax = 100;
+final int suggestionCountMax = 1200;
 //Points used to build random particles
 ArrayList<PVector> preParticles = new ArrayList<PVector>();
 

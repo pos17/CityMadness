@@ -671,7 +671,7 @@ if __name__ == "__main__":
     dispatcher.map("/currentNode", pathHandler)
     dispatcher.map("/currentNodeFirst", firstPathHandler, [client,scheduler2])
     dispatcher.map("/currentNode", interestPathHandler)
-    dispatcher.map("/currentNode", synthHandler, [nDist,client,nNodes, interestNodes2])
+    dispatcher.map("/currentNode", synthHandler, [nDist,client2,nNodes, interestNodes2])
     dispatcher.map("/currentNode", nNearestNodesHandler, [nNodes, interestNodes2,client,scheduler2,client2])
     #dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client2])
     #dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
