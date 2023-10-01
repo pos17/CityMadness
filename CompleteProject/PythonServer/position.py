@@ -89,7 +89,7 @@ def scheduleOSCPathsToInterestNode(pathsList,client,myscheduler):
     delay = 0
     for path in pathsList: 
         myscheduler.enter(delay,4,sendPath,argument=(path,client))
-        delay += 0.1
+        delay += 0.0001
         #print(delay)
     myscheduler.run()
 

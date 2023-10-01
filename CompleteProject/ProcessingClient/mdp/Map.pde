@@ -1,4 +1,4 @@
-class Map {
+class Map { //<>//
   ArrayList<MapPoint> mapPoints = new ArrayList<MapPoint>();
   MapPath path;
   MapLine line;
@@ -9,11 +9,11 @@ class Map {
 
   ArrayList<PVector> explosionsPaths = new ArrayList<PVector>();
 
-  
+
   ArrayList<ChaoticParticle> chaoticParticles = new ArrayList<ChaoticParticle>();
-  
-  ArrayList<ChaoticParticle> chaoticParticlesForExplosion = new ArrayList<ChaoticParticle>();
-  
+
+  ArrayList<RandomPathParticle> randomParticlesExp = new ArrayList<RandomPathParticle>();
+
   ArrayList<MapPathParticle> pathParticles = new ArrayList<MapPathParticle>();
   ArrayList<RandomPathParticle> wanderingParticles = new ArrayList<RandomPathParticle>();
 
@@ -36,10 +36,10 @@ class Map {
 
 
   ArrayList<IntList> explosions = new ArrayList<IntList>();
-
-
+  int explosionTime;
+  final int explosionTimeMax = 600;
   int user_alpha;
-  final int user_alpha_max = 70; 
+  final int user_alpha_max = 70;
 
   Map() {
     this.mapPoints = loadMapPoints();
@@ -71,8 +71,8 @@ class Map {
     this.trash.beginDraw();
     this.trash.circle(200, 200, 200);
     this.trash.endDraw();
-    this.user_alpha = 0; 
-
+    this.user_alpha = 0;
+    this.explosionTime = 0;
     // HANDLING STARTUP VALUES FOR SUPERCOLLIDER
 
     controlMusicVol(0);
@@ -173,10 +173,10 @@ class Map {
 
     updateExplosions();
 
-      this.render.strokeWeight(3); //<>//
-      if(this.wanderingParticles.size()>(NMAPPARTICLES)) {
-        this.wanderingParticles.remove(0);
-      }
+    this.render.strokeWeight(3);
+    if (this.wanderingParticles.size()>(NMAPPARTICLES)) {
+      this.wanderingParticles.remove(0);
+    }
     //RENDER RANDOM PATH PARTICLES
     if (this.wanderingParticles.size()>0) {
       ListIterator<RandomPathParticle> wanderingParticlesIter = this.wanderingParticles.listIterator();
@@ -188,9 +188,6 @@ class Map {
         this.render.point(p.x, p.y);
       }
     }
-    if(this.wanderingParticles.size()>NMAPPARTICLES) {
-      this.wanderingParticles.remove(0);
-    }
 
     // GENERATION OF PATH PARTICLES
     if (this.pathDone ) {
@@ -199,7 +196,34 @@ class Map {
       }
     }
     
-    
+    if (explosionRunning) {
+      explosionTime++;
+      if (this.randomParticlesExp.size()>0) {
+
+        ListIterator<RandomPathParticle> randomParticlesExpIter = this.randomParticlesExp.listIterator();
+        //this.render.stroke(44, 100, 105);
+        this.render.stroke(255, 255, 255);
+        while (randomParticlesExpIter.hasNext()) {
+          RandomPathParticle m = randomParticlesExpIter.next();
+          m.move(2);
+          PVector p = m.getP();
+          this.render.point(p.x, p.y);
+        }
+        if (explosionTime < explosionTimeMax) {
+        } else {
+          for (int i = 0; i< 50; i++) {
+            if (!this.randomParticlesExp.isEmpty()) {
+
+              this.randomParticlesExp.remove(0);
+            }
+          }
+        }
+      } else {
+        explosionRunning = false;
+        explosionTime = 0;
+      }
+    }
+
 
 
     // RENDER PATH PARTICLES
@@ -229,8 +253,8 @@ class Map {
     }
 
     // SEGNAPOSTO UTENTE
-    if (!startup && showUser && firstConnectionsArrived && this.wanderingParticles.size() < 300 &&  this.chaoticParticles.size() < 300) {
-      if(user_alpha < user_alpha_max) {
+    if (!startup && showUser && firstConnectionsArrived &&  this.chaoticParticles.size() < 300) {
+      if (user_alpha < user_alpha_max) {
         user_alpha +=2;
       }
       /*
@@ -244,11 +268,23 @@ class Map {
        }
        }
        */
-      
+
       PVector pUser = currentPoint.getCoords();
       this.render.push();
       this.render.translate(pUser.x, pUser.y);
       this.render.tint(255, user_alpha);
+      if (explosionRunning) {
+        if ( explosionTime < explosionTimeMax/(10*PI)) {
+          float resizeVal = 20+ 40* sin(explosionTime* (10*PI)/explosionTimeMax);
+          if (resizeVal < 20 ) {
+            resizeVal = 20;
+          }
+          sprite.resize(floor(resizeVal), floor(resizeVal));
+          this.render.tint(255, 255);
+        } else {
+          sprite.resize(20,20);
+        }
+      }
       this.render.image(sprite, -sprite.width/2, -sprite.height/2);
       this.render.tint(255, 255);
       //this.render.image(sprite,0,0);
@@ -266,23 +302,7 @@ class Map {
       }
     }
     // random particles for explosion
-    if(explosionRunning) {
-      //println("not startup");
-      PVector userPos = currentPoint.getCoords();
-      ListIterator<ChaoticParticle> chaoticParticlesExpIter = this.chaoticParticlesForExplosion.listIterator();
-      while (chaoticParticlesExpIter.hasNext()) {
-        ChaoticParticle m = chaoticParticlesExpIter.next();
-        PVector steeringForce = m.unseek(userPos);
-        if (m.getDist(userPos) >3) {
-          m.applyForce(steeringForce);
-          m.moveNoise();
-          PVector p = m.getPos();
-          render.point(p.x, p.y);
-        } else {
-          chaoticParticlesExpIter.remove();
-        }
-      }
-    }
+    
 
     this.render.pop();
     this.render.endDraw();
