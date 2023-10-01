@@ -9,7 +9,11 @@ class Map {
 
   ArrayList<PVector> explosionsPaths = new ArrayList<PVector>();
 
+  
   ArrayList<ChaoticParticle> chaoticParticles = new ArrayList<ChaoticParticle>();
+  
+  ArrayList<ChaoticParticle> chaoticParticlesForExplosion = new ArrayList<ChaoticParticle>();
+  
   ArrayList<MapPathParticle> pathParticles = new ArrayList<MapPathParticle>();
   ArrayList<RandomPathParticle> wanderingParticles = new ArrayList<RandomPathParticle>();
 
@@ -261,7 +265,24 @@ class Map {
         }
       }
     }
-
+    // random particles for explosion
+    if(explosionRunning) {
+      //println("not startup");
+      PVector userPos = currentPoint.getCoords();
+      ListIterator<ChaoticParticle> chaoticParticlesExpIter = this.chaoticParticlesForExplosion.listIterator();
+      while (chaoticParticlesExpIter.hasNext()) {
+        ChaoticParticle m = chaoticParticlesExpIter.next();
+        PVector steeringForce = m.unseek(userPos);
+        if (m.getDist(userPos) >3) {
+          m.applyForce(steeringForce);
+          m.moveNoise();
+          PVector p = m.getPos();
+          render.point(p.x, p.y);
+        } else {
+          chaoticParticlesExpIter.remove();
+        }
+      }
+    }
 
     this.render.pop();
     this.render.endDraw();

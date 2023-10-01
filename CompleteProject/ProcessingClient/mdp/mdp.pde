@@ -26,6 +26,7 @@ boolean showInterestPoint;
 
 boolean showChaoticParticles;
 boolean resetting;
+boolean explosionRunning;
 
 //Points used to build random particles
 ArrayList<PVector> preParticles = new ArrayList<PVector>();
@@ -145,7 +146,7 @@ void reset() {
   showPathToInterestPoint = false;
   showUser = true;
   showInterestPoint = false;
-
+  explosionRunning = false;
   showChaoticParticles = true;
   filterFreqValDEF = 1000;
   filterFreqValRANDOM = 16000;

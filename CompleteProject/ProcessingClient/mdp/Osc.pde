@@ -14,6 +14,7 @@ void oscEvent(OscMessage msg) {
 
     //println("Next addresses: " + addresses);
   } else if (msg.checkAddrPattern("/firstConections")) {
+    
     music_phase = 3;
     println("type: " + 1 );
     IntList addresses = new IntList();
@@ -39,7 +40,14 @@ void oscEvent(OscMessage msg) {
 
     map.updatePathToInterestPoint(addresses);
   } else if (msg.checkAddrPattern("/mapDiscoveredPath")) {
-    
+    if(!explosionRunning) {
+      explosionRunning = true; 
+      for (int i = 0; i < 1000; i++) {
+        map.chaoticParticlesForExplosion.add(new ChaoticParticle(map.currentPoint.getCoords(), new PVector(0,0), new PVector(0,0)));
+        
+        
+      }  
+    }
     println("type: " + 3 );
     IntList addresses = new IntList();
     println("new message");
