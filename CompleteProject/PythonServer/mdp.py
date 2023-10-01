@@ -29,6 +29,7 @@ client2 = udp_client.SimpleUDPClient("127.0.0.1", outport2)
 scheduler = sched.scheduler(time.monotonic, time.sleep)
 #scheduler for interestPaths update
 scheduler2 = sched.scheduler(time.monotonic, time.sleep)
+scheduler3 = sched.scheduler(time.monotonic, time.sleep)
 l_system_started = False
 scheduler_started_time = 0 
 endingTime = 0
@@ -465,9 +466,9 @@ def goalHandler(unused_addr, list, currentNode):
 """
 def goalHandler(unused_addr, things, currentNode):
     myinterestNodes = things[0][1]
-    
     list = things[0][0]
     client = things[0][2]
+    client2 = things[0][3]
     print("my interest nodes")
     print(myinterestNodes)
     for i in range(len(myinterestNodes)):
@@ -476,7 +477,7 @@ def goalHandler(unused_addr, things, currentNode):
             paths = list[i]
             print(paths)
             ### ADD FUNCTION HERE
-            sendNodeFeedback(client2)
+            
             scheduleOSCPathsToInterestNode(paths,client,scheduler2)
 
 def nNearestNodes():
@@ -516,6 +517,8 @@ def nNearestNodesHandler(unused_addr, things  ,currentNode):
     mynodes = things[0][0]
     myinterestNodes = things[0][1]
     client = things[0][2]
+    scheduler2 = things[0][3]
+    client2 = things[0][4]
     print("CURRENT NODE")
     print(currentNode)
     for i in range(len(mynodes)):
@@ -530,7 +533,10 @@ def nNearestNodesHandler(unused_addr, things  ,currentNode):
                 # print(nearestNodes)
                 for j in range(len(nodes[nearestNodes[i]][3])):
                     conections[i].append(nodes[nearestNodes[i]][3][j])
+            print("ciccia")
+            sendPointArrivalFeedback(client2)
             scheduleOSCPathsToInterestNode(conections,client,scheduler2)
+            
             print("printing conecctions")
             print(conections)
 
@@ -580,9 +586,26 @@ def forwardOSCMessage(used_addr, things, args):
     myclient.send_message(used_addr,args)
     #print("/noteOn",midiValue)
 
-def sendNodeFeedback(myclient): 
-    myclient.send_message("pointArrival",0)
+def sendPointArrivalFeedback(myclient): 
+    myclient.send_message("/pointArrival",0)
+    print("/pointArrival")
     #print("/noteOn",midiValue)
+
+"""
+def scheduleFadeInOutDryWetValues(initVal,finalVal,timeRate,increaseRate,myClient,myScheduler): 
+    val = initVal
+    delay = 0
+    while initVal <finalVal:
+        val = val +increaseRate
+        delay = delay + timeRate
+        myScheduler.enter(delay,4,sendPath,argument=(path,client))
+        delay += 0.0001
+        #print(delay)
+    myScheduler.run()
+
+def sendFadeInOutDryWetValues(val,myClient): 
+     myclient.send_message("/pointArrival",0)
+"""
 
 
 
@@ -649,7 +672,7 @@ if __name__ == "__main__":
     dispatcher.map("/currentNodeFirst", firstPathHandler, [client,scheduler2])
     dispatcher.map("/currentNode", interestPathHandler)
     dispatcher.map("/currentNode", synthHandler, [nDist,client2,nNodes, interestNodes2])
-    dispatcher.map("/currentNode", nNearestNodesHandler, [nNodes, interestNodes2,client,scheduler2])
+    dispatcher.map("/currentNode", nNearestNodesHandler, [nNodes, interestNodes2,client,scheduler2,client2])
     #dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client2])
     #dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system

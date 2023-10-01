@@ -125,12 +125,12 @@ class Map { //<>//
         controlFilter(filterFreqVal);
       }
 
-      if (musicVol<0.1) {
-        musicVol += 0.001;
+      if (musicVol<0.4) {
+        musicVol += 0.005;
         controlMusicVol(musicVol);
       }
-      if (scVol>=0.9) {
-        scVol -= 0.001;
+      if (scVol>=0.6) {
+        scVol -= 0.005;
         controlscVol(scVol);
       }
       if (grainVol>0.0) {

@@ -219,7 +219,7 @@ s.waitForBoot({
 		)
 	}).add;
 
-	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus,'shrate',491.25,'drywet', 0.95,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
+	~x = Synth.newPaused(\lofi_soundscape,[\outBus,~reverbBus,'shrate',491.25,'drywet', 0.95,'lpfscale', 6.92,'slewrate', 22050,'jitter',0.03,'hpf',166.07,'ampA',0.25,'ampB',0.25,'ampC',0.25,'ampD',0.25]);
 	~t = Synth.newPaused(\grain_synth,[\outBus,~reverbBus,\ampOut,~lvl_grain]);
 	~v = Synth.newPaused(\interestPoint, [\out, [0,1], \bufnum, ~i]);
 	~y = Synth.new(\synthLvl,[\inA,~lvl1,\ampA,~lvl_music,\outBus,~reverbBus],s,\addToTail);
@@ -313,7 +313,7 @@ s.waitForBoot({
 
 	OSCdef.new(\arrival,{
 		arg msg;
-
+		postln("arrival of point ");
 		~v.run;
 	},
 	path:"/pointArrival"
