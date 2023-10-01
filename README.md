@@ -1,4 +1,4 @@
-# **CITY MADNESS**
+# **SOLI VAGANT**
 
 ## INTRODUCTION
 Project developed for the course "Creative Programming and Computing", held in the Master degree of [Music and Acoustic Engineering](https://suono.polimi.it/), based in [Politecnico di Milano](https://www.polimi.it/). 
