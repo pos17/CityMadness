@@ -108,7 +108,7 @@ void mousePressed() {
       } else {
     
         timeFromClick = 0;
-        map.setChaoticParticlesState();
+        map.setChaoticParticlesState(1);
         int id = map.getClosestPointId(mouseX-HALF_WIDTH, mouseY-HALF_HEIGHT);
         if (!startup) {
           OscMessage myMessage = new OscMessage("/currentNode");

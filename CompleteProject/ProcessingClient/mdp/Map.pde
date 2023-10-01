@@ -32,7 +32,10 @@ class Map {
 
 
   ArrayList<IntList> explosions = new ArrayList<IntList>();
- 
+
+
+  int user_alpha;
+  final int user_alpha_max = 70; 
 
   Map() {
     this.mapPoints = loadMapPoints();
@@ -48,7 +51,7 @@ class Map {
     this.line = new MapLine(this.path);
     PVector chaosVel = new PVector(0, 0);
     PVector chaosAcc = new PVector(0, 0);
-    
+
     for (int i = 0; i < NMAPPARTICLES; i++) {
       int rand = (int)random(preParticles.size());
       //println("rand: " +rand);
@@ -64,7 +67,7 @@ class Map {
     this.trash.beginDraw();
     this.trash.circle(200, 200, 200);
     this.trash.endDraw();
-    
+    this.user_alpha = 0; 
 
     // HANDLING STARTUP VALUES FOR SUPERCOLLIDER
 
@@ -113,11 +116,11 @@ class Map {
         controlFilter(filterFreqVal);
       }
     } else if (music_phase == 3) {
-      if(filterFreqVal<=16000) {
+      if (filterFreqVal<=16000) {
         filterFreqVal += 0.5;
         controlFilter(filterFreqVal);
       }
-      
+
       if (musicVol<0.1) {
         musicVol += 0.001;
         //controlMusicVol(musicVol);
@@ -130,7 +133,6 @@ class Map {
         grainVol -= 0.001;
         controlGrainVol(grainVol);
       }
-      
     }
 
 
@@ -154,7 +156,7 @@ class Map {
       while (chaoticParticlesIter.hasNext()) {
         ChaoticParticle m = chaoticParticlesIter.next();
         PVector steeringForce = m.seek(userPos);
-        if (m.getDist(userPos) >10) {
+        if (m.getDist(userPos) >3) {
           m.applyForce(steeringForce);
           m.moveNoise();
           PVector p = m.getPos();
@@ -165,13 +167,16 @@ class Map {
       }
     }
 
- 
+    updateExplosions();
 
-    this.render.strokeWeight(3);
+      this.render.strokeWeight(3); //<>//
+      if(this.wanderingParticles.size()>(NMAPPARTICLES)) {
+        this.wanderingParticles.remove(0);
+      }
     //RENDER RANDOM PATH PARTICLES
     if (this.wanderingParticles.size()>0) {
       ListIterator<RandomPathParticle> wanderingParticlesIter = this.wanderingParticles.listIterator();
-      this.render.stroke(44,100,105);
+      this.render.stroke(44, 100, 105);
       while (wanderingParticlesIter.hasNext()) {
         RandomPathParticle m = wanderingParticlesIter.next();
         m.move();
@@ -179,13 +184,18 @@ class Map {
         this.render.point(p.x, p.y);
       }
     }
+    if(this.wanderingParticles.size()>NMAPPARTICLES) {
+      this.wanderingParticles.remove(0);
+    }
 
     // GENERATION OF PATH PARTICLES
     if (this.pathDone ) {
-      if (frameCount%2 == 0) {
+      if (frameCount%2 == 0 ) {
         pathParticles.add(new MapPathParticle(this.pathParticlePosBuffer, endPathID));
       }
     }
+    
+    
 
 
     // RENDER PATH PARTICLES
@@ -193,7 +203,7 @@ class Map {
 
       for (int i = 0; i<pathParticles.size(); i++) {
         MapPathParticle m = pathParticles.get(i);
-        this.render.stroke(lerpColor(color(255, 100,0),color(255, 195, 34), sq(float(i)/pathParticles.size())));
+        this.render.stroke(lerpColor(color(255, 100, 0), color(255, 195, 34), sq(float(i)/pathParticles.size())));
         PVector p = m.getP();
         render.point(p.x, p.y);
         m.move();
@@ -215,27 +225,31 @@ class Map {
     }
 
     // SEGNAPOSTO UTENTE
-    if (!startup && showUser) {
+    if (!startup && showUser && firstConnectionsArrived && this.wanderingParticles.size() < 300 &&  this.chaoticParticles.size() < 300) {
+      if(user_alpha < user_alpha_max) {
+        user_alpha +=2;
+      }
       /*
       if (timeFromClick > 60) {
-        PVector p = currentPoint.getCoords();
-        for (int j = 0; j<30; j++) {
-          float fade = sq(sq(float(j)/30));
-          this.render.stroke(lerpColor(color(255, 255, 0), color(255, 0, 0), float(j)/30), 40*sin(10*radians(timeFromClick)));
-          this.render.strokeWeight(map(fade, 0, 1, 2, 30));
-          this.render.point(p.x, p.y);
-        }
-      }
-      */
-        PVector pUser = currentPoint.getCoords();
-        this.render.push();
-        this.render.translate(pUser.x,pUser.y);
-        this.render.tint(255, 70);
-        this.render.image(sprite,-sprite.width/2,-sprite.height/2);
-        this.render.tint(255, 255);
-        //this.render.image(sprite,0,0);
-        this.render.pop();
-        // SEGNAPOSTO INTEREST POINT
+       PVector p = currentPoint.getCoords();
+       for (int j = 0; j<30; j++) {
+       float fade = sq(sq(float(j)/30));
+       this.render.stroke(lerpColor(color(255, 255, 0), color(255, 0, 0), float(j)/30), 40*sin(10*radians(timeFromClick)));
+       this.render.strokeWeight(map(fade, 0, 1, 2, 30));
+       this.render.point(p.x, p.y);
+       }
+       }
+       */
+      
+      PVector pUser = currentPoint.getCoords();
+      this.render.push();
+      this.render.translate(pUser.x, pUser.y);
+      this.render.tint(255, user_alpha);
+      this.render.image(sprite, -sprite.width/2, -sprite.height/2);
+      this.render.tint(255, 255);
+      //this.render.image(sprite,0,0);
+      this.render.pop();
+      // SEGNAPOSTO INTEREST POINT
       if (time>0 && showInterestPoint) {
         PVector p = interestPoint.getCoords();
         this.render.stroke(255, 255, 0, 2.0*sin(radians(constrain(timeFromClick, 0, 180))));
@@ -468,7 +482,7 @@ class Map {
         t.add(this.getMapPoint(add.get(i)).getCoords());
       }
 
-      this.mapFragments.add(new MapFragment(f, t, id, cityGraphics));
+      //this.mapFragments.add(new MapFragment(f, t, id, cityGraphics));
       this.explosions.remove(0);
     }
   }
@@ -569,11 +583,11 @@ class Map {
     return this.moving;
   }
 
-  void setChaoticParticlesState() {
+  void setChaoticParticlesState(int st) {
     ListIterator<ChaoticParticle> chaoticParticlesIter = this.chaoticParticles.listIterator();
     while (chaoticParticlesIter.hasNext()) {
       ChaoticParticle m = chaoticParticlesIter.next();
-      m.setState(true);
+      m.setState(st);
     }
   }
 

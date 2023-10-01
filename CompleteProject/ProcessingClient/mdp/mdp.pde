@@ -3,14 +3,16 @@ import oscP5.*;
 import netP5.*;
 import java.util.*;
 
-int NMAPPARTICLES = 20000;
+final int NMAPPARTICLES = 20000;
 int MAPPARTICLEALPHA = 30; //valore iniziale
+final  int PATHMAXLENGTH = 15;
 float HALF_WIDTH;
 float HALF_HEIGHT;
 float QUARTER_WIDTH;
-float PMASS = 0.1;
+final float  PMASS = 0.1;
 int time; // n° di click
 int timeFromClick;
+
 
 boolean click;
 boolean explosions;
@@ -137,11 +139,11 @@ void reset() {
   click = false;
   explosions = false;
 
-  creatingExplosions = false;
+  creatingExplosions = true;
   loaded = false;
   explosionPaths = true;
   showPathToInterestPoint = false;
-  showUser = false;
+  showUser = true;
   showInterestPoint = false;
 
   showChaoticParticles = true;

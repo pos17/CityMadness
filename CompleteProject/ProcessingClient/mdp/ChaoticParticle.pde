@@ -3,7 +3,7 @@ class ChaoticParticle{ // Particelle caotiche
   PVector p;
   PVector velocity;
   PVector acc; 
-  Boolean state; 
+  int state; 
   float maxspeed;
   float maxforce;
   float mass;
@@ -11,7 +11,7 @@ class ChaoticParticle{ // Particelle caotiche
   int behaviourFadeMax = 100;
   
   ChaoticParticle(PVector velocity, PVector acc){
-    this.state = false;
+    this.state = 0;
     this.p = new PVector(random(-width/2,width/2),random(-height/2,height/2)); 
     this.velocity = velocity;
     this.acc = acc;
@@ -20,7 +20,7 @@ class ChaoticParticle{ // Particelle caotiche
     this.mass = 1;
   }
   ChaoticParticle(PVector p,PVector velocity, PVector acc){
-    this.state = false;
+    this.state = 0;
     this.p = p.sub(new PVector(width/2,height/2));
     this.velocity = velocity;
     this.acc = acc;
@@ -30,7 +30,7 @@ class ChaoticParticle{ // Particelle caotiche
   }
   
   ChaoticParticle(float x, float y,PVector velocity, PVector acc){
-    this.state = false;
+    this.state = 0;
     this.p = new PVector(x,y);
     this.velocity = velocity;
     this.acc = acc;
@@ -57,16 +57,16 @@ class ChaoticParticle{ // Particelle caotiche
   //  
   //}
   
-  void setState(Boolean aState) {
+  void setState(int aState) {
     this.state = aState;
   }
   
   
   void moveNoise(){
-    if(this.state == false) {
+    if(this.state == 0) {
       this.p.add((this.p.cross(PVector.fromAngle((noise(this.p.x/100, this.p.y/100, float(frameCount)/100)-0.5)*TWO_PI))).setMag(2.0));
       this.p.add(new PVector(random(-0.5,0.5),random(-0.5,0.5)));
-    }else{
+    }else if(this.state == 1 ){
       if(behaviourFade< behaviourFadeMax) {
         behaviourFade++; 
       }
@@ -75,6 +75,20 @@ class ChaoticParticle{ // Particelle caotiche
       this.p.add((this.p.cross(PVector.fromAngle((noise(this.p.x/100, this.p.y/100, float(frameCount)/100)-0.5)*TWO_PI))).setMag(2*randBehave));
       // Update velocity
       this.velocity.add(acc);
+      // Limit speed
+      this.velocity.limit(maxspeed);
+      this.p.add(velocity);
+      // Reset accelertion to 0 each cycle
+      this.acc.mult(0);
+    } else if(this.state == 2 ) {
+      if(behaviourFade< behaviourFadeMax) {
+        behaviourFade++; 
+      }
+      //float attBehave= 0.7+ *0.3((behaviourFade/behaviourFadeMax)); 
+      float randBehave= 0.5 + 0.5*(1-(behaviourFade/behaviourFadeMax)); 
+      this.p.add((this.p.cross(PVector.fromAngle((noise(this.p.x/100, this.p.y/100, float(frameCount)/100)-0.5)*TWO_PI))).setMag(2*randBehave));
+      // Update velocity
+      this.velocity.add(acc.mult(-1));
       // Limit speed
       this.velocity.limit(maxspeed);
       this.p.add(velocity);
