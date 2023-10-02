@@ -22,17 +22,24 @@ In order to start the experience:
 5. Run the processing code loading <em>mdp.pde</em> and run the visual system. 
 
 
-Download the github Repo in 
-Connect your MIDI keyboard to your PC. Please, be sure it is turned on.\
-Open the SuperCollider file CrystalHarmony.sc. Reboot the server and run the script to initialize MIDI connections, MIDIdefs, SynthDefs and OSCdefs (follow the instructions in the file). Please, be sure that everything is working correctly by looking at the Post window.\
-Open the Processing file CrystalHarmony.pde and run it. Please, wait until the menu appears before start playing.
 
 
-### Menu 
+### Visual feedback
+The map evolves and reveals as the user explores the city. To this end, there are multiple layers of visualization
 
+- Chaotic particles: Based on a Perlin noise, used to represent the absence of knowledge about a new place.
+- Path particles: Retrieving from a geoJSON file, the particles are constraint to follow the paths near the user's location
+- Wandering particles: 
+
+As the user explores, new/interest places are suggested for him to go. This interest points allow the user to develop a large-scale knowledge of the city.
 ### NOTES 
 
+### Path finding algorithm
+The interest points suggestion is based on a Markov Decision Process framework, which aims to maximize a reward to the end of path finding optimization.
+Basically, the MDP framework solves the equations and then gives every possible path to a certain point in the map.
 
+<p align="center">
+<img class= "center" src="./README%20Assets/mdp.jpg" width="400">
 
 ### Audio Generation
 
