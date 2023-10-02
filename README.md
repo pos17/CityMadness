@@ -17,8 +17,9 @@ The Soli Vagant artistic installation aims to create an interactive experience b
 In order to start the experience: 
 1. Download the git repository
 2. Open the file named with <em>sounscape.scd</em> in [SuperCollider](https://supercollider.github.io/).
-3. 
-4. Run the code pressing <kbd>Ctrl</kbd> + <kbd>Enter</kbd>.
+3. Run the python server running the command  <em>python mdp.py</em>
+4. Run the supercolider client code pressing <kbd>Ctrl</kbd> + <kbd>Enter</kbd>.
+5. Run the processing code loading <em>mdp.pde</em> and run the visual system. 
 
 
 Download the github Repo in 
