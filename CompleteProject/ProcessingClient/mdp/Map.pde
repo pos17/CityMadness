@@ -84,7 +84,7 @@ class Map { //<>//
 
   void show() { // Tutti i render stanno qua in ordine
     timeFromClick++;
-
+    myCounter++;
     this.render.beginDraw();
     //this.render.clear();
 
@@ -276,7 +276,7 @@ class Map { //<>//
       this.render.push();
       this.render.translate(pUser.x, pUser.y);
       this.render.tint(255, user_alpha);
-      if (explosionRunning) {
+      if (explosionRunning && !experienceEnd) {
         if ( explosionTime < explosionTimeMax/(10*PI)) {
           float resizeVal = 20+ 200* sin(explosionTime* (10*PI)/explosionTimeMax);
           if (resizeVal < 20 ) {
@@ -294,17 +294,17 @@ class Map { //<>//
       this.render.pop();
     }
     // SEGNAPOSTO INTEREST POINT
-    if(startInterestGlowCount == true) {
+    if(startInterestGlowCount == true ) {
       interestGlowCount++;
       if(interestGlowCount > interestGlowCountMAX) {
         showInterestPoint= true;
       }
     }
-    if (time>0 && showInterestPoint) {
-      this.render.tint(255, 127);
+    if (time>0 && showInterestPoint && !experienceEnd) {
+      this.render.tint(255, 255);
       PVector p = interestPoint.getCoords();
       this.render.translate(p.x, p.y);
-      float resizeVal2 = 60+ 30* sin(timeFromClick*(10*PI)/500);
+      float resizeVal2 = 60+ 30* sin(myCounter*(10*PI)/500);
       sprite2.resize(floor(resizeVal2), floor(resizeVal2));
       this.render.image(sprite2, -sprite2.width/2, -sprite2.height/2);
       this.render.tint(255, 255);

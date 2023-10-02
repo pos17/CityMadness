@@ -23,6 +23,9 @@ boolean explosionPaths;
 boolean showPathToInterestPoint;
 boolean showUser;
 boolean showInterestPoint;
+int nInterestPointDiscovered;
+final int nTotalInterestPoints = 4;
+boolean experienceEnd; 
 
 boolean showChaoticParticles;
 boolean resetting;
@@ -35,11 +38,12 @@ boolean suggestionVisible;
 int suggestionCount;
 boolean startSuggestionCount;
 final int suggestionCountMax = 1200;
+int myCounter; 
 //Points used to build random particles
 ArrayList<PVector> preParticles = new ArrayList<PVector>();
 
 PGraphics title;
-
+String suggestionString;
 
 // SUPERCOLLIDER CONTROL PARAMETERS
 int filterFreqValDEF;
@@ -153,7 +157,7 @@ void draw() {
     map.show();
     if (suggestionVisible) {
       tint(255, 255);
-      text("CLICK TO START THE EXPERIENCE", width/2, height * 10/11);
+      text(suggestionString, width/2, height * 10/11);
       tint(255, 255);
     }
   } else {
@@ -194,6 +198,10 @@ void reset() {
   startSuggestionCount = true;
   startInterestGlowCount = false;
   interestGlowCount = 0;
+  myCounter = 0; 
+  nInterestPointDiscovered = 0;
+  experienceEnd = false;
+  suggestionString = "CLICK TO START THE EXPERIENCE";
 }
 
 void scMixFade(float aScMix0, float aScMix1, float aScMix2, float aScMix3) {

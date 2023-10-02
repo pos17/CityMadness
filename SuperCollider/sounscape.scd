@@ -19,6 +19,7 @@ s.waitForBoot({
 	~n1 = NetAddr.new("127.0.0.1",57120);
 	NetAddr.localAddr;
 	~note_table = 0!127;
+
 	~n = nil;
 
 	/*~lvl_music = 0;

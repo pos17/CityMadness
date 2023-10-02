@@ -37,7 +37,8 @@ countSecs = 0
 axiom = 'NWSWSENNNEEEWWNW'
 snr = 0 #value that specifies the value of noise wrt the value of audio signal
 imageMap = None
-
+interestNodesFound = 0
+interestNodesMax = 4; 
 
 def NormalizeMusic(data):
     return (((data - np.min(data)) / (np.max(data) - np.min(data))) - 0.5)*2
@@ -450,6 +451,8 @@ def resetHandler(unused_addr):
     l_system_started = False
     global snr
     snr = 0 
+    global interestNodesFound 
+    interestNodesFound = 0
     #interestNodes = [1013, 340, 1428, 1594]
     interestNodes = [715, 1676, 196, 1731]
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
@@ -519,8 +522,8 @@ def nNearestNodesHandler(unused_addr, things  ,currentNode):
     client = things[0][2]
     scheduler2 = things[0][3]
     client2 = things[0][4]
-    print("CURRENT NODE")
-    print(currentNode)
+    #print("CURRENT NODE")
+    #print(currentNode)
     for i in range(len(mynodes)):
         if currentNode == myinterestNodes[i]:
             nearestNodes = mynodes[i]
@@ -533,8 +536,9 @@ def nNearestNodesHandler(unused_addr, things  ,currentNode):
                 # print(nearestNodes)
                 for j in range(len(nodes[nearestNodes[i]][3])):
                     conections[i].append(nodes[nearestNodes[i]][3][j])
-            #print("ciccia")
-            sendPointArrivalFeedback(client2)
+            sendInterestPointDiscovered(client)
+            if interestNodesFound < interestNodesMax:
+                sendPointArrivalFeedback(client2)
             scheduleOSCPathsToInterestNode(conections,client,scheduler2)
             
             #print("printing conecctions")
@@ -581,6 +585,7 @@ def synthHandler(unused_addr, things,  currentNode):
     send_interest_node_distance(to_send,client)
     
 
+
 def forwardOSCMessage(used_addr, things, args):
     myclient = things[0][0]
     myclient.send_message(used_addr,args)
@@ -590,6 +595,11 @@ def sendPointArrivalFeedback(myclient):
     myclient.send_message("/pointArrival",0)
     print("/pointArrival")
     #print("/noteOn",midiValue)
+
+def sendInterestPointDiscovered(myclient): 
+    myclient.send_message("/interestPointDiscovered",0)
+    #print("/noteOn",midiValue)
+
 
 """
 def scheduleFadeInOutDryWetValues(initVal,finalVal,timeRate,increaseRate,myClient,myScheduler): 

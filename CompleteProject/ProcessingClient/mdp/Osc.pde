@@ -106,6 +106,15 @@ void oscEvent(OscMessage msg) {
     float scMix2 = msg.get(2).floatValue();
     float scMix3 = msg.get(3).floatValue();
     
+  } else if (msg.checkAddrPattern("/interestPointDiscovered")) {
+    nInterestPointDiscovered++;
+    if(nInterestPointDiscovered >= nTotalInterestPoints) {
+      experienceEnd = true; 
+    }
+    if(experienceEnd == true) {
+      suggestionString = "press R to restart the experience";
+    }
+    
   } else {
     println("something else");
     println(msg);
@@ -113,6 +122,7 @@ void oscEvent(OscMessage msg) {
 }
 
 void mousePressed() {
+  
   suggestionVisible = false;
   suggestionCount = 0; 
   if (loaded) {
