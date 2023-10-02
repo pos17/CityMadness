@@ -70,7 +70,7 @@ class ImageToMap:
     def RGBValuesOSCMessage(self,mapCoordinates,client):
         rgb_value = self.get_rgb_at_map_coordinates(mapCoordinates)
         print("RGB VALUES")
-        print(rgb_value[0])
+        print([rgb_value[0],rgb_value[1],rgb_value[2]])
         client.send_message("/RGBValues",[rgb_value[0],rgb_value[1],rgb_value[2]])
 
 #pos =[x,y]

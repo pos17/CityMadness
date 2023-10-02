@@ -345,6 +345,16 @@ s.waitForBoot({
 	path: "/noteOff"
 	);
 
+	OSCdef.new(\RGBValues,{
+		arg msg;
+		postln("RGBValues");
+		postln(msg[1]);
+		postln(msg[2]);
+		postln(msg[3]);
+	},
+	path:"/RGBValues"
+	);
+
 	note_getter = {
 		| index |
 		Plazy {
