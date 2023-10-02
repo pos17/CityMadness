@@ -1,4 +1,6 @@
 # **SOLI VAGANT**
+<p align="center">
+<img class= "center" src="./README%20Assets/Title.png" width="600">
 
 ## INTRODUCTION
 Project developed for the course "Creative Programming and Computing", held in the Master degree of [Music and Acoustic Engineering](https://suono.polimi.it/), based in [Politecnico di Milano](https://www.polimi.it/). 
@@ -10,6 +12,19 @@ The Soli Vagant artistic installation aims to create an interactive experience b
 ### Introduction Video
 
 ## User Guide
+## Instructions
+### Get started
+In order to start the experience: 
+1. Download the git repository
+2. Open the file named with <em>sounscape.scd</em> in [SuperCollider](https://supercollider.github.io/).
+3. 
+4. Run the code pressing <kbd>Ctrl</kbd> + <kbd>Enter</kbd>.
+
+
+Download the github Repo in 
+Connect your MIDI keyboard to your PC. Please, be sure it is turned on.\
+Open the SuperCollider file CrystalHarmony.sc. Reboot the server and run the script to initialize MIDI connections, MIDIdefs, SynthDefs and OSCdefs (follow the instructions in the file). Please, be sure that everything is working correctly by looking at the Post window.\
+Open the Processing file CrystalHarmony.pde and run it. Please, wait until the menu appears before start playing.
 
 
 ### Menu 
@@ -23,9 +38,10 @@ The Soli Vagant artistic installation aims to create an interactive experience b
 The audio generation is performed using supercollider
 
 ## Presentation files
+More information about the implementation of the project are available on the [slides](/) uploaded and used as aid during the final presentation of the project Creative Programming and Technology.
 
 ## Group members
 - Manuel Alejandro Jaramillo  (ManuelAlejandro.Jaramillo@mail.polimi.it)
 - Juan Camilo Albarracin Sanchez  (JuanCamilo.Albarracin@mail.polimi.it)
-- Marco Bernasconi  (Marco.Bernasconi7@mail.polimi.it)
+- Marco Bernasconi  (Marco7.Bernasconi@mail.polimi.it)
 - Paolo Ostan (paolo.ostan@mail.polimi.it)
