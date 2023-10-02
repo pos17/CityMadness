@@ -36,7 +36,6 @@ The map evolves and reveals as the user explores the city. To this end, there ar
 - Wandering particles: 
 
 As the user explores, new/interest places are suggested for him to go. This interest points allow the user to develop a large-scale knowledge of the city.
-### NOTES 
 
 ### Path finding algorithm
 The interest points suggestion is based on a Markov Decision Process framework, which aims to maximize a reward to the end of path finding optimization.
