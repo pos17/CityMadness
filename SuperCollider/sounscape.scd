@@ -1,6 +1,6 @@
 s.boot;
 Server.killAll;
-/*(
+(
 var samplePath = thisProcess.nowExecutingPath.dirname +/+ "/recordings";
 ~buf_r =Buffer.readChannel(s, samplePath +/+ "./CR_Duomo_Corner.WAV", channels:[1]);
 
@@ -9,7 +9,7 @@ var samplePath = thisProcess.nowExecutingPath.dirname +/+ "/recordings";
 ~c =Buffer.read(s, samplePath +/+ "/CR_MarketWalk.WAV");
 ~d =Buffer.read(s, samplePath +/+ "/CR_PStradivari_Corner.WAV");
 ~i =Buffer.read(s, samplePath +/+ "/InterestPoint.WAV");
-)*/
+)
 
 (
 s.waitForBoot({
@@ -17,14 +17,6 @@ s.waitForBoot({
 	var n0, n1, n2;
 	var note_getter;
 
-	var samplePath = thisProcess.nowExecutingPath.dirname +/+ "/recordings";
-	~buf_r =Buffer.readChannel(s, samplePath +/+ "./CR_Duomo_Corner.WAV", channels:[1]);
-
-	~a =Buffer.read(s, samplePath +/+ "/CR_PRoma2.WAV");
-	~b =Buffer.read(s, samplePath +/+ "/CR_Duomo_Corner.WAV");
-	~c =Buffer.read(s, samplePath +/+ "/CR_MarketWalk.WAV");
-	~d =Buffer.read(s, samplePath +/+ "/CR_PStradivari_Corner.WAV");
-	~i =Buffer.read(s, samplePath +/+ "/InterestPoint.WAV");
 
 	~n1 = NetAddr.new("127.0.0.1",57120);
 	NetAddr.localAddr;

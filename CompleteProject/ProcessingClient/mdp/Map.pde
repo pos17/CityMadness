@@ -111,7 +111,7 @@ class Map { //<>//
 
     if (music_phase == 1 ) {
       if (filterFreqVal< filterFreqValRANDOM) {
-        filterFreqVal = ceil((float)filterFreqVal + 0.5);
+        filterFreqVal = ceil((float)filterFreqVal + 1);
         controlFilter(filterFreqVal);
       }
     } else if (music_phase == 2 ) {
@@ -201,6 +201,12 @@ class Map { //<>//
 
     if (explosionRunning) {
       explosionTime++;
+      if (startExplosion) {
+        for (int i = 0; i < 10000; i++) {
+          map.randomParticlesExp.add(new RandomPathParticle(map.currentPoint.getId()));
+        } 
+        startExplosion = false; 
+      }
       if (this.randomParticlesExp.size()>0) {
 
         ListIterator<RandomPathParticle> randomParticlesExpIter = this.randomParticlesExp.listIterator();
@@ -219,6 +225,7 @@ class Map { //<>//
 
               this.randomParticlesExp.remove(0);
             }
+            
           }
         }
       } else {
@@ -294,9 +301,9 @@ class Map { //<>//
       this.render.pop();
     }
     // SEGNAPOSTO INTEREST POINT
-    if(startInterestGlowCount == true ) {
+    if (startInterestGlowCount == true ) {
       interestGlowCount++;
-      if(interestGlowCount > interestGlowCountMAX) {
+      if (interestGlowCount > interestGlowCountMAX) {
         showInterestPoint= true;
       }
     }

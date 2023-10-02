@@ -44,11 +44,9 @@ void oscEvent(OscMessage msg) {
     showInterestPoint = false;
     interestGlowCount = 0; 
     if (!explosionRunning) {
+      
       println("explosionRunning");
       explosionRunning = true;
-      for (int i = 0; i < 10000; i++) {
-        map.randomParticlesExp.add(new RandomPathParticle(map.currentPoint.getId()));
-      }
     }
     println("type: " + 3 );
     IntList addresses = new IntList();
@@ -107,6 +105,9 @@ void oscEvent(OscMessage msg) {
     float scMix3 = msg.get(3).floatValue();
     
   } else if (msg.checkAddrPattern("/interestPointDiscovered")) {
+    if(!startExplosion) {
+        startExplosion = true;
+    }
     nInterestPointDiscovered++;
     if(nInterestPointDiscovered >= nTotalInterestPoints) {
       experienceEnd = true; 

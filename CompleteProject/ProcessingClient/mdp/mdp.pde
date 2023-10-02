@@ -33,6 +33,7 @@ boolean explosionRunning;
 boolean startInterestGlowCount; 
 int interestGlowCount;
 final int interestGlowCountMAX = 1500;
+boolean startExplosion;
 
 boolean suggestionVisible;
 int suggestionCount;
@@ -180,7 +181,7 @@ void reset() {
   showInterestPoint = false;
   explosionRunning = false;
   showChaoticParticles = true;
-  filterFreqValDEF = 1000;
+  filterFreqValDEF = 300;
   filterFreqValRANDOM = 16000;
   filterFreqValATT= 500;
   filterFreqVal = filterFreqValDEF;
@@ -202,6 +203,7 @@ void reset() {
   nInterestPointDiscovered = 0;
   experienceEnd = false;
   suggestionString = "CLICK TO START THE EXPERIENCE";
+  startExplosion = false;
 }
 
 void scMixFade(float aScMix0, float aScMix1, float aScMix2, float aScMix3) {
