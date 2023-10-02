@@ -1,5 +1,5 @@
 
-class MapPoint{
+class MapPoint{ //CLASSE DEL MAP POINT
  PVector coordinates;
  int id;
  IntList connections;
@@ -30,9 +30,11 @@ class MapPoint{
     }
   }
   
-  void addConnection(int id){
-    if(!this.connections.hasValue(id)){
-        this.connections.append(id); 
+  void addConnection(int myId){
+    if(!this.connections.hasValue(myId)){
+        this.connections.append(myId); 
+        map.getMapPoint(myId).addConnection(this.id);
+        
       }
   }
   
@@ -58,8 +60,7 @@ class MapPointSorter implements Comparator<MapPoint> {
     }
 }
 
-
-
+// SORTER PER VEDERE CHE NODO E' PIU' VICINO AL CLICK
 class MapPointDistanceSorter implements Comparator<MapPoint>{
   PVector p;
   

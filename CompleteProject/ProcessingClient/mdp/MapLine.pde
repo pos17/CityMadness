@@ -1,5 +1,5 @@
 
-class MapLine{
+class MapLine{ // INUTILIZZATO, VECCHIA VISUALIZZAZIONE DEL PATH
   ArrayList<PVector> line;
   
   MapPath buffer;

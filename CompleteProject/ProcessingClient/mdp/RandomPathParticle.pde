@@ -1,5 +1,5 @@
 
-class RandomPathParticle{
+class RandomPathParticle{ // PARTICELLE CHE GIRANO A CASO PER I NODI VISTI
   ArrayList<PVector> path;
   PVector p;
   int currentID, nextID;
@@ -14,15 +14,17 @@ class RandomPathParticle{
   }
   
   void move(){
+    this.move(10);
+  }
+  
+  void move(int myNumSegments) {
     if(this.path.size()>0){
       this.p = this.path.get(0);
       this.path.remove(0);
-    }
-    
-    else{
+    } else {
       this.path.clear();
       this.currentID = this.nextID;
-      this.getNext();
+      this.getNext(myNumSegments);
       this.p = this.path.get(0);
       this.path.remove(0);
     }
@@ -33,13 +35,17 @@ class RandomPathParticle{
   }
   
   void getNext(){
+    getNext(10);
     
+  }
+  
+  void getNext(int myNumSegments) {
     this.nextID = map.getMapPoint(this.currentID).getRandomConnection();
     
     PVector a = map.getMapPoint(currentID).getCoords();
     PVector b = map.getMapPoint(nextID).getCoords();
       
-    int numSegments = max(10,floor(PVector.dist(a,b)*1.5));
+    int numSegments = max(myNumSegments,floor(PVector.dist(a,b)*1.5));
     for(int j = 0; j<numSegments; j++){
       this.path.add((PVector.lerp(a, b, map(j,0,numSegments,0,1))));
     }

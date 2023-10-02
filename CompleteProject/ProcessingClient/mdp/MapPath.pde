@@ -1,5 +1,5 @@
 
-class MapPath{
+class MapPath{ // CLASS DI UTILITY PER GESTIRE GLI ULTIMI NODI VISITATI
   ArrayList<MapPoint> path;
   boolean finished; // Check if path exists
   int index;

@@ -1,69 +1,118 @@
 
-class ChaoticParticle{
-  PVector p, v, a;
+class ChaoticParticle{ // Particelle caotiche
+  PVector p;
+  PVector velocity;
+  PVector acc; 
+  int state; 
+  float maxspeed;
+  float maxforce;
+  float mass;
+  int behaviourFade = 0;
+  int behaviourFadeMax = 100;
   
-  ChaoticParticle(){
-    this.p = new PVector(random(-width/2,width/2),random(-height/2,height/2));
-    this.v = new PVector(0,0);
-    this.a = new PVector(0,0);
-    
+  ChaoticParticle(PVector velocity, PVector acc){
+    this.state = 0;
+    this.p = new PVector(random(-width/2,width/2),random(-height/2,height/2)); 
+    this.velocity = velocity;
+    this.acc = acc;
+    this.maxspeed = 2;
+    this.maxforce = 30;
+    this.mass = 1;
   }
-  ChaoticParticle(PVector p){
-    this.p = p;
-    this.v = new PVector(0,0);
-    this.a = new PVector(0,0);
+  ChaoticParticle(PVector p,PVector velocity, PVector acc){
+    this.state = 0;
+    this.p = p.sub(new PVector(width/2,height/2));
+    this.velocity = velocity;
+    this.acc = acc;
+    this.maxspeed = 2;
+    this.maxforce = 30;
+    this.mass = 1;
   }
   
-  ChaoticParticle(float x, float y){
+  ChaoticParticle(float x, float y,PVector velocity, PVector acc){
+    this.state = 0;
     this.p = new PVector(x,y);
-    this.v = new PVector(0,0);
-    this.a = new PVector(0,0);
+    this.velocity = velocity;
+    this.acc = acc;
+    this.maxspeed = 2;
+    this.maxforce = 30;
+    this.mass = 1;
   }
-  
+  void applyForce(PVector force) {
+    PVector f = PVector.div(force,mass);  // Force/Mass
+    this.acc.add(f);
+  }
   PVector getPos(){
     return this.p; 
   }
   
-  
-  void move(){
-    (this.v.add(this.a)).setMag(1);
-    this.p.add(this.v);
-    
+  PVector getVel() {
+    return this.velocity;
+  }
+  PVector getAcc() {
+    return this.acc;
   }
   
-  float moveNoiseReturnAlpha(ArrayList<MapPoint> m){
-    this.p.add((this.p.cross(PVector.fromAngle((noise(this.p.x/100, this.p.y/100, float(frameCount)/100)-0.5)*TWO_PI))).setMag(2));
-    
-    float alpha = 200;
-    float alpha_temp;
-    for(int i = 0; i<m.size(); i++){
-      PVector mc = m.get(i).getCoords();
-      alpha_temp = 0.7*sqrt(sq(this.p.x - mc.x)+sq(this.p.y - mc.y));
-      
-      if(alpha_temp<alpha){
-        alpha = alpha_temp; 
-      }
-      
-    }
-    
-    if(alpha<MAPPARTICLEALPHA){
-        alpha/=MAPPARTICLEALPHA;
-        return alpha < 0.7 ? 800 * alpha * alpha * alpha * alpha : MAPPARTICLEALPHA*(1 - pow(-2 * alpha + 2, 4) / 2);
-      }
-    
-    return MAPPARTICLEALPHA;
+  //void addVel(PVector acc) {
+  //  
+  //}
+  
+  void setState(int aState) {
+    this.state = aState;
   }
+  
   
   void moveNoise(){
-    this.p.add((this.p.cross(PVector.fromAngle((noise(this.p.x/100, this.p.y/100, float(frameCount)/100)-0.5)*TWO_PI))).setMag(2));
+    if(this.state == 0) {
+      this.p.add((this.p.cross(PVector.fromAngle((noise(this.p.x/100, this.p.y/100, float(frameCount)/100)-0.5)*TWO_PI))).setMag(2.0));
+      this.p.add(new PVector(random(-0.5,0.5),random(-0.5,0.5)));
+    }else if(this.state == 1 ){
+      if(behaviourFade< behaviourFadeMax) {
+        behaviourFade++; 
+      }
+      //float attBehave= 0.7+ *0.3((behaviourFade/behaviourFadeMax)); 
+      float randBehave= 0.5 + 0.5*(1-(behaviourFade/behaviourFadeMax)); 
+      this.p.add((this.p.cross(PVector.fromAngle((noise(this.p.x/100, this.p.y/100, float(frameCount)/100)-0.5)*TWO_PI))).setMag(2*randBehave));
+      // Update velocity
+      this.velocity.add(acc);
+      // Limit speed
+      this.velocity.limit(maxspeed);
+      this.p.add(velocity);
+      // Reset accelertion to 0 each cycle
+      this.acc.mult(0);
+    } else if(this.state == 2 ) {
+      if(behaviourFade< behaviourFadeMax) {
+        behaviourFade++; 
+      }
+      //float attBehave= 0.7+ *0.3((behaviourFade/behaviourFadeMax)); 
+      float randBehave= 0.5 + 0.5*(1-(behaviourFade/behaviourFadeMax)); 
+      this.p.add((this.p.cross(PVector.fromAngle((noise(this.p.x/100, this.p.y/100, float(frameCount)/100)-0.5)*TWO_PI))).setMag(2*randBehave));
+      // Update velocity
+      this.velocity.add(acc.mult(-1));
+      // Limit speed
+      this.velocity.limit(maxspeed);
+      this.p.add(velocity);
+      // Reset accelertion to 0 each cycle
+      this.acc.mult(0);
+    }
   }
   
-  void setA(PVector acc){
-    this.a = acc; 
+  PVector seek(PVector target) {
+    if(behaviourFade<= behaviourFadeMax) {
+        behaviourFade++; 
+      }
+    float attBehave= 0.2 +0.8*((behaviourFade/behaviourFadeMax)); 
+    PVector desired = PVector.sub(target,this.p);  // A vector pointing from the location to the target
+    // Normalize desired and scale to maximum speed
+    desired.normalize();
+    desired.mult(maxspeed);
+    // Steering = Desired minus Velocity
+    PVector steer = PVector.sub(desired,velocity);
+    steer.mult(attBehave);
+    steer.limit(maxforce);  // Limit to maximum steering force
+    return steer;
   }
-  
-  void setV(PVector v){
-    this.v = v; 
+  float getDist(PVector target) {
+    return this.p.dist(target);
   }
-  
 }

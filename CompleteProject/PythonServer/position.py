@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 #from colormath.color_objects import LabColor
 #from colormath.color_conversions import convert_color
 
@@ -71,7 +70,7 @@ class ImageToMap:
     def RGBValuesOSCMessage(self,mapCoordinates,client):
         rgb_value = self.get_rgb_at_map_coordinates(mapCoordinates)
         print("RGB VALUES")
-        print(rgb_value[0])
+        print([rgb_value[0],rgb_value[1],rgb_value[2]])
         client.send_message("/RGBValues",[rgb_value[0],rgb_value[1],rgb_value[2]])
 
 #pos =[x,y]
@@ -89,14 +88,28 @@ def userDistanceSendOSC(dists,client):
 def scheduleOSCPathsToInterestNode(pathsList,client,myscheduler):
     delay = 0
     for path in pathsList: 
-        myscheduler.enter(delay,1,sendPath,argument=(path,client))
-        delay += 0.5
+        myscheduler.enter(delay,4,sendPath,argument=(path,client))
+        delay += 0.0001
+        #print(delay)
     myscheduler.run()
-    
 
 def sendPath(path,client):
     client.send_message("/mapDiscoveredPath",path)
     #print("path sent")
+
+def scheduleOSCPathsFirstNode(pathsList,client,myscheduler):
+    delay = 6
+    for path in pathsList: 
+        myscheduler.enter(delay,4,sendConections,argument=(path,client))
+        delay += 0.1
+        #print(delay)
+    myscheduler.run()
+
+def sendConections(path,client):
+    client.send_message("/firstConections",path)
+    #print("path sent")
+
+
 """
 # Example usage
 image_path = 'assets/COLORMAPTEST.png'

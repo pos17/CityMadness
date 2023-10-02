@@ -1,7 +1,7 @@
 import json
 from multiprocessing.connection import wait
 import numpy as np
-from position import scheduleOSCPathsToInterestNode
+from position import scheduleOSCPathsToInterestNode, scheduleOSCPathsFirstNode
 from position import ImageToMap
 import mdptoolbox
 import scipy
@@ -29,6 +29,7 @@ client2 = udp_client.SimpleUDPClient("127.0.0.1", outport2)
 scheduler = sched.scheduler(time.monotonic, time.sleep)
 #scheduler for interestPaths update
 scheduler2 = sched.scheduler(time.monotonic, time.sleep)
+scheduler3 = sched.scheduler(time.monotonic, time.sleep)
 l_system_started = False
 scheduler_started_time = 0 
 endingTime = 0
@@ -36,7 +37,8 @@ countSecs = 0
 axiom = 'NWSWSENNNEEEWWNW'
 snr = 0 #value that specifies the value of noise wrt the value of audio signal
 imageMap = None
-
+interestNodesFound = 0
+interestNodesMax = 4; 
 
 def NormalizeMusic(data):
     return (((data - np.min(data)) / (np.max(data) - np.min(data))) - 0.5)*2
@@ -372,24 +374,32 @@ def interestPathHandler(unused_addr, currentNode):
             client.send(msg)
 
 
-def interestPointDistance(unused_addr, things, currentNode):
-    max_dist = 0.205
-    interest_point_list = things[0][0]
-    to_send = [0,0,0,0,0]
-    in_circle = False
-    for i in range(len(interest_point_list)):
-        if(dm[currentNode,interest_point_list[i]] < max_dist):
-            percDist = dm[currentNode,interest_point_list[i]]/max_dist
-            to_send[i] = 1-percDist
-            in_circle = True
-    if(~in_circle):
-        to_send[4] = 1
-    send_interest_node_distance(to_send,client)
+# def interestNodeDistance(unused_addr, things, currentNode):
+#     interest_point_list = things[0][0]
+#     client = things[0][1]
+#     max_dist = 0.02
+    
+#     to_send = [0,0,0,0,0]
+#     in_circle = False
+#     for i in range(len(interest_point_list)):
+#         if(dm[currentNode,interest_point_list[i]] < max_dist):
+#             percDist = dm[currentNode,interest_point_list[i]]/max_dist
+#             to_send[i] = 1-percDist
+#             in_circle = True
+#     if(in_circle==False):
+#         to_send[4] = 1
+#     max_toSend = max(to_send)
+#     for i in range(len(to_send)):
+#         if to_send[i] < max_toSend:
+#             to_send[i] = 0
+        
+    
+#     send_interest_node_distance(to_send,client)
 
 def send_interest_node_distance(to_send,client):
     print("to_send")
     print(to_send)
-    client.send_message("/interest_node_distance",to_send)
+    client.send_message("/scMix",to_send)
 
 def interestZonePaths():
     global interestNodes
@@ -398,8 +408,10 @@ def interestZonePaths():
     startNodes = [[] for _ in range(len(interestNodes))]
     for i in range(len(interestNodes)):
         for j in range(len(nodes)):
-            if dm[i,j] < 0.205 and dm[i,j] > 0.2:
+            if dm[interestNodes[i],j] < 0.01: #and dm[i,j] > 0.2:
                 startNodes[i].append(j)
+    #print("START NODES")
+    #print(startNodes[0].__len__())
 
     #print("printing start nodes")
     #print(startNodes)
@@ -422,7 +434,27 @@ def interestZonePaths():
 def resetHandler(unused_addr):
     global interestNodes
     global interest_pol
-    interestNodes = [1013, 340, 1428, 1594]
+    # resetting scheduler
+    while len(scheduler.queue) >0:
+
+        scheduler.cancel(scheduler.queue[0])
+    # resetting scheduler 2
+    while len(scheduler.queue) >0:
+        scheduler.cancel(scheduler.queue[0])
+    # resetting l_system
+    l_system.dirList = ""
+    l_system.positionsList = []
+    l_system.SchedStartTime = 0
+    global axiom 
+    axiom = 'NWSWSENNNEEEWWNW'
+    global l_system_started
+    l_system_started = False
+    global snr
+    snr = 0 
+    global interestNodesFound 
+    interestNodesFound = 0
+    #interestNodes = [1013, 340, 1428, 1594]
+    interestNodes = [715, 1676, 196, 1731]
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     print(interestNodes)
 
@@ -437,9 +469,9 @@ def goalHandler(unused_addr, list, currentNode):
 """
 def goalHandler(unused_addr, things, currentNode):
     myinterestNodes = things[0][1]
-    
     list = things[0][0]
     client = things[0][2]
+    client2 = things[0][3]
     print("my interest nodes")
     print(myinterestNodes)
     for i in range(len(myinterestNodes)):
@@ -448,7 +480,143 @@ def goalHandler(unused_addr, things, currentNode):
             paths = list[i]
             print(paths)
             ### ADD FUNCTION HERE
-            scheduleOSCPathsToInterestNode(paths,client,things[0][3])
+            
+            scheduleOSCPathsToInterestNode(paths,client,scheduler2)
+
+def nNearestNodes():
+    Nodes = [[] for _ in range(len(interestNodes))]
+    distances = [[] for _ in range(len(interestNodes))]
+    for i in range(len(nodes)):
+        dist = 999
+        for j in range(len(interestNodes)):
+            if dm[interestNodes[j],i] < dist: #and dm[i,j] > 0.2:
+                closer = j
+                dist = dm[interestNodes[j],i]
+        Nodes[closer].append(i)
+        distances[closer].append(dm[interestNodes[closer],i])
+    sorted_nodes = []
+    sorted_dist = []
+    for i in range(len(distances)):
+        #print("MINDISTR")
+        #print(min(distances[i]))
+        distances[i] = (distances[i] - min(distances[i])) / ( max(distances[i]) - min(distances[i]))
+    for i in range(len(distances)):
+        pairs = list(zip(distances[i], Nodes[i]))
+        sorted_pairs = sorted(pairs)
+        sorted_list1 = [pair[1] for pair in sorted_pairs]
+        sorted_list2 = [pair[0] for pair in sorted_pairs]
+        #print("SORTED LIST")
+        #print(sorted_list.__len__())
+        sorted_nodes.append(sorted_list1)
+        sorted_dist.append(sorted_list2)
+    for i in range(len(sorted_nodes)):
+        if 1013 in sorted_nodes[i]:
+            index = sorted_nodes[i].index(1013)
+            #print("DIST0000")
+            #print(sorted_dist[i][index])
+    return sorted_nodes, sorted_dist
+
+def nNearestNodesHandler(unused_addr, things  ,currentNode):
+    mynodes = things[0][0]
+    myinterestNodes = things[0][1]
+    client = things[0][2]
+    scheduler2 = things[0][3]
+    client2 = things[0][4]
+    #print("CURRENT NODE")
+    #print(currentNode)
+    for i in range(len(mynodes)):
+        if currentNode == myinterestNodes[i]:
+            nearestNodes = mynodes[i]
+            # print("printing nearest nodes")
+            # print(nearestNodes)
+            conections = [[] for _ in range(len(nearestNodes))]
+            for i in range(len(conections)):
+                conections[i].append(nearestNodes[i])
+                # print("CHECKING")
+                # print(nearestNodes)
+                for j in range(len(nodes[nearestNodes[i]][3])):
+                    conections[i].append(nodes[nearestNodes[i]][3][j])
+            sendInterestPointDiscovered(client)
+            if interestNodesFound < interestNodesMax:
+                sendPointArrivalFeedback(client2)
+            scheduleOSCPathsToInterestNode(conections,client,scheduler2)
+            
+            #print("printing conecctions")
+            print(conections)
+
+def firstPathHandler(unused_addr, things,  currentNodeFirst):
+    client = things[0][0]
+    schedul = things[0][1]
+    nearNodes = []
+    for j in range(len(nodes)):
+        if dm[currentNodeFirst,j] < 0.01: #and dm[i,j] > 0.2:
+            nearNodes.append(j)
+
+    conections = [[] for _ in range(len(nearNodes))]
+    for i in range(len(conections)):
+        conections[i].append(nearNodes[i])
+        # print("CHECKING")
+        # print(nearestNodes)
+        for j in range(len(nodes[nearNodes[i]][3])):
+            conections[i].append(nodes[nearNodes[i]][3][j])
+    scheduleOSCPathsFirstNode(conections, client, schedul)
+    
+def synthHandler(unused_addr, things,  currentNode):
+    myNodes = things[0][2]
+    distances = things[0][0]
+    client = things[0][1]
+    myInterestNodes = things[0][3]
+    to_send = [[] for _ in range(len(distances))]
+    for i in range(len(distances)):
+        if currentNode in myNodes[i]:
+            #index = myNodes[i].index(currentNode)
+            #to_send[i] = 1 - distances[i][index]
+            dist = 999
+            for j in range(len(myInterestNodes)):
+                if i != j and dm[myInterestNodes[i], myInterestNodes[j]] < dist:
+                    dist = dm[myInterestNodes[i], myInterestNodes[j]]
+                    closer = myInterestNodes[j]
+            to_send[i] = dm[currentNode, myInterestNodes[i]]/dm[currentNode, closer]
+                    
+        else:
+            to_send[i] = 0
+    print("TOSENT")
+    print(to_send)
+    send_interest_node_distance(to_send,client)
+    
+
+
+def forwardOSCMessage(used_addr, things, args):
+    myclient = things[0][0]
+    myclient.send_message(used_addr,args)
+    #print("/noteOn",midiValue)
+
+def sendPointArrivalFeedback(myclient): 
+    myclient.send_message("/pointArrival",0)
+    print("/pointArrival")
+    #print("/noteOn",midiValue)
+
+def sendInterestPointDiscovered(myclient): 
+    myclient.send_message("/interestPointDiscovered",0)
+    #print("/noteOn",midiValue)
+
+
+"""
+def scheduleFadeInOutDryWetValues(initVal,finalVal,timeRate,increaseRate,myClient,myScheduler): 
+    val = initVal
+    delay = 0
+    while initVal <finalVal:
+        val = val +increaseRate
+        delay = delay + timeRate
+        myScheduler.enter(delay,4,sendPath,argument=(path,client))
+        delay += 0.0001
+        #print(delay)
+    myScheduler.run()
+
+def sendFadeInOutDryWetValues(val,myClient): 
+     myclient.send_message("/pointArrival",0)
+"""
+
 
 
 if __name__ == "__main__":
@@ -465,6 +633,8 @@ if __name__ == "__main__":
     loadNodes(features)
     global dm
     dm = distMatrix(nodes)
+    #print("DMDMDMDM")
+    #print(dm)
     global maxC
     maxC = getMaxC()
     global notes
@@ -475,14 +645,24 @@ if __name__ == "__main__":
     for i in range(len(tm)):
         tm_sparse.append(scipy.sparse.csr_matrix(tm[i]))
     global interestNodes
-    interestNodes = [1013, 340, 1428, 1594]
+    #interestNodes = [1013, 340, 1428, 1594]  # [877, 73, 137, 1698]
+    #interestNodes = [877, 73, 137, 1698]
+    interestNodes = [715, 1676, 196, 1731]
     global interestNodes2
-    interestNodes2 = [1013, 340, 1428, 1594]
+    #interestNodes2 = [1013, 340, 1428, 1594]
+    #interestNodes2 = [877, 73, 137, 1698]
+    interestNodes2 = [715, 1676, 196, 1731]
     global interest_pol
     interest_pol = interestPlaces(interestNodes, maxC, notes, dm, tm_sparse)
     global steps
     steps = interestZonePaths()
-    
+    global nNodes
+    nNodes, nDist = nNearestNodes()
+
+    print("MAXDIST")
+    print(max(nDist[1]))
+    print("MINDIST")
+    print(min(nDist[1]))
     dispatcher = dispatcher.Dispatcher()
 
     imageMap = ImageToMap("assets/COLORMAPTEST.png",[(10.060950707625352,
@@ -499,11 +679,19 @@ if __name__ == "__main__":
     # dispatcher.map("/target",targetHandler)
     dispatcher.map("/reset", resetHandler)
     dispatcher.map("/currentNode", pathHandler)
+    dispatcher.map("/currentNodeFirst", firstPathHandler, [client,scheduler2])
     dispatcher.map("/currentNode", interestPathHandler)
-    dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
-    frase = "ciao"
+    dispatcher.map("/currentNode", synthHandler, [nDist,client2,nNodes, interestNodes2])
+    dispatcher.map("/currentNode", nNearestNodesHandler, [nNodes, interestNodes2,client,scheduler2,client2])
+    #dispatcher.map("/currentNode", interestNodeDistance,[interestNodes2,client2])
+    #dispatcher.map("/currentNode", goalHandler, [steps,interestNodes2,client, scheduler2])
     dispatcher.map("/currentNode", l_system.update_L_system, [nodes,client2,scheduler,endingTime,l_system_started,scheduler_started_time,axiom,snr,imageMap]) #function for updating l_system
     dispatcher.map("/reset", l_system.sendNoiseOn, [client2])
+    dispatcher.map("/fcVal", forwardOSCMessage, [client2])
+    dispatcher.map("/musicVol", forwardOSCMessage, [client2])
+    dispatcher.map("/synthAgit", forwardOSCMessage, [client2])
+    dispatcher.map("/scVol", forwardOSCMessage, [client2])
+    dispatcher.map("/grainVol", forwardOSCMessage, [client2])
     server = osc_server.ThreadingOSCUDPServer((args.ip, args.port), dispatcher)
     #print("These are the nodes")
     #print(nodes)
