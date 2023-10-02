@@ -11,8 +11,6 @@ The Soli Vagant artistic installation aims to create an interactive experience b
 
 ### Introduction Video
 
-## User Guide
-## Instructions
 ### Get started
 In order to start the experience: 
 1. Download the git repository
