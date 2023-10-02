@@ -1,6 +1,6 @@
 s.boot;
 Server.killAll;
-(
+/*(
 var samplePath = thisProcess.nowExecutingPath.dirname +/+ "/recordings";
 ~buf_r =Buffer.readChannel(s, samplePath +/+ "./CR_Duomo_Corner.WAV", channels:[1]);
 
@@ -9,13 +9,23 @@ var samplePath = thisProcess.nowExecutingPath.dirname +/+ "/recordings";
 ~c =Buffer.read(s, samplePath +/+ "/CR_MarketWalk.WAV");
 ~d =Buffer.read(s, samplePath +/+ "/CR_PStradivari_Corner.WAV");
 ~i =Buffer.read(s, samplePath +/+ "/InterestPoint.WAV");
-)
+)*/
 
 (
 s.waitForBoot({
 	var right, left,bass;
 	var n0, n1, n2;
 	var note_getter;
+
+	var samplePath = thisProcess.nowExecutingPath.dirname +/+ "/recordings";
+	~buf_r =Buffer.readChannel(s, samplePath +/+ "./CR_Duomo_Corner.WAV", channels:[1]);
+
+	~a =Buffer.read(s, samplePath +/+ "/CR_PRoma2.WAV");
+	~b =Buffer.read(s, samplePath +/+ "/CR_Duomo_Corner.WAV");
+	~c =Buffer.read(s, samplePath +/+ "/CR_MarketWalk.WAV");
+	~d =Buffer.read(s, samplePath +/+ "/CR_PStradivari_Corner.WAV");
+	~i =Buffer.read(s, samplePath +/+ "/InterestPoint.WAV");
+
 	~n1 = NetAddr.new("127.0.0.1",57120);
 	NetAddr.localAddr;
 	~note_table = 0!127;
@@ -51,9 +61,10 @@ s.waitForBoot({
 
 	SynthDef.new(\reverb,{
 		arg in, fcvalue=16000;
+		//diffusion=50, spacesize=30;
 		var d = in;
-		var diffusion = \diffusion.kr(50);
-		var spacesize = \spacesize.kr(30);
+		var diffusion = \diffusion.kr(80);
+		var spacesize = \spacesize.kr(50);
 		//var diffusion = \diffusion.kr(1);
 		//var spacesize = \spacesize.kr(1);
 		d = In.ar(d,1);
@@ -307,6 +318,7 @@ s.waitForBoot({
 
 		dw.postln;
 		~x.set('ampA',1 - msg[1],'ampB',1 - msg[2],'ampC',1 - msg[3],'ampD',1 - msg[4],'drywet',dw,'wetval',dw);
+		~r.set(\diffusion,dw.linlin(0,1,0.1,80).postln,\spacesize,dw.linlin(0,1,0.1,50).postln);
 
 	},
 	path:"/scMix"
@@ -317,6 +329,7 @@ s.waitForBoot({
 		postln("arrival of point ");
 		~v.run;
 		~v = Synth.newPaused(\interestPoint, [\out, [0,1], \bufnum, ~i]);
+		//~r.set(\diffusion,msg[1],\spacesize,msg[2]);
 	},
 	path:"/pointArrival"
 	);
@@ -467,3 +480,5 @@ s.freeAll;
 ~x.free;
 ~r.free;
 ~y.free;
+
+~r.set(\diffusion,80,\spacesize,50);
